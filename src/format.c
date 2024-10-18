@@ -1,6 +1,5 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
-#include <stdio.h>
 #include "headers/format.h"
 
 int	FLAG_HIDDEN = 0;

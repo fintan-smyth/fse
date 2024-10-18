@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <string.h>
 #include "headers/structs.h"
 #include "headers/utils.h"
 

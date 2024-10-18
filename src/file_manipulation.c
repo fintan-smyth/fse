@@ -1,9 +1,5 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-// #include "headers/utils.h"
 
 path_node	*copied;
 path_node	*cut;
