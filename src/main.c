@@ -296,7 +296,7 @@ int	main(void)
 		current->directory = get_directory(cwd_name);
 	}
 	printf("\e[2J\e[H");
-	print_copied(copied);
+	// print_copied(copied);
 	free_visited(VISITED_DIRS);
 	free_path_list(copied);
 	free_path_list(cut);
