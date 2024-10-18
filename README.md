@@ -10,3 +10,23 @@ Currently there is only basic fuctionality. You can navigate through the filesys
 
 ### Binds
 
+q	quit
+j	Select next
+k	Select previous
+h	Go to parent directory
+l	Open
+y	Copy selected
+x	Copy selected
+p	Paste selected
+D	Delete selected
+e	Open selected in editor
+E	Open current directory in editor
+:	Execute shell command
+H	Toggle hidden file visibility
+P	Toggle text file preview
+R	Reload directory
+?	Display this helpful page!
+
+## Building
+
+Simply clone this repository and run `make`. I think the only dependencies should be GCC and coreutils.
