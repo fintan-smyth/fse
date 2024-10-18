@@ -10,37 +10,37 @@ Currently there is only basic fuctionality. You can navigate through the filesys
 
 ### Binds
 
-q	quit
+q	- quit
 
-j	Select next
+j	- Select next
 
-k	Select previous
+k	- Select previous
 
-h	Go to parent directory
+h	- Go to parent directory
 
-l	Open
+l	- Open
 
-y	Copy selected
+y	- Copy selected
 
-x	Copy selected
+x	- Copy selected
 
-p	Paste selected
+p	- Paste selected
 
-D	Delete selected
+D	- Delete selected
 
-e	Open selected in editor
+e	- Open selected in editor
 
-E	Open current directory in editor
+E	- Open current directory in editor
 
-:	Execute shell command
+:	- Execute shell command
 
-H	Toggle hidden file visibility
+H	- Toggle hidden file visibility
 
-P	Toggle text file preview
+P	- Toggle text file preview
 
-R	Reload directory
+R	- Reload directory
 
-?	Display this helpful page!
+?	- Display this helpful page!
 
 ## Building
 
