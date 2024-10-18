@@ -204,6 +204,8 @@ int	navigate(vd_node *dir_node)
 			if (check_path(copied, buf) == 0)
 			{
 				insert_path_node(buf, copied);
+				if (check_path(cut, buf))
+					delete_path(buf, cut);
 			}
 			else {
 				delete_path(buf, copied);
@@ -218,6 +220,8 @@ int	navigate(vd_node *dir_node)
 			if (check_path(cut, buf) == 0)
 			{
 				insert_path_node(buf, cut);
+				if (check_path(copied, buf))
+					delete_path(buf, copied);
 			}
 			else {
 				delete_path(buf, cut);
