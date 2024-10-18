@@ -106,7 +106,7 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == 'p')
 		{
-			paste(copied, dir_node->dir_name);
+			paste(dir_node);
 			cleanup_directory(dir_node->directory);
 			free(buf);
 			return (0);

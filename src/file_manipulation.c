@@ -1,4 +1,5 @@
 #include "headers/structs.h"
+#include "headers/format.h"
 #include "headers/utils.h"
 
 path_node	*copied;
@@ -120,26 +121,78 @@ char	*get_file_name(char *path)
 	return (file_name);
 }
 
-void	paste(path_node *copied, char *directory)
+int	check_file_exists(vd_node *dir_node, char *path)
 {
+	char	*file_name;
+	entry_node *current = dir_node->directory->children->next;
+
+
+	file_name = get_file_name(path);
+	while (current != current->next)
+	{
+		if (strcmp(file_name, current->data->d_name) == 0)
+		{
+			free(file_name);
+			return (1);
+		}
+		current = current->next;
+	}
+	free(file_name);
+	return (0);
+}
+
+void	paste(vd_node *dir_node)
+{
+	path_node	*current;
 	char		command_buf[500];
 	char		*file_name;
+	char		c;
 
-	while (copied->next != copied->next->next)
+	current = copied;
+	while (current->next != current->next->next)
 	{
-		sprintf(command_buf, "cp -r %s %s", copied->next->path, directory);
+		if (check_file_exists(dir_node, current->next->path))
+		{
+			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, current->next->path);
+			if ((c = getchar()) != 'y')
+			{
+				current = current->next;
+				draw_box();
+				display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+				continue;
+			}
+			draw_box();
+			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
+		}
+		sprintf(command_buf, "cp -r %s %s", current->next->path, dir_node->dir_name);
 		system(command_buf);
 		memset(command_buf, 0, 500);
-		delete_next_path(copied);
+		delete_next_path(current);
 	}
-	while (cut->next != cut->next->next)
+	current = cut;
+	while (current->next != current->next->next)
 	{
-		file_name = get_file_name(cut->next->path);
-		construct_path(command_buf, directory, file_name);
-		rename(cut->next->path, command_buf);
+		if (check_file_exists(dir_node, current->next->path))
+		{
+			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, current->next->path);
+			if ((c = getchar()) != 'y')
+			{
+				current = current->next;
+				draw_box();
+				display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+				continue;
+			}
+			draw_box();
+			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
+		}
+		file_name = get_file_name(current->next->path);
+		construct_path(command_buf, dir_node->dir_name, file_name);
+		rename(current->next->path, command_buf);
 		memset(command_buf, 0, 500);
 		free(file_name);
-		delete_next_path(cut);
+		delete_next_path(current);
 	}
 }
 
