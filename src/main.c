@@ -1,6 +1,9 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
+#include <string.h>
+
+
 
 int	navigate(vd_node *dir_node)
 {
@@ -86,6 +89,9 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1mk\e[m\tSelect previous\n");
 			printf("\t\e[1mh\e[m\tGo to parent directory\n");
 			printf("\t\e[1ml\e[m\tOpen\n");
+			printf("\t\e[1my\e[m\tCopy selected\n");
+			printf("\t\e[1mx\e[m\tCopy selected\n");
+			printf("\t\e[1mp\e[m\tPaste selected\n");
 			printf("\t\e[1mD\e[m\tDelete selected\n");
 			printf("\t\e[1me\e[m\tOpen selected in editor\n");
 			printf("\t\e[1mE\e[m\tOpen current directory in editor\n");
@@ -95,6 +101,13 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1mR\e[m\tReload directory\n");
 			printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
 			getchar();
+			cleanup_directory(dir_node->directory);
+			free(buf);
+			return (0);
+		}
+		else if (c == 'p')
+		{
+			paste(copied, dir_node->dir_name);
 			cleanup_directory(dir_node->directory);
 			free(buf);
 			return (0);
@@ -185,6 +198,34 @@ int	navigate(vd_node *dir_node)
 			free(buf);
 			return (0);
 		}
+		else if (c == 'y')
+		{
+			construct_path(buf, dir_node->dir_name, selected->data->d_name);
+			if (check_path(copied, buf) == 0)
+			{
+				insert_path_node(buf, copied);
+			}
+			else {
+				delete_path(buf, copied);
+			}
+			cleanup_directory(dir_node->directory);
+			free(buf);
+			return (0);
+		}
+		else if (c == 'x')
+		{
+			construct_path(buf, dir_node->dir_name, selected->data->d_name);
+			if (check_path(cut, buf) == 0)
+			{
+				insert_path_node(buf, cut);
+			}
+			else {
+				delete_path(buf, cut);
+			}
+			cleanup_directory(dir_node->directory);
+			free(buf);
+			return (0);
+		}
 		else if (c == 'D')
 		{
 			if (selected->data->d_type != DT_SOCK)
@@ -241,6 +282,8 @@ int	main(void)
 	vd_node			*current;
 	
 	VISITED_DIRS = init_visited();
+	copied = init_path_list();
+	cut = init_path_list();
 	set_term_settings();
 	atexit(reset_term_settings);
 	getcwd(cwd_name, size);
@@ -253,6 +296,9 @@ int	main(void)
 		current->directory = get_directory(cwd_name);
 	}
 	printf("\e[2J\e[H");
+	print_copied(copied);
 	free_visited(VISITED_DIRS);
+	free_path_list(copied);
+	free_path_list(cut);
 	free(cwd_name);
 }

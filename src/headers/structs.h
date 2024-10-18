@@ -11,6 +11,11 @@ typedef struct entry_node
 	int				pos;
 } entry_node;
 
+typedef struct path_node
+{
+	struct path_node	*next;
+	char				*path;
+} path_node;
 
 struct	directory
 {
@@ -32,8 +37,8 @@ extern vd_node *VISITED_DIRS;
 entry_node	*init_list(void);
 entry_node	*insertafter(struct dirent *data, entry_node *t);
 entry_node	*get_selected(vd_node *dir_node);
-void    	deletenext(entry_node *t);
-void    	free_list(entry_node *head);
+void    	delete_next_entry(entry_node *t);
+void    	free_entries(entry_node *head);
 void    	print_ll(entry_node *head);
 void		swap_adj_nodes(entry_node *a, entry_node *b);
 void		swap_distant_nodes(entry_node *a, entry_node *b);
@@ -52,5 +57,19 @@ vd_node				*get_parent(vd_node *dir_node);
 void				cleanup_directory(struct directory *directory);
 void				free_visited(vd_node *head);
 int					check_visited(vd_node *visited, char *dir_name);
+
+extern path_node	*copied;
+extern path_node	*cut;
+
+path_node	*init_path_list(void);
+path_node	*insert_path_node(char *path, path_node *t);
+void		delete_next_path(path_node *t);
+void		free_path_list(path_node *head);
+int			check_path(path_node *copied, char *path);
+int			delete_path(char *path, path_node *head);
+char		*construct_path(char *buf, char *directory, char *file_name);
+char		*get_file_name(char *path);
+void		paste(path_node *copied, char *directory);
+void		print_copied(path_node *copied);
 
 #endif // !STRUCTS_H_

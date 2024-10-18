@@ -54,7 +54,7 @@ int	check_visited(vd_node *visited, char *dir_name)
 
 void	cleanup_directory(struct directory *directory)
 {
-	free_list(directory->children);
+	free_entries(directory->children);
 	closedir(directory->dir);
 	free(directory);
 	directory = NULL;
@@ -79,7 +79,7 @@ struct directory	*get_directory(char *dir_name)
 	if (dir == NULL)
 	{
 		free(directory);
-		free_list(head);
+		free_entries(head);
 		return (NULL);
 	}
 	while ((child = readdir(dir)) != NULL)
@@ -90,14 +90,14 @@ struct directory	*get_directory(char *dir_name)
 	while (current->next != current->next->next)
 	{
 		if (!str_printable(current->next->data->d_name))
-			deletenext(current);
+			delete_next_entry(current);
 		else if (current->next->data->d_type < 4 || current->next->data->d_type > 10)
-			deletenext(current);
+			delete_next_entry(current);
 		else if (strncmp(current->next->data->d_name, ".", 1) == 0)
 		{
 			if (FLAG_HIDDEN == 0)
 			{
-				deletenext(current);
+				delete_next_entry(current);
 				continue;
 			}
 			current = current->next;

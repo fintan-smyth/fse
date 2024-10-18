@@ -1,5 +1,6 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
+#include <stdio.h>
 #include "headers/format.h"
 
 int	FLAG_HIDDEN = 0;
@@ -18,12 +19,17 @@ void	colour_entry(entry_node *entry)
 			break;
 		case DT_REG:
 			if (get_extension(ext_buf, entry->data->d_name) == NULL)
+			{
+				printf("\e[39m");
 				break;
+			}
 			else if (strcmp(ext_buf, "mp4") == 0
 					|| strcmp(ext_buf, "mkv") == 0
 					// || strcmp(ext_buf, "") == 0
 				)
 				printf("\e[36m");
+			else
+				printf("\e[39m");
 			break;
 		default:
 			printf("\e[39m");
@@ -31,10 +37,11 @@ void	colour_entry(entry_node *entry)
 	}
 }
 
-void	format_entry(entry_node *current, entry_node *selected, int level)
+void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level)
 {
-	int	offset;
-	int	box_width;
+	char	buf[500] = {0};
+	int		offset;
+	int		box_width;
 
 	switch (level) {
 		case 0:
@@ -69,9 +76,14 @@ void	format_entry(entry_node *current, entry_node *selected, int level)
 		default :
 			break;
 	}
-	printf("%.*s", box_width, current->data->d_name);
+	printf("%.*s", box_width - 1, current->data->d_name);
+	construct_path(buf, dir_node->dir_name, current->data->d_name);
+	if (check_path(copied, buf))
+		printf("\e[m\e[33m*\e[m");
+	if (check_path(cut, buf))
+		printf("\e[m\e[31m*\e[m");
 	if (my_strlen(current->data->d_name) > box_width)
-		printf("%c", '~');
+		printf("~");
 }
 
 void	print_entries(vd_node *dir_node, entry_node *selected, int level)
@@ -126,7 +138,7 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 	printf("\e[3;1H");
 	while ((current != current->next) && current->pos <= max + offset)
 	{
-		format_entry(current, selected, level);
+		format_entry(dir_node, current, selected, level);
 		printf("\n\e[m");
 		current = current->next;
 	}

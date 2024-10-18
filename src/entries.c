@@ -21,7 +21,7 @@ entry_node *init_list(void)
     return (head);
 }
 
-void    deletenext(entry_node *t)
+void    delete_next_entry(entry_node *t)
 {
     entry_node *temp;
     temp = t->next;
@@ -43,7 +43,7 @@ entry_node *insertafter(struct dirent *data, entry_node *t)
 	return (new);
 }
 
-void    free_list(entry_node *head)
+void    free_entries(entry_node *head)
 {
     entry_node	*current;
     entry_node	*temp;
