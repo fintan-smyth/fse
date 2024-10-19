@@ -29,6 +29,7 @@ vd_node	*vd_insert(vd_node *visited, char *dir_name)
 	new->next = visited->next;
 	visited->next = new;
 	new->directory = NULL;
+	memset(new->search_term, 0, 255);
 	new->dir_name = strdup(dir_name);
 	new->selected_name = malloc(1 * sizeof(char));
 	memset(new->selected_name, 0, 1 * sizeof(char));
@@ -50,12 +51,13 @@ int	check_visited(vd_node *visited, char *dir_name)
 	return (0);
 }
 
-void	cleanup_directory(struct directory *directory)
+void	cleanup_directory(vd_node *dir_node)
 {
-	free_entries(directory->children);
-	closedir(directory->dir);
-	free(directory);
-	directory = NULL;
+	free_entries(dir_node->directory->children);
+	closedir(dir_node->directory->dir);
+	free(dir_node->directory);
+	memset(dir_node->search_term, 0, 255);
+	dir_node->directory = NULL;
 }
 
 struct directory	*get_directory(char *dir_name)
@@ -174,3 +176,4 @@ vd_node	*get_parent(vd_node *dir_node)
 	}
 	return (parent);
 }
+

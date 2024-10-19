@@ -30,6 +30,7 @@ typedef struct vd_node
 	int					offset;
 	char				*dir_name;
 	char				*selected_name;
+	char				search_term[255];
 } vd_node;
 
 extern vd_node *VISITED_DIRS;
@@ -37,6 +38,7 @@ extern vd_node *VISITED_DIRS;
 entry_node	*init_list(void);
 entry_node	*insertafter(struct dirent *data, entry_node *t);
 entry_node	*get_selected(vd_node *dir_node);
+entry_node	*get_search_match(vd_node *dir_node);
 void    	delete_next_entry(entry_node *t);
 void    	free_entries(entry_node *head);
 void    	print_ll(entry_node *head);
@@ -54,7 +56,7 @@ vd_node				*init_visited(void);
 vd_node				*vd_insert(vd_node *visited, char *dir_name);
 vd_node				*get_vd_node(vd_node *visited, char *path);
 vd_node				*get_parent(vd_node *dir_node);
-void				cleanup_directory(struct directory *directory);
+void				cleanup_directory(vd_node *dir_node);
 void				free_visited(vd_node *head);
 int					check_visited(vd_node *visited, char *dir_name);
 

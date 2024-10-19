@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
+#include <string.h>
 
 
 
@@ -9,16 +10,20 @@ int	navigate(vd_node *dir_node)
 	char				*buf = malloc(500 * sizeof(char));
 	char				*editor = getenv("EDITOR");
 	char				*pager = getenv("PAGER");
+	char 				*searchp;
 	entry_node			*children;
 	vd_node				*parent;
 	entry_node			*selected;
+	entry_node			*search_result;
 	char				c;
+	char				s;
 
 	children = dir_node->directory->children;
 	parent = get_parent(dir_node);
 	selected = get_selected(dir_node);
 	set_winsize();
 	draw_box();
+	clear_gutter();
 	display_directory(dir_node, selected, parent);
 	while ((c = getchar()) != 'q')
 	{
@@ -26,7 +31,7 @@ int	navigate(vd_node *dir_node)
 		if (c == 'h')
 		{
 			chdir("..");
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
@@ -38,21 +43,21 @@ int	navigate(vd_node *dir_node)
 				sprintf(buf, "%s %s", editor, ".");
 			system(buf);
 			set_term_settings();
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
 		else if (c == 'H')
 		{
 			FLAG_HIDDEN = !FLAG_HIDDEN;
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
 		else if (c == 'P')
 		{
 			FLAG_PREVIEW = !FLAG_PREVIEW;
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
@@ -68,14 +73,14 @@ int	navigate(vd_node *dir_node)
 			system(buf);
 			set_term_settings();
 			c = getchar();
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
 		else if (c == 'R')
 		{
 			// refresh_dir(dir_node);
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
@@ -95,19 +100,22 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1me\e[m\tOpen selected in editor\n");
 			printf("\t\e[1mE\e[m\tOpen current directory in editor\n");
 			printf("\t\e[1m:\e[m\tExecute shell command\n");
+			printf("\t\e[1m/\e[m\tSearch in directory\n");
+			printf("\t\e[1mn\e[m\tNext search result\n");
+			printf("\t\e[1mN\e[m\tPrevious search result\n");
 			printf("\t\e[1mH\e[m\tToggle hidden file visibility\n");
 			printf("\t\e[1mP\e[m\tToggle text file preview\n");
 			printf("\t\e[1mR\e[m\tReload directory\n");
 			printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
 			getchar();
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
 		else if (c == 'p')
 		{
 			paste(dir_node);
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
@@ -140,12 +148,43 @@ int	navigate(vd_node *dir_node)
 			free(dir_node->selected_name); 
 			dir_node->selected_name = strdup(selected->data->d_name);
 		}
+		else if (c == 'n')
+		{
+			if (*dir_node->search_term != 0)
+			{
+				do {
+					selected = selected->next;
+					if (selected == selected->next)
+						selected = children->next;
+					free(dir_node->selected_name); 
+					dir_node->selected_name = strdup(selected->data->d_name);
+				}
+				while (strcasestr(selected->data->d_name, dir_node->search_term) == NULL);
+			}
+		}
+		else if (c == 'N')
+		{
+			if (*dir_node->search_term != 0)
+			{
+				do {
+					selected = selected->prev;
+					if (selected == selected->prev)
+					{
+						while (selected->next != selected->next->next)
+							selected = selected->next;
+					}
+					free(dir_node->selected_name); 
+					dir_node->selected_name = strdup(selected->data->d_name);
+				}
+				while (strcasestr(selected->data->d_name, dir_node->search_term) == NULL);
+			}
+		}
 		else if (c == 'l')
 		{
 			if (selected->data->d_type == DT_DIR)
 			{
 				chdir(selected->data->d_name);
-				cleanup_directory(dir_node->directory);
+				cleanup_directory(dir_node);
 				free(buf);
 				return (0);
 			}
@@ -154,7 +193,7 @@ int	navigate(vd_node *dir_node)
 				if (readlink(selected->data->d_name, buf, 500) != -1)
 				{
 					chdir(buf);
-					cleanup_directory(dir_node->directory);
+					cleanup_directory(dir_node);
 					free(buf);
 					return (0);
 				}
@@ -162,25 +201,28 @@ int	navigate(vd_node *dir_node)
 			else if (selected->data->d_type == DT_REG)
 			{
 				char	ext_buf[10];
-				if (get_extension(ext_buf, selected->data->d_name) == NULL)
+				if (get_extension(ext_buf, selected->data->d_name) != NULL)
 			 	{
-					if (pager == NULL)
-						sprintf(buf, "%s %s", "less", selected->data->d_name);
-					else if (strncmp(pager, "bat", 3) == 0)
-						sprintf(buf, "%s %s", "bat --paging=always", selected->data->d_name);
-					else
-						sprintf(buf, "%s %s", pager, selected->data->d_name);
-					system(buf);
+					if (strcmp(ext_buf, "mp4") == 0
+							|| strcmp(ext_buf, "mkv") == 0
+							// || strcmp(ext_buf, "") == 0
+						)
+					{
+						sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->data->d_name);
+						system(buf);
+						cleanup_directory(dir_node);
+						free(buf);
+						return (0);
+					}
 				}
-				else if (strcmp(ext_buf, "mp4") == 0
-						|| strcmp(ext_buf, "mkv") == 0
-						// || strcmp(ext_buf, "") == 0
-					)
-				{
-					sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->data->d_name);
-					system(buf);
-				}
-				cleanup_directory(dir_node->directory);
+				if (pager == NULL)
+					sprintf(buf, "%s %s", "less", selected->data->d_name);
+				else if (strncmp(pager, "bat", 3) == 0)
+					sprintf(buf, "%s %s", "bat --paging=always", selected->data->d_name);
+				else
+					sprintf(buf, "%s %s", pager, selected->data->d_name);
+				system(buf);
+				cleanup_directory(dir_node);
 				free(buf);
 				return (0);
 			}
@@ -193,7 +235,7 @@ int	navigate(vd_node *dir_node)
 				sprintf(buf, "%s %s", editor, selected->data->d_name);
 			system(buf);
 			set_term_settings();
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
@@ -209,7 +251,7 @@ int	navigate(vd_node *dir_node)
 			else {
 				delete_path(buf, copied);
 			}
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
@@ -225,9 +267,37 @@ int	navigate(vd_node *dir_node)
 			else {
 				delete_path(buf, cut);
 			}
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
+		}
+		else if (c == '/')
+		{
+			// set_term_input();
+			reset_term_settings();
+			printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", TERM_ROWS, (SEP_2) - 6, "");
+			memset(dir_node->search_term, 0, 255);
+			searchp = dir_node->search_term;
+			while ((s = getchar()) != '\n')
+			{
+				*searchp++ = s;
+				// display_directory(dir_node, selected, parent);
+			}
+			*searchp++ = 0;
+			set_term_settings();
+			if ((search_result = get_search_match(dir_node)) != NULL)
+				selected = search_result;
+			else
+			{
+				cleanup_directory(dir_node);
+				free(buf);
+				return (0);
+			}
+			draw_box();
+			clear_gutter();
+			// cleanup_directory(dir_node);
+			// free(buf);
+			// return (0);
 		}
 		else if (c == 'D')
 		{
@@ -267,13 +337,13 @@ int	navigate(vd_node *dir_node)
 					}
 				}
 			}
-			cleanup_directory(dir_node->directory);
+			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
 		}
 		display_directory(dir_node, selected, parent);
 	}
-	cleanup_directory(dir_node->directory);
+	cleanup_directory(dir_node);
 	free(buf);
 	return (1);
 }

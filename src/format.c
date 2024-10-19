@@ -1,5 +1,6 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
+#include <string.h>
 #include "headers/format.h"
 
 int	FLAG_HIDDEN = 0;
@@ -39,28 +40,29 @@ void	colour_entry(entry_node *entry)
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level)
 {
 	char	buf[500] = {0};
+	char	*found;
 	int		offset;
 	int		box_width;
 
 	switch (level) {
 		case 0:
-			offset = (SEP_1);
+			offset = SEP_1 + 2;
 			break;
 		case 1:
-			offset = SEP_2;
+			offset = SEP_2 + 2;
 			break;
 		case -1:
-			offset = 0;
+			offset = 2;
 			break;
 		default :
 			break;
 	}
 	printf("\e[%dG", offset);
 	colour_entry(current);
-	printf("\e[2C");
 	if (current == selected)
 	{
 		printf("\e[1;7m");
+		// printf("\e[41m");
 	}
 	switch (level) {
 		case 0:
@@ -76,6 +78,9 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 			break;
 	}
 	printf("%.*s", box_width - 1, current->data->d_name);
+	found = strcasestr(current->data->d_name, dir_node->search_term);
+	if (found != NULL && *dir_node->search_term != 0)
+		printf("\e[31m\e[%dG%s", offset + (int)(found - current->data->d_name), dir_node->search_term);
 	construct_path(buf, dir_node->dir_name, current->data->d_name);
 	if (check_path(copied, buf))
 		printf("\e[m\e[33m*\e[m");
@@ -90,7 +95,7 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 	entry_node			*head;
 	entry_node			*current;
 	int				offset;
-	int 			max = TERM_ROWS - 3;
+	int 			max = TERM_ROWS - 4;
 
 	head = dir_node->directory->children;
 	if (head->next == head->next->next)
@@ -159,7 +164,7 @@ void	display_subdirectory(entry_node *selected, char *path)
 	}
 	selected_sub = get_selected(current);
 	print_entries(current, selected_sub, 1);
-	cleanup_directory(current->directory);
+	cleanup_directory(current);
 }
 
 void	display_parent(vd_node *dir_node, vd_node *parent)
@@ -174,7 +179,7 @@ void	display_parent(vd_node *dir_node, vd_node *parent)
 	parent->directory = get_directory(parent->dir_name);
 	selected = get_selected(parent);
 	print_entries(parent, selected, -1);
-	cleanup_directory(parent->directory);
+	cleanup_directory(parent);
 }
 
 
@@ -193,7 +198,7 @@ void	preview_text(entry_node *file)
 		return;
 	}
 	printf("\e[3;1H");
-	while (line_no < TERM_ROWS - 1 && (getline(&line, &size, fp)) != -1)
+	while (line_no < TERM_ROWS - 2 && (getline(&line, &size, fp)) != -1)
 	{
 		if (strlen(line) > 0)
 			line[strlen(line) - 1] = '\0';

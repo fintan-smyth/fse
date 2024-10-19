@@ -10,11 +10,13 @@ extern int	SEP_2;
 
 void	set_winsize(void);
 void	set_term_settings(void);
+void	set_term_input(void);
 void	reset_term_settings(void);
 void	draw_box(void);
 void	clear_main_box(void);
 void	clear_parent_box(void);
 void	clear_sub_box(void);
+void	clear_gutter(void);
 
 extern int	FLAG_HIDDEN;
 extern int	FLAG_PREVIEW;

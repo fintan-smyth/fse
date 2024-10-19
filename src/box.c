@@ -31,6 +31,17 @@ void	set_term_settings(void)
 	printf("\e[?25l");
 }
 
+void	set_term_input(void)
+{
+	struct termios term;
+
+	set_winsize();
+    tcgetattr(fileno(stdin), &term);
+    term.c_lflag |= ECHO;
+    tcsetattr(fileno(stdin), TCSANOW, &term);
+	printf("\e[?25l");
+}
+
 void	reset_term_settings(void)
 {
 	struct termios term;
@@ -47,13 +58,13 @@ void	draw_box(void)
 
 	printf("\e[2J\e[H");
 	y = 1;
-	while (y <= TERM_ROWS)
+	while (y <= TERM_ROWS - 1)
 	{
 		x = 1;
 		while (x <= TERM_COLS)
 		{
 			printf("\e[%d;%dH", y, x);
-			if (y == 2 || y == TERM_ROWS || ((y == 1) && (x < SEP_2)))
+			if (y == 2 || y == TERM_ROWS - 1 || ((y == 1) && (x < SEP_2)))
 				printf("%s", "─");
 			else if (y != 1 && (x == 1 || x == TERM_COLS || x == SEP_1))
 				printf("%s", "│");
@@ -67,13 +78,13 @@ void	draw_box(void)
 	}
 	printf("\e[;1H╭");
 	printf("\e[2;%dH┐\e[1;%dH╮", TERM_COLS, (SEP_2));
-	printf("\e[%d;1H└", TERM_ROWS);
-	printf("\e[%d;%dH┘", TERM_ROWS, TERM_COLS);
+	printf("\e[%d;1H├", TERM_ROWS - 1);
+	printf("\e[%d;%dH┤", TERM_ROWS - 1, TERM_COLS);
 	printf("\e[2;%dH┬", (SEP_1));
 	printf("\e[2;%dH┼", (SEP_2));
 	printf("\e[2;1H├");
-	printf("\e[%d;%dH┴", TERM_ROWS, (SEP_1));
-	printf("\e[%d;%dH┴", TERM_ROWS, SEP_2);
+	printf("\e[%d;%dH┴", TERM_ROWS - 1, (SEP_1));
+	printf("\e[%d;%dH┴", TERM_ROWS - 1, SEP_2);
 }
 
 void	clear_main_box(void)
@@ -81,7 +92,7 @@ void	clear_main_box(void)
 	int	x, y;
 
 	y = 3;
-	while (y < TERM_ROWS)
+	while (y < TERM_ROWS - 1)
 	{
 		x = (SEP_1) + 1;
 		while (x < (SEP_2))
@@ -98,7 +109,7 @@ void	clear_parent_box(void)
 	int	x, y;
 
 	y = 3;
-	while (y < TERM_ROWS)
+	while (y < TERM_ROWS - 1)
 	{
 		x = 3;
 		while (x < (SEP_1))
@@ -119,9 +130,20 @@ void	clear_sub_box(void)
 	width = (TERM_COLS - SEP_2) - 2;
 	start = SEP_2 + 2;
 	row = 3;
-	while (row < TERM_ROWS)
+	while (row < TERM_ROWS - 1)
 	{
 		printf("\e[%d;%dH%*s", row, start, width, "");
 		row++;
 	}
+}
+
+void	clear_gutter(void)
+{
+	int	i;
+	
+	printf("\e[%d;1H╰", TERM_ROWS);
+	i = 2;
+	while (i++ < TERM_COLS)
+		printf("─");
+	printf("╯");
 }

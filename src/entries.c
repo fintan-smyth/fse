@@ -233,3 +233,29 @@ entry_node	*get_selected(vd_node *dir_node)
 	dir_node->selected_name = strdup(selected->data->d_name);
 	return (selected);
 }
+
+entry_node	*get_search_match(vd_node *dir_node)
+{
+	entry_node	*children;
+	entry_node	*current;
+
+	children = dir_node->directory->children;
+	current = children->next;
+	if (children->next == children->next->next)
+		return (NULL);
+	if (*(dir_node->search_term) != 0)
+	{
+		while (strcasestr(current->data->d_name, dir_node->search_term) == NULL)
+		{
+			current = current->next;
+			if (current == current->next)
+			{
+				return (NULL);
+			}
+		}
+		free(dir_node->selected_name);
+		dir_node->selected_name = strdup(current->data->d_name);
+		return (current);
+	}
+	return (NULL);
+}
