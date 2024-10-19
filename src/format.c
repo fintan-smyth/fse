@@ -12,10 +12,10 @@ void	colour_entry(entry_node *entry)
 
 	switch (entry->data->d_type) {
 		case DT_DIR:
-			printf("\e[34m");
+			printf("\e[1;34m");
 			break;
 		case DT_LNK:
-			printf("\e[32m");
+			printf("\e[1;32m");
 			break;
 		case DT_REG:
 			if ((ext_buf = get_extension(entry->data->d_name)) == NULL)
@@ -77,15 +77,15 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	}
 	printf("%.*s", box_width - 1, current->data->d_name);
 	found = strcasestr(current->data->d_name, dir_node->search_term);
-	if (found != NULL && *dir_node->search_term != 0)
-		printf("\e[31m\e[%dG%s", offset + (int)(found - current->data->d_name), dir_node->search_term);
 	construct_path(buf, dir_node->dir_name, current->data->d_name);
+	if (my_strlen(current->data->d_name) > box_width)
+		printf("~");
 	if (check_path(copied, buf))
 		printf("\e[m\e[33m*\e[m");
 	if (check_path(cut, buf))
 		printf("\e[m\e[31m*\e[m");
-	if (my_strlen(current->data->d_name) > box_width)
-		printf("~");
+	if (found != NULL && *dir_node->search_term != 0)
+		printf("\e[%sm\e[%dG%s", current == selected ? "7;41" : "1;31", offset + (int)(found - current->data->d_name), dir_node->search_term);
 }
 
 void	print_entries(vd_node *dir_node, entry_node *selected, int level)

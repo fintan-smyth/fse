@@ -251,10 +251,11 @@ int	navigate(vd_node *dir_node)
 			}
 			else {
 				delete_path(buf, copied);
+				clear_main_box();
 			}
-			cleanup_directory(dir_node);
-			free(buf);
-			return (0);
+			// cleanup_directory(dir_node);
+			// free(buf);
+			// return (0);
 		}
 		else if (c == 'x')
 		{
@@ -267,10 +268,11 @@ int	navigate(vd_node *dir_node)
 			}
 			else {
 				delete_path(buf, cut);
+				clear_main_box();
 			}
-			cleanup_directory(dir_node);
-			free(buf);
-			return (0);
+			// cleanup_directory(dir_node);
+			// free(buf);
+			// return (0);
 		}
 		else if (c == '/')
 		{

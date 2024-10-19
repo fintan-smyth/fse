@@ -165,7 +165,7 @@ void	paste(vd_node *dir_node)
 			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
 			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
 		}
-		sprintf(command_buf, "cp -r %s %s", current->next->path, dir_node->dir_name);
+		sprintf(command_buf, "cp -r \"%s\" %s", current->next->path, dir_node->dir_name);
 		system(command_buf);
 		memset(command_buf, 0, 500);
 		delete_next_path(current);
