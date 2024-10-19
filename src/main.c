@@ -276,16 +276,12 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == '/')
 		{
-			// set_term_input();
 			reset_term_settings();
-			printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", TERM_ROWS, (SEP_2) - 6, "");
+			printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
 			memset(dir_node->search_term, 0, 255);
 			searchp = dir_node->search_term;
 			while ((s = getchar()) != '\n')
-			{
 				*searchp++ = s;
-				// display_directory(dir_node, selected, parent);
-			}
 			*searchp++ = 0;
 			set_term_settings();
 			if ((search_result = get_search_match(dir_node)) != NULL)
@@ -298,9 +294,7 @@ int	navigate(vd_node *dir_node)
 			}
 			draw_box();
 			clear_gutter();
-			// cleanup_directory(dir_node);
-			// free(buf);
-			// return (0);
+			printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", TERM_ROWS, (SEP_2) - 6, dir_node->search_term);
 		}
 		else if (c == 'D')
 		{
