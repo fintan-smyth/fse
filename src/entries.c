@@ -155,7 +155,7 @@ int	comp_entries(entry_node *a, entry_node *b)
 
 	if (type_comp > 0)
 		return (1);
-	else if (type_comp == 0 && (strcmp(a->data->d_name, b->data->d_name) < 0))
+	else if (type_comp == 0 && (strcasecmp(a->data->d_name, b->data->d_name) < 0))
 		return (1);
 	return (0);
 }
