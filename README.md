@@ -34,6 +34,12 @@ E	- Open current directory in editor
 
 :	- Execute shell command
 
+/ - Search in directory
+
+n - Next search result
+
+N - Previous Search result
+
 H	- Toggle hidden file visibility
 
 P	- Toggle text file preview
