@@ -64,7 +64,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == ':')
 		{
 			reset_term_settings();
-			printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", TERM_ROWS, (SEP_2) - 6, "");
+			printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
 			char *bufp = buf;
 			while ((c = getchar()) != '\n')
 				*(bufp++) = c;
@@ -72,7 +72,7 @@ int	navigate(vd_node *dir_node)
 			fflush(stdout);
 			system(buf);
 			set_term_settings();
-			c = getchar();
+			// c = getchar();
 			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
