@@ -85,7 +85,7 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	if (check_path(cut, buf))
 		printf("\e[m\e[31m*\e[m");
 	if (found != NULL && *dir_node->search_term != 0)
-		printf("\e[%sm\e[%dG%.*s", current == selected ? "7;41" : "1;31", offset + (int)(found - current->data->d_name), my_strlen(dir_node->search_term), found);
+		printf("\e[%sm\e[%dG%s", current == selected ? "7;41" : "1;31", offset + (int)(found - current->data->d_name), dir_node->search_term);
 }
 
 void	print_entries(vd_node *dir_node, entry_node *selected, int level)
