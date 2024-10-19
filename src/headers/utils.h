@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-char	*get_extension(char *ext_buf, char *file_name);
+char	*get_extension(char *file_name);
 char	*replace_tab(char *string, size_t size);
 int		my_strlen(char *s);
 int		str_printable(char *s);

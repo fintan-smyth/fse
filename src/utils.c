@@ -12,16 +12,17 @@ int	str_printable(char *s)
 	return (1);
 }
 
-char	*get_extension(char *ext_buf, char *file_name)
+char	*get_extension(char *file_name)
 {
 	int		i;
+	char	*ext_buf;
 
 	i = strlen(file_name) - 1;
 	while (i > 0 && file_name[i] != '.')
 		i--;
 	if (i == 0)
 		return NULL;
-	strcpy(ext_buf, &file_name[i + 1]);
+	ext_buf = strdup(&file_name[i + 1]);
 	return (ext_buf);
 }
 

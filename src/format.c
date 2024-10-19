@@ -8,7 +8,7 @@ int	FLAG_PREVIEW = 1;
 
 void	colour_entry(entry_node *entry)
 {
-	char	ext_buf[10];
+	char	*ext_buf;
 
 	switch (entry->data->d_type) {
 		case DT_DIR:
@@ -18,11 +18,8 @@ void	colour_entry(entry_node *entry)
 			printf("\e[32m");
 			break;
 		case DT_REG:
-			if (get_extension(ext_buf, entry->data->d_name) == NULL)
-			{
+			if ((ext_buf = get_extension(entry->data->d_name)) == NULL)
 				printf("\e[39m");
-				break;
-			}
 			else if (strcmp(ext_buf, "mp4") == 0
 					|| strcmp(ext_buf, "mkv") == 0
 					// || strcmp(ext_buf, "") == 0
@@ -30,6 +27,7 @@ void	colour_entry(entry_node *entry)
 				printf("\e[36m");
 			else
 				printf("\e[39m");
+			free(ext_buf);
 			break;
 		default:
 			printf("\e[39m");
@@ -52,7 +50,7 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 			offset = SEP_2 + 2;
 			break;
 		case -1:
-			offset = 2;
+			offset = 3;
 			break;
 		default :
 			break;

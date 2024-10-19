@@ -200,8 +200,8 @@ int	navigate(vd_node *dir_node)
 			}
 			else if (selected->data->d_type == DT_REG)
 			{
-				char	ext_buf[10];
-				if (get_extension(ext_buf, selected->data->d_name) != NULL)
+				char	*ext_buf;
+				if ((ext_buf = get_extension(selected->data->d_name)) != NULL)
 			 	{
 					if (strcmp(ext_buf, "mp4") == 0
 							|| strcmp(ext_buf, "mkv") == 0
@@ -212,6 +212,7 @@ int	navigate(vd_node *dir_node)
 						system(buf);
 						cleanup_directory(dir_node);
 						free(buf);
+						free(ext_buf);
 						return (0);
 					}
 				}
