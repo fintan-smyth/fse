@@ -38,18 +38,22 @@ void	colour_entry(entry_node *entry)
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level)
 {
 	char	buf[500] = {0};
-	char	*found;
+	char	*search_term_start;
 	int		offset;
 	int		box_width;
+	int		remaining_space;
 
 	switch (level) {
 		case 0:
 			offset = SEP_1 + 2;
+			box_width = (SEP_2 - SEP_1) - 3;
 			break;
 		case 1:
+			box_width = (TERM_COLS - SEP_2) - 3;
 			offset = SEP_2 + 2;
 			break;
 		case -1:
+			box_width = SEP_1 - 4;
 			offset = 3;
 			break;
 		default :
@@ -60,32 +64,21 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	if (current == selected)
 	{
 		printf("\e[1;7m");
-		// printf("\e[41m");
-	}
-	switch (level) {
-		case 0:
-			box_width = (SEP_2 - SEP_1) - 3;
-			break;
-		case 1:
-			box_width = (TERM_COLS - SEP_2) - 3;
-			break;
-		case -1:
-			box_width = SEP_1 - 4;
-			break;
-		default :
-			break;
 	}
 	printf("%.*s", box_width - 1, current->data->d_name);
-	found = strcasestr(current->data->d_name, dir_node->search_term);
+	remaining_space = box_width - my_strlen(current->data->d_name);
+	if (remaining_space > 0)
+		printf("%*s", box_width - my_strlen(current->data->d_name), " ");
+	search_term_start = strcasestr(current->data->d_name, dir_node->search_term);
 	construct_path(buf, dir_node->dir_name, current->data->d_name);
 	if (my_strlen(current->data->d_name) > box_width)
 		printf("~");
 	if (check_path(copied, buf))
-		printf("\e[m\e[33m*\e[m");
+		printf("\e[%dG\e[m\e[33m*\e[m", offset - 1);
 	if (check_path(cut, buf))
-		printf("\e[m\e[31m*\e[m");
-	if (found != NULL && *dir_node->search_term != 0)
-		printf("\e[%sm\e[%dG%.*s", current == selected ? "7;41" : "1;31", offset + (int)(found - current->data->d_name), my_strlen(dir_node->search_term), found);
+		printf("\e[%dG\e[m\e[31m*\e[m", offset - 1);
+	if (search_term_start != NULL && *dir_node->search_term != 0)
+		printf("\e[%sm\e[%dG%.*s", current == selected ? "7;41" : "1;31", offset + (int)(search_term_start - current->data->d_name), my_strlen(dir_node->search_term), search_term_start);
 }
 
 void	print_entries(vd_node *dir_node, entry_node *selected, int level)
