@@ -89,35 +89,33 @@ void	draw_box(void)
 
 void	clear_main_box(void)
 {
-	int	x, y;
+	int	row;
+	int	width;
+	int	start;
 
-	y = 3;
-	while (y < TERM_ROWS - 1)
+	width = (SEP_2 - SEP_1) - 1;
+	start = SEP_1 + 1;
+	row = 3;
+	while (row < TERM_ROWS - 1)
 	{
-		x = (SEP_1) + 1;
-		while (x < (SEP_2))
-		{
-			printf("\e[%d;%dH ", y, x);
-			x++;
-		}
-		y++;
+		printf("\e[%d;%dH%*s", row, start, width, "");
+		row++;
 	}
 }
 
 void	clear_parent_box(void)
 {
-	int	x, y;
+	int	row;
+	int	width;
+	int	start;
 
-	y = 3;
-	while (y < TERM_ROWS - 1)
+	width = SEP_1 - 2;
+	start = 2;
+	row = 3;
+	while (row < TERM_ROWS - 1)
 	{
-		x = 3;
-		while (x < (SEP_1))
-		{
-			printf("\e[%d;%dH ", y, x);
-			x++;
-		}
-		y++;
+		printf("\e[%d;%dH%*s", row, start, width, "");
+		row++;
 	}
 }
 
@@ -127,8 +125,8 @@ void	clear_sub_box(void)
 	int	width;
 	int	start;
 
-	width = (TERM_COLS - SEP_2) - 2;
-	start = SEP_2 + 2;
+	width = (TERM_COLS - SEP_2) - 1;
+	start = SEP_2 + 1;
 	row = 3;
 	while (row < TERM_ROWS - 1)
 	{
