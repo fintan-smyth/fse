@@ -247,6 +247,7 @@ char	*user_from_uid(uid_t uid)
 	strncpy(user, line, user_len - 1);
 	user[user_len - 1] = 0;
 	free(line);
+	fclose(fp);
 	return (user);
 }
 
@@ -281,6 +282,7 @@ char	*group_from_gid(gid_t gid)
 	strncpy(group, line, group_len - 1);
 	group[group_len - 1] = 0;
 	free(line);
+	fclose(fp);
 	return (group);
 }
 
