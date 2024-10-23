@@ -22,9 +22,11 @@ l	- Open
 
 y	- Copy selected
 
-x	- Copy selected
+x	- Cut selected
 
-p	- Paste selected
+p	- Paste copy/cut buffer
+
+c - Clear copy/cut buffer
 
 D	- Delete selected
 
