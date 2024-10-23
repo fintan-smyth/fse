@@ -15,7 +15,7 @@ OBJ := $(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.c=.o))
 
 NAME = fse
 
-all: directories $(NAME)
+all: directories $(NAME) install
 
 directories: 
 	mkdir -p build
@@ -32,6 +32,9 @@ clean:
 fclean: clean	
 	rm -f $(NAME)
 #	rm -f $(OBJ) $(NAME)
+
+install: 
+	cp ./fse ~/.local/bin/fse
 
 re: fclean all
 .PHONY: all clean fclean re

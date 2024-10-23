@@ -243,10 +243,15 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent)
 		printf("─");
 	printf("╮\e[2;%dH┤", TERM_COLS);
 	printf("\e[2;%dH┬", SEP_2);
+	if (selected !=  NULL)
+	{
+		printf("\e[%d;3H[ ", TERM_ROWS);
+		print_file_attributes(selected);
+		printf(" ]");
+	}
 	clear_sub_box();
 	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
 		display_subdirectory(selected, cwd_name);
-	// else if (selected->data->d_type == DT_REG && FLAG_PREVIEW == 1)
 	else if (FLAG_PREVIEW == 1 && selected->data->d_type == DT_REG)
 		preview_text(selected);
 	free(cwd_name);

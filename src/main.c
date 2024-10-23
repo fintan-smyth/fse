@@ -1,7 +1,6 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
-#include <string.h>
 
 
 
@@ -64,7 +63,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == ':')
 		{
 			reset_term_settings();
-			printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", TERM_ROWS, (SEP_2) - 6, "");
+			printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
 			char *bufp = buf;
 			while ((c = getchar()) != '\n')
 				*(bufp++) = c;
@@ -79,7 +78,6 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == 'R')
 		{
-			// refresh_dir(dir_node);
 			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
@@ -119,10 +117,20 @@ int	navigate(vd_node *dir_node)
 			free(buf);
 			return (0);
 		}
+		else if (c == 'c')
+		{
+			clear_path_list(copied);
+			clear_path_list(cut);
+			clear_path_list(highlighted);
+			cleanup_directory(dir_node);
+			free(buf);
+			return (0);
+		}
 		if (selected == NULL)
 			continue;
 		else if (c == 'j')
 		{
+			clear_gutter();
 			if (selected->next == selected->next->next)
 			{
 				selected = children->next;
@@ -138,6 +146,7 @@ int	navigate(vd_node *dir_node)
 		}
 		else if(c == 'k')
 		{
+			clear_gutter();
 			if (selected->prev == selected->prev->prev)
 			{
 				while (selected->next != selected->next->next)
@@ -215,6 +224,7 @@ int	navigate(vd_node *dir_node)
 						free(ext_buf);
 						return (0);
 					}
+					free(ext_buf);
 				}
 				if (pager == NULL)
 					sprintf(buf, "%s %s", "less", selected->data->d_name);
@@ -253,9 +263,6 @@ int	navigate(vd_node *dir_node)
 				delete_path(buf, copied);
 				clear_main_box();
 			}
-			// cleanup_directory(dir_node);
-			// free(buf);
-			// return (0);
 		}
 		else if (c == 'x')
 		{
@@ -270,10 +277,21 @@ int	navigate(vd_node *dir_node)
 				delete_path(buf, cut);
 				clear_main_box();
 			}
-			// cleanup_directory(dir_node);
-			// free(buf);
-			// return (0);
 		}
+		// else if (c == ' ')
+		// {
+		// 	construct_path(buf, dir_node->dir_name, selected->data->d_name);
+		// 	if (check_path(highlighted, buf) == 0)
+		// 	{
+		// 		insert_path_node(buf, cut);
+		// 		if (check_path(copied, buf))
+		// 			delete_path(buf, copied);
+		// 	}
+		// 	else {
+		// 		delete_path(buf, cut);
+		// 		clear_main_box();
+		// 	}
+		// }
 		else if (c == '/')
 		{
 			reset_term_settings();
@@ -295,6 +313,11 @@ int	navigate(vd_node *dir_node)
 			draw_box();
 			clear_gutter();
 			printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", TERM_ROWS, (SEP_2) - 6, dir_node->search_term);
+		}
+		else if (c == 'w')
+		{
+			print_file_attributes(selected);
+			exit(0);
 		}
 		else if (c == 'D')
 		{
@@ -354,6 +377,7 @@ int	main(void)
 	VISITED_DIRS = init_visited();
 	copied = init_path_list();
 	cut = init_path_list();
+	highlighted = init_path_list();
 	set_term_settings();
 	atexit(reset_term_settings);
 	getcwd(cwd_name, size);
@@ -370,5 +394,6 @@ int	main(void)
 	free_visited(VISITED_DIRS);
 	free_path_list(copied);
 	free_path_list(cut);
+	free_path_list(highlighted);
 	free(cwd_name);
 }

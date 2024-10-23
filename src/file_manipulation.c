@@ -1,9 +1,11 @@
 #include "headers/structs.h"
 #include "headers/format.h"
 #include "headers/utils.h"
+#include <sys/stat.h>
 
 path_node	*copied;
 path_node	*cut;
+path_node	*highlighted;
 
 path_node	*init_path_list(void)
 {
@@ -60,6 +62,12 @@ void	free_path_list(path_node *head)
 		free(current);
 	}
 	free(temp);
+}
+
+void	clear_path_list(path_node *head)
+{
+	while (head->next != head->next->next)
+		delete_next_path(head);
 }
 
 int	check_path(path_node *copied, char *path)
@@ -208,3 +216,97 @@ void	print_copied(path_node *copied)
 	printf("<addr: %p>\t<next: %p>\t<path: %s>\n",current, current->next, current->path);
 }
 
+char	*user_from_uid(uid_t uid)
+{
+	size_t	size = 200;
+	FILE	*fp;
+	char	*line = malloc(size);
+	char	*user;
+	int		user_len;
+	int		i;
+	int		colons;
+
+	fp = fopen("/etc/passwd", "r");
+	while ((getline(&line, &size, fp)) != -1)
+	{
+		i = 0;
+		colons = 0;
+		while (colons < 2)
+		{
+			if (line[i++] == ':')
+			{
+				colons++;
+				if (colons == 1)
+					user_len = i;
+			}
+		}
+		if ((int) uid == atoi(&line[i]))
+			break;
+	}
+	user = malloc(user_len);
+	strncpy(user, line, user_len - 1);
+	user[user_len - 1] = 0;
+	free(line);
+	return (user);
+}
+
+char	*group_from_gid(gid_t gid)
+{
+	size_t	size = 200;
+	FILE	*fp;
+	char	*line = malloc(size);
+	char	*group;
+	int		group_len;
+	int		i;
+	int		colons;
+
+	fp = fopen("/etc/group", "r");
+	while ((getline(&line, &size, fp)) != -1)
+	{
+		i = 0;
+		colons = 0;
+		while (colons < 2)
+		{
+			if (line[i++] == ':')
+			{
+				colons++;
+				if (colons == 1)
+					group_len = i;
+			}
+		}
+		if ((int) gid == atoi(&line[i]))
+			break;
+	}
+	group = malloc(group_len);
+	strncpy(group, line, group_len - 1);
+	group[group_len - 1] = 0;
+	free(line);
+	return (group);
+}
+
+void	print_file_attributes(entry_node *entry)
+{
+	struct stat	fs;
+	char		*user;
+	char		*group;
+
+	stat(entry->data->d_name, &fs);
+	printf("%c", (S_ISDIR(fs.st_mode)) ? 'd' : '-');
+	printf("%c", (fs.st_mode & S_IRUSR) ? 'r' : '-');
+	printf("%c", (fs.st_mode & S_IWUSR) ? 'w' : '-');
+	printf("%c", (fs.st_mode & S_IXUSR) ? 'x' : '-');
+	printf("%c", (fs.st_mode & S_IRGRP) ? 'r' : '-');
+	printf("%c", (fs.st_mode & S_IWGRP) ? 'w' : '-');
+	printf("%c", (fs.st_mode & S_IXGRP) ? 'x' : '-');
+	printf("%c", (fs.st_mode & S_IROTH) ? 'r' : '-');
+	printf("%c", (fs.st_mode & S_IWOTH) ? 'w' : '-');
+	printf("%c", (fs.st_mode & S_IXOTH) ? 'x' : '-');
+	printf(" %ld", fs.st_size);
+	user = user_from_uid(fs.st_uid);
+	group = group_from_gid(fs.st_gid);
+	printf(" %s", user);
+	printf(" %s", group);
+
+	free(user);
+	free(group);
+}
