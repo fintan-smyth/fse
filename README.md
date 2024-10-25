@@ -2,7 +2,7 @@
 
 F(ile) S(ystem) E(xplorer) - A simple terminal file manager written in C.
 
-This is just a fun little project I have been doing to test my skills in C, not to be taken too seriously. Heavy inspiration is taken from other terminal file managers, particularly `lf`.
+This is just a fun little project I have been doing to test my skills in C, not to be taken too seriously. Heavy inspiration is taken from other terminal file managers, particularly [`lf`](https://github.com/gokcehan/lf).
 
 ## Features
 
