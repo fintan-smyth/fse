@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 int	str_printable(char *s)
 {
@@ -10,6 +11,17 @@ int	str_printable(char *s)
 		s++;
 	}
 	return (1);
+}
+
+int	is_executable(char *path)
+{
+	struct stat	fs;
+
+	if (stat(path, &fs) == 1)
+		return (0);
+	if (fs.st_mode & S_IXUSR)
+		return (1);
+	return (0);
 }
 
 char	*get_extension(char *file_name)

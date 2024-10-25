@@ -1,9 +1,6 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
-#include <string.h>
 #include "headers/format.h"
-#include <strings.h>
-#include <sys/stat.h>
 
 int	FLAG_HIDDEN = 0;
 int	FLAG_PREVIEW = 1;
@@ -11,9 +8,8 @@ int	FLAG_PREVIEW = 1;
 void	colour_entry(char *path, entry_node *entry)
 {
 	char	*ext_buf;
-	struct stat	fs;
 
-	stat(path, &fs);
+	printf("\e[m");
 	switch (entry->data->d_type) {
 		case DT_DIR:
 			printf("\e[1;34m");
@@ -57,13 +53,10 @@ void	colour_entry(char *path, entry_node *entry)
 				}
 				free(ext_buf);
 			}
-			if (fs.st_mode & S_IXUSR)
+			if (is_executable(path))
 				printf("\e[32m");
-			else
-				printf("\e[39m");
 			break;
 		default:
-			printf("\e[39m");
 			break;
 	}
 }
@@ -91,6 +84,8 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 			offset = 3;
 			break;
 		default :
+			offset = SEP_1 + 2;
+			box_width = (SEP_2 - SEP_1) - 3;
 			break;
 	}
 	printf("\e[%dG", offset);

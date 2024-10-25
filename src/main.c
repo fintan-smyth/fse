@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
+#include <stdio.h>
 
 
 
@@ -49,6 +50,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == 'H')
 		{
 			FLAG_HIDDEN = !FLAG_HIDDEN;
+			dir_node->offset = 0;
 			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
@@ -71,6 +73,7 @@ int	navigate(vd_node *dir_node)
 			fflush(stdout);
 			system(buf);
 			set_term_settings();
+			printf("Press any key to continue...");
 			c = getchar();
 			cleanup_directory(dir_node);
 			free(buf);
@@ -92,10 +95,11 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1mh\e[m\tGo to parent directory\n");
 			printf("\t\e[1ml\e[m\tOpen\n");
 			printf("\t\e[1my\e[m\tCopy selected\n");
-			printf("\t\e[1mx\e[m\tCopy selected\n");
+			printf("\t\e[1md\e[m\tCopy selected\n");
 			printf("\t\e[1mp\e[m\tPaste selected\n");
 			printf("\t\e[1mc\e[m\tClear copy/cut buffer\n");
 			printf("\t\e[1mD\e[m\tDelete selected\n");
+			printf("\t\e[1mx\e[m\tRun selected executable\n");
 			printf("\t\e[1me\e[m\tOpen selected in editor\n");
 			printf("\t\e[1mE\e[m\tOpen current directory in editor\n");
 			printf("\t\e[1m:\e[m\tExecute shell command\n");
@@ -265,7 +269,7 @@ int	navigate(vd_node *dir_node)
 				clear_main_box();
 			}
 		}
-		else if (c == 'x')
+		else if (c == 'd')
 		{
 			construct_path(buf, dir_node->dir_name, selected->data->d_name);
 			if (check_path(cut, buf) == 0)
@@ -278,6 +282,23 @@ int	navigate(vd_node *dir_node)
 				delete_path(buf, cut);
 				clear_main_box();
 			}
+		}
+		else if (c == 'x')
+		{
+			reset_term_settings();
+			printf("\e[2J\e[H");
+			fflush(stdout);
+			if (selected->data->d_type == DT_REG && is_executable(selected->data->d_name))
+			{
+				sprintf(buf, "./%s", selected->data->d_name);
+				system(buf);
+				printf("Press any key to continue...");
+				getchar();
+			}
+			set_term_settings();
+			cleanup_directory(dir_node);
+			free(buf);
+			return (0);
 		}
 		// else if (c == ' ')
 		// {
@@ -315,16 +336,12 @@ int	navigate(vd_node *dir_node)
 			clear_gutter();
 			printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", TERM_ROWS, (SEP_2) - 6, dir_node->search_term);
 		}
-		else if (c == 'w')
-		{
-			print_file_attributes(selected);
-			exit(0);
-		}
 		else if (c == 'D')
 		{
 			if (selected->data->d_type != DT_SOCK)
 			{
-				strncpy(buf, dir_node->dir_name, strlen(dir_node->dir_name));
+				int len = strlen(dir_node->dir_name);
+				memcpy(buf, dir_node->dir_name, len);
 				if (strncmp(buf, "/", strlen(buf)))
 					strcat(buf, "/");
 				strcat(buf, selected->data->d_name);

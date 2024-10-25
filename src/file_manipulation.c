@@ -223,7 +223,7 @@ char	*user_from_uid(uid_t uid)
 	FILE	*fp;
 	char	*line = malloc(size);
 	char	*user;
-	int		user_len;
+	int		user_len = 0;
 	int		i;
 	int		colons;
 
@@ -258,7 +258,7 @@ char	*group_from_gid(gid_t gid)
 	FILE	*fp;
 	char	*line = malloc(size);
 	char	*group;
-	int		group_len;
+	int		group_len = 0;
 	int		i;
 	int		colons;
 
@@ -352,7 +352,8 @@ void	print_file_attributes(entry_node *entry)
 	char		*user;
 	char		*group;
 
-	stat(entry->data->d_name, &fs);
+	if ((stat(entry->data->d_name, &fs)) == -1)
+		return ;
 	printf("\e[1m%s", (S_ISDIR(fs.st_mode)) ? "\e[34md" : "\e[30m-");
 	printf("%s", (fs.st_mode & S_IRUSR) ? "\e[33mr" : "\e[30m-");
 	printf("%s", (fs.st_mode & S_IWUSR) ? "\e[31mw" : "\e[30m-");

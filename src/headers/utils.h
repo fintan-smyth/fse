@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 char	*get_extension(char *file_name);
+int		is_executable(char *path);
 char	*replace_tab(char *string, size_t size);
 int		my_strlen(char *s);
 int		str_printable(char *s);
