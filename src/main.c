@@ -94,6 +94,7 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1my\e[m\tCopy selected\n");
 			printf("\t\e[1mx\e[m\tCopy selected\n");
 			printf("\t\e[1mp\e[m\tPaste selected\n");
+			printf("\t\e[1mc\e[m\tClear copy/cut buffer\n");
 			printf("\t\e[1mD\e[m\tDelete selected\n");
 			printf("\t\e[1me\e[m\tOpen selected in editor\n");
 			printf("\t\e[1mE\e[m\tOpen current directory in editor\n");
