@@ -2,6 +2,7 @@
 #include "headers/format.h"
 #include "headers/utils.h"
 #include <sys/stat.h>
+#include <time.h>
 
 path_node	*copied;
 path_node	*cut;
@@ -286,6 +287,65 @@ char	*group_from_gid(gid_t gid)
 	return (group);
 }
 
+void	print_time(time_t time)
+{
+	struct tm	*timeinfo;
+	char 		*time_str;
+	int 		i;
+	timeinfo = localtime(&time);
+	time_str = asctime(timeinfo);
+	i = 0;
+	while (time_str[i] != 0)
+	{
+		if (time_str[i] == '\n')
+			time_str[i] = 0;
+		i++;
+	}
+	printf(" %s", time_str);
+}
+
+void	format_filesize(off_t filesize)
+{
+	double	size = (double) filesize;
+	int		power = 0;
+	
+	while (size >= 1000)
+	{
+		size /= 1000;
+		power++;
+	}
+	switch (power) {
+		case (1):
+			if (size < 10)
+				printf("\e[1;32m%3.1fK", size);
+			else
+				printf("\e[1;32m%3.0fK", size);
+			break;
+		case (2):
+			if (size < 10)
+				printf("\e[33m%3.1fM", size);
+			else
+				printf("\e[33m%3.0fM", size);
+			break;
+		case (3):
+			if (size < 10)
+				printf("\e[31m%3.1fG", size);
+			else
+				printf("\e[31m%3.0fG", size);
+			break;
+		case (4):
+			if (size < 10)
+				printf("\e[38m%3.1fT", size);
+			else
+				printf("\e[38m%3.0fT", size);
+			break;
+		default:
+			printf("\e[32m%3.0f ", size);
+			break;
+	}
+	printf("\e[m");
+}
+
 void	print_file_attributes(entry_node *entry)
 {
 	struct stat	fs;
@@ -293,21 +353,25 @@ void	print_file_attributes(entry_node *entry)
 	char		*group;
 
 	stat(entry->data->d_name, &fs);
-	printf("%c", (S_ISDIR(fs.st_mode)) ? 'd' : '-');
-	printf("%c", (fs.st_mode & S_IRUSR) ? 'r' : '-');
-	printf("%c", (fs.st_mode & S_IWUSR) ? 'w' : '-');
-	printf("%c", (fs.st_mode & S_IXUSR) ? 'x' : '-');
-	printf("%c", (fs.st_mode & S_IRGRP) ? 'r' : '-');
-	printf("%c", (fs.st_mode & S_IWGRP) ? 'w' : '-');
-	printf("%c", (fs.st_mode & S_IXGRP) ? 'x' : '-');
-	printf("%c", (fs.st_mode & S_IROTH) ? 'r' : '-');
-	printf("%c", (fs.st_mode & S_IWOTH) ? 'w' : '-');
-	printf("%c", (fs.st_mode & S_IXOTH) ? 'x' : '-');
-	printf(" %ld", fs.st_size);
+	printf("\e[1m%s", (S_ISDIR(fs.st_mode)) ? "\e[34md" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IRUSR) ? "\e[33mr" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IWUSR) ? "\e[31mw" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IXUSR) ? "\e[32mx" : "\e[30m-");
+	printf("\e[m%s", (fs.st_mode & S_IRGRP) ? "\e[33mr" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IWGRP) ? "\e[31mw" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IXGRP) ? "\e[32mx" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IROTH) ? "\e[33mr" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IWOTH) ? "\e[31mw" : "\e[30m-");
+	printf("%s", (fs.st_mode & S_IXOTH) ? "\e[32mx" : "\e[30m-");
+	printf(" \e[m");
+	format_filesize(fs.st_size);
 	user = user_from_uid(fs.st_uid);
 	group = group_from_gid(fs.st_gid);
-	printf(" %s", user);
-	printf(" %s", group);
+	printf(" \e[1;33m%s", user);
+	printf(" \e[1;34m%s", group);
+	printf("\e[0;35m");
+	print_time(fs.st_mtime);
+	printf("\e[m");
 
 	free(user);
 	free(group);
