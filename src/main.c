@@ -117,6 +117,7 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == 'p')
 		{
+			clear_gutter();
 			paste(dir_node);
 			cleanup_directory(dir_node);
 			free(buf);
@@ -296,6 +297,7 @@ int	navigate(vd_node *dir_node)
 				printf("Press any key to continue...");
 				getchar();
 			}
+			set_term_settings();
 			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
@@ -345,6 +347,7 @@ int	navigate(vd_node *dir_node)
 				if (strncmp(buf, "/", strlen(buf)))
 					strcat(buf, "/");
 				strcat(buf, selected->data->d_name);
+				clear_gutter();
 				printf("\e[%d;3H[ \e[1;33mdelete selected file? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, selected->data->d_name);
 				if ((c = getchar()) == 'y')
 				{

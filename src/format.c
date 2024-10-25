@@ -54,7 +54,7 @@ void	colour_entry(char *path, entry_node *entry)
 				free(ext_buf);
 			}
 			if (is_executable(path))
-				printf("\e[32m");
+				printf("\e[1;32m");
 			break;
 		default:
 			break;
