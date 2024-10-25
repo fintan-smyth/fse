@@ -2,32 +2,65 @@
 #include "headers/utils.h"
 #include <string.h>
 #include "headers/format.h"
+#include <strings.h>
+#include <sys/stat.h>
 
 int	FLAG_HIDDEN = 0;
 int	FLAG_PREVIEW = 1;
 
-void	colour_entry(entry_node *entry)
+void	colour_entry(char *path, entry_node *entry)
 {
 	char	*ext_buf;
+	struct stat	fs;
 
+	stat(path, &fs);
 	switch (entry->data->d_type) {
 		case DT_DIR:
 			printf("\e[1;34m");
 			break;
 		case DT_LNK:
-			printf("\e[1;32m");
+			printf("\e[1;36m");
 			break;
 		case DT_REG:
-			if ((ext_buf = get_extension(entry->data->d_name)) == NULL)
-				printf("\e[39m");
-			else if (strcmp(ext_buf, "mp4") == 0
-					|| strcmp(ext_buf, "mkv") == 0
-					// || strcmp(ext_buf, "") == 0
-				)
-				printf("\e[36m");
+			if ((ext_buf = get_extension(entry->data->d_name)) != NULL)
+			{
+				if (strcasecmp(ext_buf, "mp4") == 0
+					|| strcasecmp(ext_buf, "mkv") == 0
+					|| strcasecmp(ext_buf, "png") == 0
+					|| strcasecmp(ext_buf, "jpg") == 0
+					|| strcasecmp(ext_buf, "jpeg") == 0
+					|| strcasecmp(ext_buf, "xcf") == 0
+					|| strcasecmp(ext_buf, "tif") == 0
+					|| strcasecmp(ext_buf, "gif") == 0
+				) {
+					printf("\e[35m");
+					free(ext_buf);
+					break;
+				}
+				else if (strcasecmp(ext_buf, "mp3") == 0
+					|| strcasecmp(ext_buf, "flac") == 0
+					|| strcasecmp(ext_buf, "m4a") == 0
+				) {
+					printf("\e[36m");
+					free(ext_buf);
+					break;
+				}
+				else if (strcasecmp(ext_buf, "xz") == 0
+					|| strcasecmp(ext_buf, "gz") == 0
+					|| strcasecmp(ext_buf, "zstd") == 0
+					|| strcasecmp(ext_buf, "tar") == 0
+					|| strcasecmp(ext_buf, "zip") == 0
+				) {
+					printf("\e[31m");
+					free(ext_buf);
+					break;
+				}
+				free(ext_buf);
+			}
+			if (fs.st_mode & S_IXUSR)
+				printf("\e[32m");
 			else
 				printf("\e[39m");
-			free(ext_buf);
 			break;
 		default:
 			printf("\e[39m");
@@ -43,6 +76,7 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	int		box_width;
 	int		remaining_space;
 
+	construct_path(buf, dir_node->dir_name, current->data->d_name);
 	switch (level) {
 		case 0:
 			offset = SEP_1 + 2;
@@ -60,17 +94,19 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 			break;
 	}
 	printf("\e[%dG", offset);
-	colour_entry(current);
+	colour_entry(buf, current);
 	if (current == selected)
 	{
-		printf("\e[1;7m");
+		if (level == 1)
+			printf("\e[4m");
+		else
+			printf("\e[1;7m");
 	}
 	printf("%.*s", box_width - 1, current->data->d_name);
 	remaining_space = box_width - my_strlen(current->data->d_name);
 	if (remaining_space > 0)
 		printf("%*s", box_width - my_strlen(current->data->d_name), " ");
 	search_term_start = strcasestr(current->data->d_name, dir_node->search_term);
-	construct_path(buf, dir_node->dir_name, current->data->d_name);
 	if (my_strlen(current->data->d_name) > box_width)
 		printf("~");
 	if (check_path(copied, buf))
@@ -213,6 +249,7 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent)
 {
 	int				size = 500 * sizeof(char);
 	char			*cwd_name =  malloc(size);
+	char			buf[size];
 	int				path_length;
 
 	getcwd(cwd_name, size);
@@ -234,7 +271,8 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent)
 		free(cwd_name);
 		return ;
 	}
-	colour_entry(selected);
+	construct_path(buf, dir_node->dir_name, selected->data->d_name);
+	colour_entry(buf, selected);
 	printf("%.*s\e[m ]\e[K", (TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
 	path_length = my_strlen(cwd_name) + my_strlen(selected->data->d_name) + 8;
 	while (path_length++ < TERM_COLS)
