@@ -292,10 +292,10 @@ int	navigate(vd_node *dir_node)
 			{
 				sprintf(buf, "./%s", selected->data->d_name);
 				system(buf);
+				set_term_settings();
 				printf("Press any key to continue...");
 				getchar();
 			}
-			set_term_settings();
 			cleanup_directory(dir_node);
 			free(buf);
 			return (0);
