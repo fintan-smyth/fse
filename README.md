@@ -25,10 +25,11 @@ Currently there is only basic functionality. Some of the available features are:
 | h | Go to parent directory |
 | l	| Open |
 |	y | Copy selected |
-| x	| Cut selected |
+| d	| Cut selected |
 | p	| Paste copy/cut buffer |
 | c | Clear copy/cut buffer |
 | D	| Delete selected |
+| x	| Run selected executable |
 | e	| Open selected in editor |
 | E	| Open current directory in editor |
 | :	| Execute shell command |
