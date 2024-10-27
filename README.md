@@ -11,7 +11,7 @@ Currently there is only basic functionality. Some of the available features are:
 - Copying/cutting/pasting files and directories
 - Permanent deletion of files and empty directories
 - Search within current directory
-- A simple text file preview (scrolling of preview to be added soon)
+- A simple text file preview (scrolling of preview now implemented)
 - A (heavily) exa/eza inspired file attribute display
 - File-dependent highlighting
 - Running executable files
