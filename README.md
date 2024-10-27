@@ -37,6 +37,8 @@ Currently there is only basic functionality. Some of the available features are:
 | / | Search in directory |
 | n | Next search result |
 | N | Previous Search result |
+| [ | Scroll up text preview |
+| ] | Scroll down text preview |
 | H	| Toggle hidden file visibility |
 | P	| Toggle text file preview |
 | R	| Reload directory |
