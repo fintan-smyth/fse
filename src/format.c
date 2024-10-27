@@ -205,7 +205,7 @@ void	display_parent(vd_node *dir_node, vd_node *parent)
 }
 
 
-void	preview_text(entry_node *file)
+void	preview_text(entry_node *file, int start_line)
 {
 	size_t	size = 511;
 	char	*line = malloc(size);
@@ -222,6 +222,8 @@ void	preview_text(entry_node *file)
 	printf("\e[3;1H");
 	while (line_no < TERM_ROWS - 2 && (getline(&line, &size, fp)) != -1)
 	{
+		if (start_line-- > 0)
+			continue;
 		if (strlen(line) > 0)
 			line[strlen(line) - 1] = '\0';
 		line = replace_tab(line, size);
@@ -240,7 +242,7 @@ void	preview_text(entry_node *file)
 	// exit(0);
 }
 
-void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent)
+void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_start)
 {
 	int				size = 500 * sizeof(char);
 	char			*cwd_name =  malloc(size);
@@ -286,6 +288,6 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent)
 	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
 		display_subdirectory(selected, cwd_name);
 	else if (FLAG_PREVIEW == 1 && selected->data->d_type == DT_REG)
-		preview_text(selected);
+		preview_text(selected, preview_start);
 	free(cwd_name);
 }

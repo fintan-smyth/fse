@@ -167,11 +167,11 @@ void	paste(vd_node *dir_node)
 			{
 				current = current->next;
 				draw_box();
-				display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+				display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
 				continue;
 			}
 			draw_box();
-			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
 			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
 		}
 		sprintf(command_buf, "cp -r \"%s\" %s", current->next->path, dir_node->dir_name);
@@ -189,11 +189,11 @@ void	paste(vd_node *dir_node)
 			{
 				current = current->next;
 				draw_box();
-				display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+				display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
 				continue;
 			}
 			draw_box();
-			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node));
+			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
 			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
 		}
 		file_name = get_file_name(current->next->path);

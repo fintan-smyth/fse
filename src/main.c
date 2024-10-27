@@ -11,6 +11,7 @@ int	navigate(vd_node *dir_node)
 	char				*editor = getenv("EDITOR");
 	char				*pager = getenv("PAGER");
 	char 				*searchp;
+	int					preview_start = 0;
 	entry_node			*children;
 	vd_node				*parent;
 	entry_node			*selected;
@@ -24,7 +25,7 @@ int	navigate(vd_node *dir_node)
 	set_winsize();
 	draw_box();
 	clear_gutter();
-	display_directory(dir_node, selected, parent);
+	display_directory(dir_node, selected, parent, preview_start);
 	while ((c = getchar()) != 'q')
 	{
 		memset(buf, 0, 500 * sizeof(char));
@@ -106,6 +107,8 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1m/\e[m\tSearch in directory\n");
 			printf("\t\e[1mn\e[m\tNext search result\n");
 			printf("\t\e[1mN\e[m\tPrevious search result\n");
+			printf("\t\e[1m[\e[m\tScroll up text preview\n");
+			printf("\t\e[1m]\e[m\tScroll down text preview\n");
 			printf("\t\e[1mH\e[m\tToggle hidden file visibility\n");
 			printf("\t\e[1mP\e[m\tToggle text file preview\n");
 			printf("\t\e[1mR\e[m\tReload directory\n");
@@ -137,6 +140,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == 'j')
 		{
 			clear_gutter();
+			preview_start = 0;
 			if (selected->next == selected->next->next)
 			{
 				selected = children->next;
@@ -153,6 +157,7 @@ int	navigate(vd_node *dir_node)
 		else if(c == 'k')
 		{
 			clear_gutter();
+			preview_start = 0;
 			if (selected->prev == selected->prev->prev)
 			{
 				while (selected->next != selected->next->next)
@@ -233,11 +238,11 @@ int	navigate(vd_node *dir_node)
 					free(ext_buf);
 				}
 				if (pager == NULL)
-					sprintf(buf, "%s %s", "less", selected->data->d_name);
+					sprintf(buf, "%s \"%s\"", "less", selected->data->d_name);
 				else if (strncmp(pager, "bat", 3) == 0)
-					sprintf(buf, "%s %s", "bat --paging=always", selected->data->d_name);
+					sprintf(buf, "%s \"%s\"", "bat --paging=always", selected->data->d_name);
 				else
-					sprintf(buf, "%s %s", pager, selected->data->d_name);
+					sprintf(buf, "%s \"%s\"", pager, selected->data->d_name);
 				system(buf);
 				cleanup_directory(dir_node);
 				free(buf);
@@ -247,9 +252,9 @@ int	navigate(vd_node *dir_node)
 		else if (c == 'e')
 		{
 			if (editor == NULL)
-				sprintf(buf, "%s %s", "vim", selected->data->d_name);
+				sprintf(buf, "%s \"%s\"", "vim", selected->data->d_name);
 			else
-				sprintf(buf, "%s %s", editor, selected->data->d_name);
+				sprintf(buf, "%s \"%s\"", editor, selected->data->d_name);
 			system(buf);
 			set_term_settings();
 			cleanup_directory(dir_node);
@@ -291,7 +296,7 @@ int	navigate(vd_node *dir_node)
 			fflush(stdout);
 			if (selected->data->d_type == DT_REG && is_executable(selected->data->d_name))
 			{
-				sprintf(buf, "./%s", selected->data->d_name);
+				sprintf(buf, "./\"%s\"", selected->data->d_name);
 				system(buf);
 				set_term_settings();
 				printf("Press any key to continue...");
@@ -338,6 +343,16 @@ int	navigate(vd_node *dir_node)
 			clear_gutter();
 			printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", TERM_ROWS, (SEP_2) - 6, dir_node->search_term);
 		}
+		else if (c == ']')
+		{
+			if ((count_lines(selected->data->d_name) - preview_start) > TERM_ROWS - 4)
+				preview_start++;
+		}
+		else if (c == '[')
+		{
+			if (preview_start > 0)
+				preview_start--;
+		}
 		else if (c == 'D')
 		{
 			if (selected->data->d_type != DT_SOCK)
@@ -382,7 +397,7 @@ int	navigate(vd_node *dir_node)
 			free(buf);
 			return (0);
 		}
-		display_directory(dir_node, selected, parent);
+		display_directory(dir_node, selected, parent, preview_start);
 	}
 	cleanup_directory(dir_node);
 	free(buf);

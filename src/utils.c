@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -72,4 +73,25 @@ char	*replace_tab(char *string, size_t size)
 	output[j] = 0;
 	free(string);
 	return (output);
+}
+
+int	count_lines(char *path)
+{
+	size_t	size = 511;
+	char	buf[size];
+	char	*line = buf;
+	int		line_no = 0;
+	FILE	*fp;
+
+	fp = fopen(path, "r");
+	if (fp == NULL)
+	{
+		return (-1);
+	}
+	while ((getline(&line, &size, fp)) != -1)
+	{
+		line_no++;
+	}
+	fclose(fp);
+	return (line_no);
 }
