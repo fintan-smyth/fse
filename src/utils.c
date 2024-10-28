@@ -1,6 +1,5 @@
+#include "headers/utils.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 
 int	str_printable(char *s)
@@ -22,6 +21,30 @@ int	is_executable(char *path)
 		return (0);
 	if (fs.st_mode & S_IXUSR)
 		return (1);
+	return (0);
+}
+
+int is_binary(char *path)
+{
+	FILE	*fileptr;
+	char	buffer[500];
+	int		i;
+
+	fileptr = fopen(path, "rb");
+	while (fread(buffer, 1, 500, fileptr) != 0)
+	{
+		i = 0;
+		while (i < 500)
+		{
+			if (( buffer[i] < 32 || buffer[i] > 126) && buffer[i] != '\n' && buffer[i] != '\t')
+			{
+				fclose(fileptr);
+				return (1);
+			}
+			i++;
+		}
+	}
+	fclose(fileptr);
 	return (0);
 }
 
@@ -91,6 +114,8 @@ int	count_lines(char *path)
 	while ((getline(&line, &size, fp)) != -1)
 	{
 		line_no++;
+		// if (!str_printable(line))
+		// 	return (-1);
 	}
 	fclose(fp);
 	return (line_no);

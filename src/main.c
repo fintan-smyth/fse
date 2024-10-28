@@ -345,6 +345,10 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == ']')
 		{
+			if (selected->data->d_type != DT_REG)
+				continue;
+			if (is_binary(selected->data->d_name))
+				continue ;
 			if ((count_lines(selected->data->d_name) - preview_start) > TERM_ROWS - 4)
 				preview_start++;
 		}
@@ -352,6 +356,13 @@ int	navigate(vd_node *dir_node)
 		{
 			if (preview_start > 0)
 				preview_start--;
+		}
+		else if (c == 'w')
+		{
+			is_binary(selected->data->d_name);
+			cleanup_directory(dir_node);
+			free(buf);
+			exit (0);
 		}
 		else if (c == 'D')
 		{
@@ -404,10 +415,19 @@ int	navigate(vd_node *dir_node)
 	return (1);
 }
 
+void	exit_cleanup()
+{
+	reset_term_settings();
+	free_visited(VISITED_DIRS);
+	free_path_list(copied);
+	free_path_list(cut);
+	free_path_list(highlighted);
+}
+
 int	main(void)
 {
 	int				size = 500 * sizeof(char);
-	char			*cwd_name =  malloc(size);
+	char			cwd_name[500];
 	vd_node			*current;
 	
 	VISITED_DIRS = init_visited();
@@ -415,7 +435,7 @@ int	main(void)
 	cut = init_path_list();
 	highlighted = init_path_list();
 	set_term_settings();
-	atexit(reset_term_settings);
+	atexit(exit_cleanup);
 	getcwd(cwd_name, size);
 	current = vd_insert(VISITED_DIRS, cwd_name);
 	current->directory = get_directory(cwd_name);
@@ -426,10 +446,4 @@ int	main(void)
 		current->directory = get_directory(cwd_name);
 	}
 	printf("\e[2J\e[H");
-	// print_copied(copied);
-	free_visited(VISITED_DIRS);
-	free_path_list(copied);
-	free_path_list(cut);
-	free_path_list(highlighted);
-	free(cwd_name);
 }

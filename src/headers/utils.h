@@ -12,5 +12,6 @@ char	*replace_tab(char *string, size_t size);
 int		my_strlen(char *s);
 int		str_printable(char *s);
 int		count_lines(char *path);
+int 	is_binary(char *path);
 
 #endif // !UTILS_H_
