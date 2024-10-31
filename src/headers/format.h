@@ -3,12 +3,13 @@
 
 #include "structs.h"
 
-extern int	TERM_COLS;
-extern int	TERM_ROWS;
-extern int	SEP_1;
-extern int	SEP_2;
+extern int				TERM_COLS;
+extern int				TERM_ROWS;
+extern int				SEP_1;
+extern int				SEP_2;
 
 void	set_winsize(void);
+void	store_term_settings(void);
 void	set_term_settings(void);
 void	reset_term_settings(void);
 void	draw_box(void);

@@ -421,6 +421,7 @@ int	main(void)
 	copied = init_path_list();
 	cut = init_path_list();
 	highlighted = init_path_list();
+	store_term_settings();
 	set_term_settings();
 	atexit(exit_cleanup);
 	getcwd(cwd_name, size);

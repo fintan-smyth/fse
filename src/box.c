@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include "headers/format.h"
 
+struct termios g_term_original;
 int	TERM_COLS;
 int TERM_ROWS;
 int	SEP_1;
@@ -19,12 +21,17 @@ void	set_winsize(void)
 	SEP_2 = TERM_COLS / 2;
 }
 
+void	store_term_settings(void)
+{
+	tcgetattr(STDIN_FILENO, &g_term_original);
+}
+
 void	set_term_settings(void)
 {
 	struct termios term;
 
 	set_winsize();
-    tcgetattr(fileno(stdin), &term);
+	term = g_term_original;
     term.c_lflag &= ~ECHO;
 	term.c_lflag &= ~(ICANON);
     tcsetattr(fileno(stdin), TCSANOW, &term);
@@ -34,9 +41,7 @@ void	set_term_settings(void)
 void	reset_term_settings(void)
 {
 	struct termios term;
-    tcgetattr(fileno(stdin), &term);
-    term.c_lflag |= ECHO;
-	term.c_lflag |= (ICANON);
+	term = g_term_original;
     tcsetattr(fileno(stdin), TCSANOW, &term);
 	printf("\e[?25h");
 }
