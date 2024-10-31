@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/format.h"
 #include "headers/utils.h"
+#include <dirent.h>
 #include <sys/stat.h>
 #include <time.h>
 
@@ -354,7 +355,18 @@ void	print_file_attributes(entry_node *entry)
 
 	if ((stat(entry->data->d_name, &fs)) == -1)
 		return ;
-	printf("\e[1m%s", (S_ISDIR(fs.st_mode)) ? "\e[34md" : "\e[30m-");
+	switch (entry->data->d_type) {
+		case (DT_LNK):
+			printf("\e[1;36ml");
+			break;
+		case (DT_DIR):
+			printf("\e[1;34md");
+			break;
+		default:
+			printf("\e[1;30m-");
+			break;
+	}
+	// printf("\e[1m%s", (S_ISDIR(fs.st_mode)) ? "\e[34md" : "\e[30m-");
 	printf("%s", (fs.st_mode & S_IRUSR) ? "\e[33mr" : "\e[30m-");
 	printf("%s", (fs.st_mode & S_IWUSR) ? "\e[31mw" : "\e[30m-");
 	printf("%s", (fs.st_mode & S_IXUSR) ? "\e[32mx" : "\e[30m-");
