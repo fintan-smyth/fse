@@ -38,6 +38,7 @@ entry_node *insertafter(struct dirent *data, entry_node *t)
 	new->data = data;
 	new->next = t->next;
 	new->prev = t;
+	new->lines = 0;
 	t->next = new;
 	new->next->prev = new;
 	return (new);

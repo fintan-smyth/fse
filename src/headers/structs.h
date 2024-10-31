@@ -5,10 +5,11 @@
 
 typedef struct entry_node
 {
-	struct entry_node *prev;
-	struct entry_node *next;
-	struct dirent	  *data;
-	int				   pos;
+	struct entry_node	*prev;
+	struct entry_node	*next;
+	struct dirent		*data;
+	int					pos;
+	int					lines;
 } entry_node;
 
 typedef struct path_node

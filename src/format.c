@@ -210,6 +210,7 @@ void	preview_text(entry_node *file, int start_line)
 	size_t	size = 511;
 	char	*line = malloc(size);
 	int		line_no = 2;
+	int		to_skip = start_line;
 	FILE	*fp;
 
 	fp = fopen(file->data->d_name, "r");
@@ -222,24 +223,28 @@ void	preview_text(entry_node *file, int start_line)
 	printf("\e[3;1H");
 	while (line_no < TERM_ROWS - 2 && (getline(&line, &size, fp)) != -1)
 	{
-		if (start_line-- > 0)
+		if (to_skip-- > 0)
 			continue;
 		if (strlen(line) > 0)
 			line[strlen(line) - 1] = '\0';
 		line = replace_tab(line, size);
-		if (!str_printable(line))
-		{
-			clear_sub_box();
-			printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
-			break;
-		}
 		printf("\e[%dG%.*s\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, line);
 		line_no++;
 
 	}
+	if (start_line > 0)
+	{
+		printf("\e[3;%dH\e[7m%*s", SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
+		printf("\e[%dG^\e[m", (TERM_COLS + SEP_2) / 2);
+	}
+	if ((file->lines - start_line) > TERM_ROWS - 4)
+	{
+		printf("\e[%d;%dH\e[7m%*s", TERM_ROWS - 2, SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
+		printf("\e[%dGv\e[m", (TERM_COLS + SEP_2) / 2);
+		// printf("\e[%dG\e[7mlines: %d offset: %d rows: %d\e[m", SEP_2 + 3, file->lines, start_line, TERM_ROWS);
+	}
 	free(line);
 	fclose(fp);
-	// exit(0);
 }
 
 void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_start)
@@ -247,47 +252,46 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 	int				size = 500 * sizeof(char);
 	char			*cwd_name =  malloc(size);
 	char			buf[size];
-	int				path_length;
+	// int				path_length;
 
 	getcwd(cwd_name, size);
 	print_entries(dir_node, selected, 0);
 	display_parent(dir_node, parent);
+	clear_header();
 	printf("\e[1;3H[ \e[31;1m%.*s", TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
 		printf("/");
 	if (selected == NULL)
 	{
-		printf("\e[m ]\e[K");
-		path_length = my_strlen(cwd_name) + 8;
-		while (path_length++ < TERM_COLS)
-			printf("─");
-		if (my_strlen(cwd_name) == 1)
-			printf("─");
-		printf("╮\e[2;%dH┤", TERM_COLS);
-		printf("\e[2;%dH┬", SEP_2);
+		printf("\e[m ]");
 		free(cwd_name);
 		return ;
 	}
 	construct_path(buf, dir_node->dir_name, selected->data->d_name);
 	colour_entry(buf, selected);
-	printf("%.*s\e[m ]\e[K", (TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
-	path_length = my_strlen(cwd_name) + my_strlen(selected->data->d_name) + 8;
-	while (path_length++ < TERM_COLS)
-		printf("─");
-	if (my_strlen(cwd_name) == 1)
-		printf("─");
-	printf("╮\e[2;%dH┤", TERM_COLS);
-	printf("\e[2;%dH┬", SEP_2);
-	if (selected !=  NULL)
-	{
-		printf("\e[%d;3H[ ", TERM_ROWS);
-		print_file_attributes(selected);
-		printf(" ]");
-	}
+	printf("%.*s\e[m ]", (TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
+	printf("\e[%d;3H[ ", TERM_ROWS);
+	print_file_attributes(selected);
+	printf(" ]");
 	clear_sub_box();
 	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
 		display_subdirectory(selected, cwd_name);
 	else if (FLAG_PREVIEW == 1 && selected->data->d_type == DT_REG)
-		preview_text(selected, preview_start);
+	{
+		if (selected->lines == 0)
+		{
+			if (is_binary(selected->data->d_name))
+			{
+				selected->lines = -1;
+				printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
+			}
+			else
+				selected->lines = count_lines(selected->data->d_name);
+		}
+		if (selected->lines < 0)
+			printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
+		else
+			preview_text(selected, preview_start);
+	}
 	free(cwd_name);
 }

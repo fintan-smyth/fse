@@ -29,12 +29,13 @@ int is_binary(char *path)
 	FILE	*fileptr;
 	char	buffer[500];
 	int		i;
+	int		n_read;
 
 	fileptr = fopen(path, "rb");
-	while (fread(buffer, 1, 500, fileptr) != 0)
+	while ((n_read = fread(buffer, 1, 500, fileptr)) != 0)
 	{
 		i = 0;
-		while (i < 500)
+		while (i < n_read)
 		{
 			if (( buffer[i] < 32 || buffer[i] > 126) && buffer[i] != '\n' && buffer[i] != '\t')
 			{
@@ -100,7 +101,7 @@ char	*replace_tab(char *string, size_t size)
 
 int	count_lines(char *path)
 {
-	size_t	size = 511;
+	size_t	size = 2000;
 	char	buf[size];
 	char	*line = buf;
 	int		line_no = 0;

@@ -1,13 +1,14 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
+#include <dirent.h>
 #include <stdio.h>
 
 
 
 int	navigate(vd_node *dir_node)
 {
-	char				*buf = malloc(500 * sizeof(char));
+	char				buf[500];
 	char				*editor = getenv("EDITOR");
 	char				*pager = getenv("PAGER");
 	char 				*searchp;
@@ -16,8 +17,7 @@ int	navigate(vd_node *dir_node)
 	vd_node				*parent;
 	entry_node			*selected;
 	entry_node			*search_result;
-	char				c;
-	char				s;
+	unsigned char				c;
 
 	children = dir_node->directory->children;
 	parent = get_parent(dir_node);
@@ -33,11 +33,11 @@ int	navigate(vd_node *dir_node)
 		{
 			chdir("..");
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'E')
 		{
+			reset_term_settings();
 			if (editor == NULL)
 				sprintf(buf, "%s %s", "vim", ".");
 			else
@@ -45,7 +45,6 @@ int	navigate(vd_node *dir_node)
 			system(buf);
 			set_term_settings();
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'H')
@@ -53,14 +52,12 @@ int	navigate(vd_node *dir_node)
 			FLAG_HIDDEN = !FLAG_HIDDEN;
 			dir_node->offset = 0;
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'P')
 		{
 			FLAG_PREVIEW = !FLAG_PREVIEW;
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == ':')
@@ -70,6 +67,12 @@ int	navigate(vd_node *dir_node)
 			char *bufp = buf;
 			while ((c = getchar()) != '\n')
 				*(bufp++) = c;
+			if (my_strlen(buf) == 0 || c == 27)
+			{
+				set_term_settings();
+				cleanup_directory(dir_node);
+				return (0);
+			}
 			printf("\e[2J\e[H\e[31m###OUTPUT###\e[m\n");
 			fflush(stdout);
 			system(buf);
@@ -77,13 +80,11 @@ int	navigate(vd_node *dir_node)
 			printf("Press any key to continue...");
 			c = getchar();
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'R')
 		{
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == '?')
@@ -115,7 +116,6 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
 			getchar();
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'p')
@@ -123,7 +123,6 @@ int	navigate(vd_node *dir_node)
 			clear_gutter();
 			paste(dir_node);
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'c')
@@ -132,7 +131,6 @@ int	navigate(vd_node *dir_node)
 			clear_path_list(cut);
 			clear_path_list(highlighted);
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		if (selected == NULL)
@@ -205,7 +203,6 @@ int	navigate(vd_node *dir_node)
 			{
 				chdir(selected->data->d_name);
 				cleanup_directory(dir_node);
-				free(buf);
 				return (0);
 			}
 			else if (selected->data->d_type == DT_LNK)
@@ -214,7 +211,6 @@ int	navigate(vd_node *dir_node)
 				{
 					chdir(buf);
 					cleanup_directory(dir_node);
-					free(buf);
 					return (0);
 				}
 			}
@@ -231,7 +227,6 @@ int	navigate(vd_node *dir_node)
 						sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->data->d_name);
 						system(buf);
 						cleanup_directory(dir_node);
-						free(buf);
 						free(ext_buf);
 						return (0);
 					}
@@ -245,12 +240,12 @@ int	navigate(vd_node *dir_node)
 					sprintf(buf, "%s \"%s\"", pager, selected->data->d_name);
 				system(buf);
 				cleanup_directory(dir_node);
-				free(buf);
 				return (0);
 			}
 		}
 		else if (c == 'e')
 		{
+			reset_term_settings();
 			if (editor == NULL)
 				sprintf(buf, "%s \"%s\"", "vim", selected->data->d_name);
 			else
@@ -258,7 +253,6 @@ int	navigate(vd_node *dir_node)
 			system(buf);
 			set_term_settings();
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		else if (c == 'y')
@@ -304,7 +298,6 @@ int	navigate(vd_node *dir_node)
 			}
 			set_term_settings();
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		// else if (c == ' ')
@@ -327,8 +320,8 @@ int	navigate(vd_node *dir_node)
 			printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
 			memset(dir_node->search_term, 0, 255);
 			searchp = dir_node->search_term;
-			while ((s = getchar()) != '\n')
-				*searchp++ = s;
+			while ((c = getchar()) != '\n')
+				*searchp++ = c;
 			*searchp++ = 0;
 			set_term_settings();
 			if ((search_result = get_search_match(dir_node)) != NULL)
@@ -336,7 +329,6 @@ int	navigate(vd_node *dir_node)
 			else
 			{
 				cleanup_directory(dir_node);
-				free(buf);
 				return (0);
 			}
 			draw_box();
@@ -345,24 +337,21 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == ']')
 		{
-			if (selected->data->d_type != DT_REG)
+			if ((selected->lines - preview_start) <= TERM_ROWS - 4)
 				continue;
-			if (is_binary(selected->data->d_name))
-				continue ;
-			if ((count_lines(selected->data->d_name) - preview_start) > TERM_ROWS - 4)
-				preview_start++;
+			preview_start++;
 		}
 		else if (c == '[')
 		{
-			if (preview_start > 0)
-				preview_start--;
+			if (preview_start <= 0)
+				continue;
+			preview_start--;
 		}
 		else if (c == 'w')
 		{
 			is_binary(selected->data->d_name);
 			cleanup_directory(dir_node);
-			free(buf);
-			exit (0);
+			exit(0);
 		}
 		else if (c == 'D')
 		{
@@ -405,13 +394,11 @@ int	navigate(vd_node *dir_node)
 				}
 			}
 			cleanup_directory(dir_node);
-			free(buf);
 			return (0);
 		}
 		display_directory(dir_node, selected, parent, preview_start);
 	}
 	cleanup_directory(dir_node);
-	free(buf);
 	return (1);
 }
 
