@@ -234,14 +234,15 @@ void	preview_text(entry_node *file, int start_line)
 	}
 	if (start_line > 0)
 	{
-		printf("\e[3;%dH\e[7m%*s", SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
+		printf("\e[3;%dH\e[1;7m%*s", SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
+		// printf("\e[%dG^\e[%dG]\e[m", (TERM_COLS + SEP_2) / 2, SEP_2 + 2);
 		printf("\e[%dG^\e[m", (TERM_COLS + SEP_2) / 2);
 	}
 	if ((file->lines - start_line) > TERM_ROWS - 4)
 	{
-		printf("\e[%d;%dH\e[7m%*s", TERM_ROWS - 2, SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
+		printf("\e[%d;%dH\e[1;7m%*s", TERM_ROWS - 2, SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
+		// printf("\e[%dGv\e[%dG]\e[m", (TERM_COLS + SEP_2) / 2, SEP_2 + 2);
 		printf("\e[%dGv\e[m", (TERM_COLS + SEP_2) / 2);
-		// printf("\e[%dG\e[7mlines: %d offset: %d rows: %d\e[m", SEP_2 + 3, file->lines, start_line, TERM_ROWS);
 	}
 	free(line);
 	fclose(fp);

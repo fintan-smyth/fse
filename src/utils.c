@@ -32,6 +32,8 @@ int is_binary(char *path)
 	int		n_read;
 
 	fileptr = fopen(path, "rb");
+	if (fileptr == NULL)
+		return (1);
 	while ((n_read = fread(buffer, 1, 500, fileptr)) != 0)
 	{
 		i = 0;
