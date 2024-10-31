@@ -22,27 +22,29 @@ Currently there is only basic functionality. Some of the available features are:
 |:---:|---|
 | q | Quit |
 | j | Select next |
-| k	| Select previous |
+| k | Select previous |
 | h | Go to parent directory |
-| l	| Open |
-|	y | Copy selected |
-| d	| Cut selected |
-| p	| Paste copy/cut buffer |
+| l | Open |
+| g | Select first entry |
+| G | Select last entry |
+| y | Copy selected |
+| d | Cut selected |
+| p | Paste copy/cut buffer |
 | c | Clear copy/cut buffer |
-| D	| Delete selected |
-| x	| Run selected executable |
-| e	| Open selected in editor |
-| E	| Open current directory in editor |
-| :	| Execute shell command |
+| D | Delete selected |
+| x | Run selected executable |
+| e | Open selected in editor |
+| E | Open current directory in editor |
+| : | Execute shell command |
 | / | Search in directory |
 | n | Next search result |
 | N | Previous Search result |
 | [ | Scroll up text preview |
 | ] | Scroll down text preview |
-| H	| Toggle hidden file visibility |
-| P	| Toggle text file preview |
-| R	| Reload directory |
-| ?	| Display these helpful instructions! |
+| H | Toggle hidden file visibility |
+| P | Toggle text file preview |
+| R | Reload directory |
+| ? | Display these helpful instructions! |
 
 ## Building
 
