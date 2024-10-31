@@ -96,6 +96,8 @@ int	navigate(vd_node *dir_node)
 			printf("\t\e[1mk\e[m\tSelect previous\n");
 			printf("\t\e[1mh\e[m\tGo to parent directory\n");
 			printf("\t\e[1ml\e[m\tOpen\n");
+			printf("\t\e[1mg\e[m\tSelect first entry\n");
+			printf("\t\e[1mG\e[m\tSelect last entry\n");
 			printf("\t\e[1my\e[m\tCopy selected\n");
 			printf("\t\e[1md\e[m\tCut selected\n");
 			printf("\t\e[1mp\e[m\tPaste selected\n");
@@ -170,6 +172,7 @@ int	navigate(vd_node *dir_node)
 		{
 			if (*dir_node->search_term != 0)
 			{
+				preview_start = 0;
 				do {
 					selected = selected->next;
 					if (selected == selected->next)
@@ -184,6 +187,7 @@ int	navigate(vd_node *dir_node)
 		{
 			if (*dir_node->search_term != 0)
 			{
+				preview_start = 0;
 				do {
 					selected = selected->prev;
 					if (selected == selected->prev)
@@ -347,6 +351,22 @@ int	navigate(vd_node *dir_node)
 				continue;
 			preview_start--;
 		}
+		else if (c == 'g')
+		{
+			preview_start = 0;
+			selected = children->next;
+			free(dir_node->selected_name);
+			dir_node->selected_name = strdup(selected->data->d_name);
+		}
+		else if (c == 'G')
+		{
+			preview_start = 0;
+			selected = children->next;
+			while (selected->next != selected->next->next)
+				selected = selected->next;
+			free(dir_node->selected_name); 
+			dir_node->selected_name = strdup(selected->data->d_name);
+		}
 		else if (c == 'w')
 		{
 			is_binary(selected->data->d_name);
@@ -375,21 +395,21 @@ int	navigate(vd_node *dir_node)
 						if (selected->prev == selected->prev->prev)
 						{
 							free(dir_node->selected_name); 
-							dir_node->selected_name = strdup("");	
+							dir_node->selected_name = strdup("");
 
 						}
 						else
 						{
 							selected = selected->prev;
-							free(dir_node->selected_name); 
-							dir_node->selected_name = strdup(selected->data->d_name);	
+							free(dir_node->selected_name);
+							dir_node->selected_name = strdup(selected->data->d_name);
 						}
 					}
 					else
 					{
 						selected = selected->next;
 						free(dir_node->selected_name); 
-						dir_node->selected_name = strdup(selected->data->d_name);	
+						dir_node->selected_name = strdup(selected->data->d_name);
 					}
 				}
 			}
