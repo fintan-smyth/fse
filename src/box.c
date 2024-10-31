@@ -31,17 +31,6 @@ void	set_term_settings(void)
 	printf("\e[?25l");
 }
 
-void	set_term_input(void)
-{
-	struct termios term;
-
-	set_winsize();
-    tcgetattr(fileno(stdin), &term);
-    term.c_lflag |= ECHO;
-    tcsetattr(fileno(stdin), TCSANOW, &term);
-	printf("\e[?25l");
-}
-
 void	reset_term_settings(void)
 {
 	struct termios term;
@@ -51,6 +40,7 @@ void	reset_term_settings(void)
     tcsetattr(fileno(stdin), TCSANOW, &term);
 	printf("\e[?25h");
 }
+
 void	draw_box(void)
 {
 	int	x;
@@ -64,7 +54,7 @@ void	draw_box(void)
 		while (x <= TERM_COLS)
 		{
 			printf("\e[%d;%dH", y, x);
-			if (y == 2 || y == TERM_ROWS - 1 || ((y == 1) && (x < SEP_2)))
+			if (y == 2 || y == TERM_ROWS - 1)
 				printf("%s", "─");
 			else if (y != 1 && (x == 1 || x == TERM_COLS || x == SEP_1))
 				printf("%s", "│");
@@ -76,12 +66,12 @@ void	draw_box(void)
 		}
 		y++;
 	}
-	printf("\e[;1H╭");
-	printf("\e[2;%dH┐\e[1;%dH╮", TERM_COLS, (SEP_2));
+	// printf("\e[;1H╭");
+	printf("\e[2;%dH┤", TERM_COLS);
 	printf("\e[%d;1H├", TERM_ROWS - 1);
 	printf("\e[%d;%dH┤", TERM_ROWS - 1, TERM_COLS);
 	printf("\e[2;%dH┬", (SEP_1));
-	printf("\e[2;%dH┼", (SEP_2));
+	printf("\e[2;%dH┬", (SEP_2));
 	printf("\e[2;1H├");
 	printf("\e[%d;%dH┴", TERM_ROWS - 1, (SEP_1));
 	printf("\e[%d;%dH┴", TERM_ROWS - 1, SEP_2);
@@ -144,4 +134,15 @@ void	clear_gutter(void)
 	while (i++ < TERM_COLS)
 		printf("─");
 	printf("╯");
+}
+
+void	clear_header(void)
+{
+	int	i;
+
+	printf("\e[1;1H╭");
+	i = 2;
+	while (i++ < TERM_COLS)
+		printf("─");
+	printf("╮");
 }
