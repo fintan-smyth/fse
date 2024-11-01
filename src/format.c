@@ -1,5 +1,6 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
+#include <string.h>
 #include "headers/format.h"
 
 int	FLAG_HIDDEN = 0;
@@ -226,7 +227,10 @@ void	preview_text(entry_node *file, int start_line)
 		if (to_skip-- > 0)
 			continue;
 		if (strlen(line) > 0)
-			line[strlen(line) - 1] = '\0';
+		{
+			if (line[strlen(line) - 1] == '\n')
+				line[strlen(line) - 1] = '\0';
+		}
 		line = replace_tab(line, size);
 		printf("\e[%dG%.*s\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, line);
 		line_no++;
