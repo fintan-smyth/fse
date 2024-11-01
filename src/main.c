@@ -1,10 +1,6 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
-#include <dirent.h>
-#include <stdio.h>
-
-
 
 int	navigate(vd_node *dir_node)
 {
@@ -354,6 +350,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == 'g')
 		{
 			preview_start = 0;
+			clear_gutter();
 			selected = children->next;
 			free(dir_node->selected_name);
 			dir_node->selected_name = strdup(selected->data->d_name);
@@ -361,6 +358,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == 'G')
 		{
 			preview_start = 0;
+			clear_gutter();
 			selected = children->next;
 			while (selected->next != selected->next->next)
 				selected = selected->next;
