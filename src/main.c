@@ -365,12 +365,12 @@ int	navigate(vd_node *dir_node)
 			free(dir_node->selected_name); 
 			dir_node->selected_name = strdup(selected->data->d_name);
 		}
-		else if (c == 'w')
-		{
-			is_binary(selected->data->d_name);
-			cleanup_directory(dir_node);
-			exit(0);
-		}
+		// else if (c == 'w')
+		// {
+		// 	printf("\e[2J\e[H%d", count_lines(selected->data->d_name));
+		// 	cleanup_directory(dir_node);
+		// 	exit(0);
+		// }
 		else if (c == 'D')
 		{
 			if (selected->data->d_type != DT_SOCK)
