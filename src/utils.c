@@ -101,25 +101,50 @@ char	*replace_tab(char *string, size_t size)
 	return (output);
 }
 
-int	count_lines(char *path)
-{
-	size_t	size = 2000;
-	char	buf[size];
-	char	*line = buf;
-	int		line_no = 0;
-	FILE	*fp;
+// int	count_lines(char *path)
+// {
+// 	size_t	size = 50000;
+// 	char	buf[size];
+// 	char	*line = buf;
+// 	int		line_no = 0;
+// 	FILE	*fp;
+//
+// 	fp = fopen(path, "r");
+// 	if (fp == NULL)
+// 	{
+// 		return (-1);
+// 	}
+// 	while ((getline(&line, &size, fp)) != -1)
+// 	{
+// 		line_no++;
+// 		// if (!str_printable(line))
+// 		// 	return (-1);
+// 	}
+// 	fclose(fp);
+// 	return (line_no);
+// }
 
-	fp = fopen(path, "r");
-	if (fp == NULL)
-	{
+int count_lines(char *path)
+{
+	FILE	*fileptr;
+	char	buffer[500];
+	int		i;
+	int		n_read;
+	int		lines = 0;
+
+	fileptr = fopen(path, "rb");
+	if (fileptr == NULL)
 		return (-1);
-	}
-	while ((getline(&line, &size, fp)) != -1)
+	while ((n_read = fread(buffer, 1, 500, fileptr)) != 0)
 	{
-		line_no++;
-		// if (!str_printable(line))
-		// 	return (-1);
+		i = 0;
+		while (i < n_read)
+		{
+			if (buffer[i] == '\n')
+				lines++;
+			i++;
+		}
 	}
-	fclose(fp);
-	return (line_no);
+	fclose(fileptr);
+	return (lines);
 }
