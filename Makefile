@@ -34,6 +34,7 @@ fclean: clean
 #	rm -f $(OBJ) $(NAME)
 
 install: 
+	mkdir -p ~/.local/bin/
 	cp ./fse ~/.local/bin/fse
 
 re: fclean all
