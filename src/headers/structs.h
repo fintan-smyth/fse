@@ -63,7 +63,6 @@ int				  check_visited(vd_node *visited, char *dir_name);
 
 extern path_node *copied;
 extern path_node *cut;
-extern path_node *highlighted;
 
 path_node	*init_path_list(void);
 path_node	*insert_path_node(char *path, path_node *t);
