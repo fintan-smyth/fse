@@ -109,8 +109,6 @@ struct directory	*get_directory(char *dir_name)
 	entry_list = malloc(no_entries * sizeof(*entry_list));
 	populate_entry_list(entry_list, head->next);
 	q_sort(entry_list, 0, no_entries - 1);
-	// print_ll(head);
-	// exit(0);
 	number_list(head);
 	free(entry_list);
 	return (directory);
@@ -126,7 +124,6 @@ void	free_visited(vd_node *head)
 	{
 		free(current->dir_name);
 		free(current->selected_name);
-		// cleanup_directory(current->directory);
 		current = current->next;
 	}
 	current = head;

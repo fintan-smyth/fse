@@ -115,8 +115,8 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 {
 	entry_node			*head;
 	entry_node			*current;
-	int				offset;
-	int 			max = TERM_ROWS - 4;
+	int					offset;
+	int 				max = TERM_ROWS - 4;
 
 	head = dir_node->directory->children;
 	if (head->next == head->next->next)
@@ -171,8 +171,8 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 
 void	display_subdirectory(entry_node *selected, char *path)
 {
-	vd_node				*current;
-	entry_node				*selected_sub;
+	vd_node		*current;
+	entry_node	*selected_sub;
 
 	if (strncmp(path, "/", strlen(path)))
 		path = strcat(path, "/");
@@ -238,13 +238,11 @@ void	preview_text(entry_node *file, int start_line)
 	{
 		printf("\e[3;%dH\e[1;7m%*s", SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
 		printf("\e[%dG^\e[%dG[\e[m", (TERM_COLS + SEP_2) / 2, TERM_COLS - 3);
-		// printf("\e[%dG^\e[m", (TERM_COLS + SEP_2) / 2);
 	}
 	if ((file->lines - start_line) > TERM_ROWS - 4)
 	{
 		printf("\e[%d;%dH\e[1;7m%*s", TERM_ROWS - 2, SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
 		printf("\e[%dGv\e[%dG]\e[m", (TERM_COLS + SEP_2) / 2, TERM_COLS - 3);
-		// printf("\e[%dGv\e[m", (TERM_COLS + SEP_2) / 2);
 	}
 	free(line);
 	fclose(fp);
@@ -253,9 +251,8 @@ void	preview_text(entry_node *file, int start_line)
 void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_start)
 {
 	int				size = 500 * sizeof(char);
-	char			*cwd_name =  malloc(size);
+	char			cwd_name[size];
 	char			buf[size];
-	// int				path_length;
 
 	getcwd(cwd_name, size);
 	print_entries(dir_node, selected, 0);
@@ -267,7 +264,6 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 	if (selected == NULL)
 	{
 		printf("\e[m ]");
-		free(cwd_name);
 		return ;
 	}
 	construct_path(buf, dir_node->dir_name, selected->data->d_name);
@@ -296,5 +292,4 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 		else
 			preview_text(selected, preview_start);
 	}
-	free(cwd_name);
 }

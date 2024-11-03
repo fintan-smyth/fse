@@ -132,8 +132,8 @@ char	*get_file_name(char *path)
 
 int	check_file_exists(vd_node *dir_node, char *path)
 {
-	char	*file_name;
-	entry_node *current = dir_node->directory->children->next;
+	char		*file_name;
+	entry_node	*current = dir_node->directory->children->next;
 
 
 	file_name = get_file_name(path);

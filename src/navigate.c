@@ -309,13 +309,12 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 		strcat(buf, "/");
 	strcat(buf, (*selected)->data->d_name);
 	clear_gutter();
-	printf("\e[%d;3H[ \e[1;33mdelete selected file? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, (*selected)->data->d_name);
+	printf("\e[%d;3H[ \e[1;33mdelete selected file? [y/N] : \e[m%.*s ]",
+		TERM_ROWS, TERM_COLS - 38, (*selected)->data->d_name);
 	if ((c = getchar()) == 'y')
 	{
 		if ((remove(buf)) != 0)
-		{
 			;
-		}
 		else if ((*selected)->next == (*selected)->next->next)
 		{
 			if ((*selected)->prev == (*selected)->prev->prev)
@@ -434,12 +433,12 @@ int	navigate(vd_node *dir_node)
 					return (0);
 				}
 				break;
-			case ('['):
+			case (']'):
 				if ((selected->lines - preview_offset) <= TERM_ROWS - 4)
 					continue;
 				preview_offset++;
 				break;
-			case (']'):
+			case ('['):
 				if (preview_offset <= 0)
 					continue;
 				preview_offset--;

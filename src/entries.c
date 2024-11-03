@@ -182,7 +182,7 @@ void q_sort(entry_node **entry_list, int left, int right)
 int	number_list(entry_node *head)
 {
 	entry_node	*current;
-	int		i;
+	int			i;
 
 	current = head->next;
 	i = 0;
@@ -198,7 +198,7 @@ int	number_list(entry_node *head)
 void	populate_entry_list(entry_node **entry_list, entry_node *first)
 {
 	entry_node	*current;
-	int		i = 0;
+	int			i = 0;
 
 	current = first;
 	while (current != current->next)

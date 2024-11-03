@@ -1,4 +1,3 @@
-// #include "navigate.c"
 #include "headers/format.h"
 #include <stdio.h>
 #include <stdlib.h>

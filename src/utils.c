@@ -101,29 +101,6 @@ char	*replace_tab(char *string, size_t size)
 	return (output);
 }
 
-// int	count_lines(char *path)
-// {
-// 	size_t	size = 50000;
-// 	char	buf[size];
-// 	char	*line = buf;
-// 	int		line_no = 0;
-// 	FILE	*fp;
-//
-// 	fp = fopen(path, "r");
-// 	if (fp == NULL)
-// 	{
-// 		return (-1);
-// 	}
-// 	while ((getline(&line, &size, fp)) != -1)
-// 	{
-// 		line_no++;
-// 		// if (!str_printable(line))
-// 		// 	return (-1);
-// 	}
-// 	fclose(fp);
-// 	return (line_no);
-// }
-
 int count_lines(char *path)
 {
 	FILE	*fileptr;
