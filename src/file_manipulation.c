@@ -354,7 +354,7 @@ void	format_filesize(off_t filesize)
 				printf("\e[38m%3.0fT", size);
 			break;
 		default:
-			printf("\e[32m%3.0f ", size);
+			printf("\e[32m%4.0f", size);
 			break;
 	}
 	printf("\e[m");
@@ -389,7 +389,7 @@ void	print_file_attributes(entry_node *entry)
 	printf("%s", (fs.st_mode & S_IWOTH) ? "\e[31mw" : "\e[30m-");
 	printf("%s", (fs.st_mode & S_IXOTH) ? "\e[32mx" : "\e[30m-");
 	printf(" \e[m");
-	format_filesize(fs.st_size);
+	(entry->data->d_type == DT_REG) ? format_filesize(fs.st_size) : printf("\e[30m   -");
 	user = user_from_uid(fs.st_uid);
 	group = group_from_gid(fs.st_gid);
 	printf(" \e[1;33m%s", user);
