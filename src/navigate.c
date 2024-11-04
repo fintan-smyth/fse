@@ -71,8 +71,6 @@ void	print_help(void)
 	printf("\t\e[1mk\e[m\tSelect previous\n");
 	printf("\t\e[1mh\e[m\tGo to parent directory\n");
 	printf("\t\e[1ml\e[m\tOpen\n");
-	printf("\t\e[1mg\e[m\tSelect first entry\n");
-	printf("\t\e[1mG\e[m\tSelect last entry\n");
 	printf("\t\e[1my\e[m\tCopy selected\n");
 	printf("\t\e[1md\e[m\tCut selected\n");
 	printf("\t\e[1mp\e[m\tPaste selected\n");
@@ -85,11 +83,12 @@ void	print_help(void)
 	printf("\t\e[1m/\e[m\tSearch in directory\n");
 	printf("\t\e[1mn\e[m\tNext search result\n");
 	printf("\t\e[1mN\e[m\tPrevious search result\n");
+	printf("\t\e[1mg\e[m\tSelect first entry\n");
+	printf("\t\e[1mG\e[m\tSelect last entry\n");
 	printf("\t\e[1m[\e[m\tScroll up text preview\n");
 	printf("\t\e[1m]\e[m\tScroll down text preview\n");
 	printf("\t\e[1mH\e[m\tToggle hidden file visibility\n");
 	printf("\t\e[1mP\e[m\tToggle text file preview\n");
-	printf("\t\e[1mR\e[m\tReload directory\n");
 	printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
 	getchar();
 }
