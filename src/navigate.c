@@ -76,6 +76,7 @@ void	print_help(void)
 	printf("\t\e[1mp\e[m\tPaste selected\n");
 	printf("\t\e[1mc\e[m\tClear copy/cut buffer\n");
 	printf("\t\e[1mD\e[m\tDelete selected\n");
+	printf("\t\e[1mr\e[m\tRename selected\n");
 	printf("\t\e[1mx\e[m\tRun selected executable\n");
 	printf("\t\e[1me\e[m\tOpen selected in editor\n");
 	printf("\t\e[1mE\e[m\tOpen current directory in editor\n");
