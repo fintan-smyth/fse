@@ -71,13 +71,13 @@ void	clear_path_list(path_node *head)
 		delete_next_path(head);
 }
 
-int	check_path(path_node *copied, char *path)
+int	check_path(path_node *path_list, char *path)
 {
 	path_node	*current;
 
-	if (copied->next == copied->next->next)
+	if (path_list->next == path_list->next->next)
 		return (0);
-	current = copied->next;
+	current = path_list->next;
 	while (current != current->next)
 	{
 		if (strcmp(path, current->path) == 0)
@@ -130,7 +130,7 @@ char	*get_file_name(char *path)
 	return (file_name);
 }
 
-int	check_file_exists(vd_node *dir_node, char *path)
+int	check_path_exists(vd_node *dir_node, char *path)
 {
 	char		*file_name;
 	entry_node	*current = dir_node->directory->children->next;
@@ -150,6 +150,20 @@ int	check_file_exists(vd_node *dir_node, char *path)
 	return (0);
 }
 
+int	check_file_exists(vd_node *dir_node, char *file_name)
+{
+	entry_node	*current = dir_node->directory->children->next;
+
+	while (current != current->next)
+	{
+		if (strcmp(file_name, current->data->d_name) == 0)
+			return (1);
+		current = current->next;
+	}
+	return (0);
+}
+
+
 void	paste(vd_node *dir_node)
 {
 	path_node	*current;
@@ -160,7 +174,7 @@ void	paste(vd_node *dir_node)
 	current = copied;
 	while (current->next != current->next->next)
 	{
-		if (check_file_exists(dir_node, current->next->path))
+		if (check_path_exists(dir_node, current->next->path))
 		{
 			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, current->next->path);
 			if ((c = getchar()) != 'y')
@@ -182,7 +196,7 @@ void	paste(vd_node *dir_node)
 	current = cut;
 	while (current->next != current->next->next)
 	{
-		if (check_file_exists(dir_node, current->next->path))
+		if (check_path_exists(dir_node, current->next->path))
 		{
 			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, current->next->path);
 			if ((c = getchar()) != 'y')

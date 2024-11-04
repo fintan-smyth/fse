@@ -73,6 +73,7 @@ int			check_path(path_node *copied, char *path);
 int			delete_path(char *path, path_node *head);
 char		*construct_path(char *buf, char *directory, char *file_name);
 char		*get_file_name(char *path);
+int			check_path_exists(vd_node *dir_node, char *path);
 int			check_file_exists(vd_node *dir_node, char *path);
 void		paste(vd_node *dir_node);
 void		print_copied(path_node *copied);

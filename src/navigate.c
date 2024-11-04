@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
+#include <string.h>
 #include <sys/ioctl.h>
 
 void	open_dir_in_editor(char *buf)
@@ -339,6 +340,37 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 	}
 }
 
+void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
+{
+	char	*bufp = buf;
+	char	command_buf[500];
+	char	c;
+
+	reset_term_settings();
+	printf("\e[%d;3H[%*s]\e[4G \e[33mrename:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
+	while ((c = getchar()) != '\n')
+		*(bufp++) = c;
+	set_term_settings();
+	if (my_strlen(buf) == 0 || c == 27 || str_printable(buf) == 0)
+		return ;
+	if (check_file_exists(dir_node, buf))
+	{
+		draw_box();
+		display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
+		clear_gutter();
+		printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, buf);
+		if ((c = getchar()) != 'y')
+			return ;
+	}
+	set_term_settings();
+	sprintf(command_buf, "mv \"%s\" \"%s\"", selected->data->d_name, buf);
+	if (system(command_buf) == 0)
+	{
+		free(dir_node->selected_name);
+		dir_node->selected_name = strdup(buf);
+	}
+}
+
 int	navigate(vd_node *dir_node)
 {
 	char				buf[500];
@@ -451,6 +483,10 @@ int	navigate(vd_node *dir_node)
 				break;
 			case ('D'):
 				delete_selected(dir_node, &selected, buf);
+				cleanup_directory(dir_node);
+				return (0);
+			case ('r'):
+				rename_file(dir_node, selected, buf);
 				cleanup_directory(dir_node);
 				return (0);
 		}
