@@ -25,13 +25,12 @@ Currently there is only basic functionality. Some of the available features are:
 | k | Select previous |
 | h | Go to parent directory |
 | l | Open |
-| g | Select first entry |
-| G | Select last entry |
 | y | Copy selected |
 | d | Cut selected |
 | p | Paste copy/cut buffer |
 | c | Clear copy/cut buffer |
 | D | Delete selected |
+| r | Rename selected |
 | x | Run selected executable |
 | e | Open selected in editor |
 | E | Open current directory in editor |
@@ -39,11 +38,12 @@ Currently there is only basic functionality. Some of the available features are:
 | / | Search in directory |
 | n | Next search result |
 | N | Previous Search result |
+| g | Select first entry |
+| G | Select last entry |
 | [ | Scroll up text preview |
 | ] | Scroll down text preview |
 | H | Toggle hidden file visibility |
 | P | Toggle text file preview |
-| R | Reload directory |
 | ? | Display these helpful instructions! |
 
 ## Building
