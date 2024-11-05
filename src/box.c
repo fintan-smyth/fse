@@ -58,7 +58,7 @@ void	reset_term_settings(void)
 }
 
 void	draw_box(void)
-// Prints the border frame border
+// Prints the frame border
 {
 	int	x;
 	int	y;
