@@ -43,7 +43,7 @@ Currently there is only basic functionality. Some of the available features are:
 | [ | Scroll up text preview |
 | ] | Scroll down text preview |
 | H | Toggle hidden file visibility |
-| P | Toggle text file preview |
+| P | Toggle parent directory preview |
 | ? | Display these helpful instructions! |
 
 ## Building

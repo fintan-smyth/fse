@@ -256,7 +256,8 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 
 	getcwd(cwd_name, size);
 	print_entries(dir_node, selected, 0);
-	display_parent(dir_node, parent);
+	if (FLAG_PREVIEW == 1)
+		display_parent(dir_node, parent);
 	clear_header();
 	printf("\e[1;3H[ \e[31;1m%.*s", TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
@@ -275,7 +276,7 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 	clear_sub_box();
 	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
 		display_subdirectory(selected, cwd_name);
-	else if (FLAG_PREVIEW == 1 && selected->data->d_type == DT_REG)
+	else if (selected->data->d_type == DT_REG)
 	{
 		if (selected->lines == 0)
 		{

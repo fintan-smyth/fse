@@ -89,7 +89,7 @@ void	print_help(void)
 	printf("\t\e[1m[\e[m\tScroll up text preview\n");
 	printf("\t\e[1m]\e[m\tScroll down text preview\n");
 	printf("\t\e[1mH\e[m\tToggle hidden file visibility\n");
-	printf("\t\e[1mP\e[m\tToggle text file preview\n");
+	printf("\t\e[1mP\e[m\tToggle parent directory preview\n");
 	printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
 	getchar();
 }
