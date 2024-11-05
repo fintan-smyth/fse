@@ -46,9 +46,9 @@ void		print_ll(entry_node *head);
 void		swap_adj_nodes(entry_node *a, entry_node *b);
 void		swap_distant_nodes(entry_node *a, entry_node *b);
 void		swap_nodes(entry_node *a, entry_node *b);
-void		swap_entries(entry_node **entry_list, int i, int j);
-void		populate_entry_list(entry_node **entry_list, entry_node *first);
-void		q_sort(entry_node **entry_list, int left, int right);
+void		swap_entries(entry_node **entry_array, int i, int j);
+void		populate_entry_array(entry_node **entry_array, entry_node *first);
+void		q_sort(entry_node **entry_array, int left, int right);
 int			number_list(entry_node *head);
 int			comp_entries(entry_node *a, entry_node *b);
 
