@@ -9,19 +9,19 @@ entry_node *init_list(void)
 // Returns:
 //  - Pointer to head of the entry list
 {
-    entry_node *head;
-    entry_node *tail;
+	entry_node *head;
+	entry_node *tail;
 
 	head = (entry_node *)malloc(sizeof(*head));
 	tail = (entry_node *)malloc(sizeof(*tail));
 	head->next = tail;
-    head->data = NULL;
+	head->data = NULL;
 	head->pos = -5;
 	tail->next = tail;
 	tail->prev = head;
-    tail->data = NULL;
+	tail->data = NULL;
 	head->prev = head;
-    return (head);
+	return (head);
 }
 
 void    delete_next_entry(entry_node *t)
@@ -29,11 +29,11 @@ void    delete_next_entry(entry_node *t)
 // Args:
 //  - t:	pointer to the node before the node to be deleted
 {
-    entry_node *temp;
-    temp = t->next;
+	entry_node *temp;
+	temp = t->next;
 	t->next = t->next->next;
 	t->next->prev = t;
-    free(temp);
+	free(temp);
 }
 
 entry_node *insertafter(struct dirent *data, entry_node *t)
