@@ -11,6 +11,7 @@ int	SEP_1;
 int	SEP_2;
 
 void	set_winsize(void)
+// Sets global variables containing terminal dimensions
 {
 	struct winsize w;
 
@@ -25,11 +26,17 @@ void	set_winsize(void)
 }
 
 void	store_term_settings(void)
+// Stores the original terminal emulator attributes
 {
 	tcgetattr(STDIN_FILENO, &g_term_original);
 }
 
 void	set_term_settings(void)
+// Sets the terminal attributes to those
+// needed by the program:
+//  - Disabling STDIN echo
+//  - Processing single characters from STDIN as they appear
+//  - Turning off cursor
 {
 	struct termios term;
 
@@ -42,6 +49,7 @@ void	set_term_settings(void)
 }
 
 void	reset_term_settings(void)
+// Restores terminal attributes to their original state
 {
 	struct termios term;
 	term = g_term_original;
@@ -50,6 +58,7 @@ void	reset_term_settings(void)
 }
 
 void	draw_box(void)
+// Prints the border frame border
 {
 	int	x;
 	int	y;
@@ -89,6 +98,7 @@ void	draw_box(void)
 }
 
 void	clear_main_box(void)
+// Clears the box displaying the current directory
 {
 	int	row;
 	int	width;
@@ -105,6 +115,7 @@ void	clear_main_box(void)
 }
 
 void	clear_parent_box(void)
+// Clears the box displaying the parent directory
 {
 	int	row;
 	int	width;
@@ -121,6 +132,7 @@ void	clear_parent_box(void)
 }
 
 void	clear_sub_box(void)
+// Clears the box previewing the contents of the selected file/directory
 {
 	int	row;
 	int	width;
@@ -137,6 +149,8 @@ void	clear_sub_box(void)
 }
 
 void	clear_gutter(void)
+// Clears the "gutter" i.e the bottom row where relevant 
+// information/prompts are displayed
 {
 	int	i;
 	
@@ -150,6 +164,8 @@ void	clear_gutter(void)
 }
 
 void	clear_header(void)
+// Clears the "header" i.e the top row where the current 
+// directory and selected file are displayed
 {
 	int	i;
 
