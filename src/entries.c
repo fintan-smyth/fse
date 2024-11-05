@@ -3,8 +3,11 @@
 #include <string.h>
 #include "headers/structs.h"
 
-
 entry_node *init_list(void)
+// Initialises a doubly linked list of nodes containing information
+// about the entries in a directory.
+// Returns:
+//  - Pointer to head of the entry list
 {
     entry_node *head;
     entry_node *tail;
@@ -22,6 +25,9 @@ entry_node *init_list(void)
 }
 
 void    delete_next_entry(entry_node *t)
+// Deletes a node from the given entry list.
+// Args:
+//  - t:	pointer to the node before the node to be deleted
 {
     entry_node *temp;
     temp = t->next;
@@ -31,6 +37,12 @@ void    delete_next_entry(entry_node *t)
 }
 
 entry_node *insertafter(struct dirent *data, entry_node *t)
+// Inserts a node into a list of entries.
+// Args:
+//  - data:	pointer to 'dirent' struct containing information about an entry
+//  - t:	pointer to the node after which the new node will be inserted
+// Returns:
+//  - Pointer to the newly inserted node
 {
 	entry_node *new;
 
@@ -45,6 +57,9 @@ entry_node *insertafter(struct dirent *data, entry_node *t)
 }
 
 void    free_entries(entry_node *head)
+// Frees a list of entries.
+// Args:
+//  - head:	pointer to the head of a list of entries
 {
     entry_node	*current;
     entry_node	*temp;
@@ -61,21 +76,11 @@ void    free_entries(entry_node *head)
     free(temp);
 }
 
-void    print_ll(entry_node *head)
-{
-	entry_node *current;
-
-	// printf("<addr: %p>\t<next: %p>\t<prev: %p>\t<data: %4d \"%s\">\n", head, head->next, head->prev, head->pos, NULL);
-	current = head->next;
-	while (current != current->next)
-	{
-		printf("<addr: %p>\t<next: %p>\t<prev: %p>\t<data: %4d %4d \"%s\">\n", current, current->next, current->prev, current->pos, current->data->d_type, current->data->d_name);
-		current = current->next;
-	}
-	// printf("<addr: %p>\t<next: %p>\t<prev: %p>\t<data: %4d \"%s\">\n", current, current->next, current->prev, current->pos, NULL);
-}
-
 void	swap_adj_nodes(entry_node *a, entry_node *b)
+// Swaps the position of two adjacent entry nodes.
+// Args:
+//  - a:	pointer to the node earlier in the list
+//  - b:	pointer to the node later in the list
 {
 	entry_node	*temp = malloc(sizeof(*temp));
 
@@ -94,6 +99,10 @@ void	swap_adj_nodes(entry_node *a, entry_node *b)
 }
 
 void	swap_distant_nodes(entry_node *a, entry_node *b)
+// Swaps the position of two non-adjacent entry nodes.
+// Args:
+//  - a:	pointer to the node earlier in the list
+//  - b:	pointer to the node later in the list
 {
 	entry_node	*temp = malloc(sizeof(*temp));
 	
@@ -113,6 +122,10 @@ void	swap_distant_nodes(entry_node *a, entry_node *b)
 }
 
 void	swap_nodes(entry_node *a, entry_node *b)
+// Swaps the position of any two nodes in an entry list.
+// Args:
+//  - a:	pointer to a node in the entry list
+//  - b:	pointer to a node in the entry list
 {
 	entry_node	*first;
 	entry_node	*second;
@@ -140,17 +153,29 @@ void	swap_nodes(entry_node *a, entry_node *b)
 		swap_distant_nodes(first, second);
 }
 
-void	swap_entries(entry_node **entry_list, int i, int j)
+void	swap_entries(entry_node **entry_array, int i, int j)
+// Swaps the position of two entries in the sort array.
+// Args:
+//  - entry_array:	array of pointers to entry nodes, to be used for sorting
+//  - i:			index of entry in sort array
+//  - j:			index of entry in sort array
 {
 	entry_node	*temp;
 
-	swap_nodes(entry_list[i], entry_list[j]);
-	temp = entry_list[i];
-	entry_list[i] = entry_list[j];
-	entry_list[j] = temp;
+	swap_nodes(entry_array[i], entry_array[j]);
+	temp = entry_array[i];
+	entry_array[i] = entry_array[j];
+	entry_array[j] = temp;
 }
 
 int	comp_entries(entry_node *a, entry_node *b)
+// Compares entries by type and then alphabetical order, for use in q_sort.
+// Args:
+//  - a:	pointer to entry to compare
+//  - b:	pointer to entry to compare
+// Returns:
+//  - 1 if position of nodes should be swapped
+//  - 0 if position of nodes should not be swapped
 {
 	int	type_comp = b->data->d_type - a->data->d_type;
 
@@ -161,25 +186,35 @@ int	comp_entries(entry_node *a, entry_node *b)
 	return (0);
 }
 
-void q_sort(entry_node **entry_list, int left, int right)
+void q_sort(entry_node **entry_array, int left, int right)
+// Stably quicksorts a list of entries by type and then alphabetical order.
+// Args:
+//  - entry_array:	array of pointers to entry nodes, to be used for sorting
+//  - left:			index of leftmost entry to sort
+//  - right:		index of rightmost entry to sort
 {
 	int i, last;
 
 	if (left >= right)
 		return;
-	swap_entries(entry_list, left, (left + right) / 2);
+	swap_entries(entry_array, left, (left + right) / 2);
 	last = left;
 	for (i = left + 1; i <= right; i++)
 	{
-		if (comp_entries(entry_list[i], entry_list[left]))
-			swap_entries(entry_list, ++last, i);
+		if (comp_entries(entry_array[i], entry_array[left]))
+			swap_entries(entry_array, ++last, i);
 	}
-	swap_entries(entry_list, left, last);
-	q_sort(entry_list, left, last - 1);
-	q_sort(entry_list, last + 1, right);
+	swap_entries(entry_array, left, last);
+	q_sort(entry_array, left, last - 1);
+	q_sort(entry_array, last + 1, right);
 }
 
 int	number_list(entry_node *head)
+// Numbers the entries in a list based on their position in the list.
+// Args:
+//  - head:	pointer to head of the entry list to number
+// Returns:
+//  - Number of entries in the list
 {
 	entry_node	*current;
 	int			i;
@@ -190,12 +225,15 @@ int	number_list(entry_node *head)
 	{
 		current->pos = ++i;
 		current = current->next;
-
 	}
 	return (i);
 }
 
-void	populate_entry_list(entry_node **entry_list, entry_node *first)
+void	populate_entry_array(entry_node **entry_array, entry_node *first)
+// Populates the array used for sorting an entry list.
+// Args:
+//  - entry_array:	array of pointers to entry nodes, to be used for sorting
+//  - first:		pointer to the first entry in an entry list (i.e one after the head)
 {
 	entry_node	*current;
 	int			i = 0;
@@ -203,13 +241,18 @@ void	populate_entry_list(entry_node **entry_list, entry_node *first)
 	current = first;
 	while (current != current->next)
 	{
-		entry_list[i] = current;
+		entry_array[i] = current;
 		i++;
 		current = current->next;
 	}
 }
 
 entry_node	*get_selected(vd_node *dir_node)
+// Retrieves the node of the selected entry in a directory.
+// Args:
+//  - dir_node:	pointer to the vd_node who's selected entry should be retrieved
+// Returns:
+//  - Pointer to the entry_node of the selected entry
 {
 	entry_node	*children;
 	entry_node	*selected;
@@ -236,6 +279,12 @@ entry_node	*get_selected(vd_node *dir_node)
 }
 
 entry_node	*get_search_match(vd_node *dir_node)
+// Finds the first entry in a directory matching the search term
+// Args:
+//  - dir_node: pointer to search directory
+// Returns:
+//  - pointer to first entry node matching search term
+//  - NULL if no entry matches search term
 {
 	entry_node	*children;
 	entry_node	*current;
