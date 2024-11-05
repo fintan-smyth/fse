@@ -5,6 +5,10 @@ extern int FLAG_HIDDEN;
 vd_node	*VISITED_DIRS;
 
 struct vd_node	*init_visited(void)
+// Initialises a linked list of nodes containing information
+// about directories that have been visited.
+// Returns:
+//  - Pointer to head of the linked list
 {
 	struct vd_node	*head;
 	struct vd_node	*tail;
@@ -22,7 +26,13 @@ struct vd_node	*init_visited(void)
 	return (head);
 }
 
-vd_node	*vd_insert(vd_node *visited, char *dir_name)
+vd_node	*vd_insert(vd_node *visited, char *dir_path)
+// Inserts a node into the linked list of visited directories
+// Args:
+//  - visited:	pointer to the head of the visited directories list
+//  - dir_name:	full path of directory
+// Returns:
+//  - Pointer to newly inserted node
 {
 	vd_node 			*new = malloc(sizeof(*new));
 
@@ -30,21 +40,28 @@ vd_node	*vd_insert(vd_node *visited, char *dir_name)
 	visited->next = new;
 	new->directory = NULL;
 	memset(new->search_term, 0, 255);
-	new->dir_name = strdup(dir_name);
+	new->dir_name = strdup(dir_path);
 	new->selected_name = malloc(1 * sizeof(char));
 	memset(new->selected_name, 0, 1 * sizeof(char));
 	new->offset = 0;
 	return (new);
 }
 
-int	check_visited(vd_node *visited, char *dir_name)
+int	check_visited(vd_node *visited, char *dir_path)
+// Checks if a directory has already been visited
+// Args:
+//  - visited:	pointer to the head of the visited directories list
+//  - dir_name:	full path of directory
+// Returns:
+//  - 1 if directory has been visited
+//  - 0 if directory has not been visited
 {
 	vd_node	*current;
 
 	current = visited->next;
 	while (current != current->next)
 	{
-		if ((strncmp(current->dir_name, dir_name, strlen(current->dir_name)) == 0) && (strncmp(current->dir_name, dir_name, strlen(dir_name)) == 0))
+		if ((strncmp(current->dir_name, dir_path, strlen(current->dir_name)) == 0) && (strncmp(current->dir_name, dir_path, strlen(dir_path)) == 0))
 			return (1);
 		current = current->next;
 	}
@@ -52,6 +69,10 @@ int	check_visited(vd_node *visited, char *dir_name)
 }
 
 void	cleanup_directory(vd_node *dir_node)
+// Frees resources associated with an open directory, allowing
+// its contents to be refreshed.
+// Args:
+//  - dir_node:	pointer to node in visited directories list
 {
 	free_entries(dir_node->directory->children);
 	closedir(dir_node->directory->dir);
@@ -60,21 +81,27 @@ void	cleanup_directory(vd_node *dir_node)
 	dir_node->directory = NULL;
 }
 
-struct directory	*get_directory(char *dir_name)
+struct directory	*get_directory(char *dir_path)
+// Creates a list of the entries in a directory, sorts them, and 
+// puts the list in a 'directory' struct.
+// Args:
+//  - dir_path:	full path to directory
+// Returns:
+//  - 'directory' struct containing doubly linked list of entries
 {
 	struct dirent		*child;
 	struct directory	*directory;
 	DIR					*dir;
 	entry_node			*head;
 	entry_node			*current;
-	entry_node			**entry_list;
+	entry_node			**entry_array;
 	int					no_entries;
 
 	directory = malloc(sizeof(*directory));
 	head = init_list();
 	directory->children = head;
 	current = head;
- 	dir = opendir(dir_name);
+ 	dir = opendir(dir_path);
 	directory->dir = dir;
 	if (dir == NULL)
 	{
@@ -106,15 +133,18 @@ struct directory	*get_directory(char *dir_name)
 			current = current->next;
 	}
 	no_entries = number_list(head);
-	entry_list = malloc(no_entries * sizeof(*entry_list));
-	populate_entry_list(entry_list, head->next);
-	q_sort(entry_list, 0, no_entries - 1);
+	entry_array = malloc(no_entries * sizeof(*entry_array));
+	populate_entry_array(entry_array, head->next);
+	q_sort(entry_array, 0, no_entries - 1);
 	number_list(head);
-	free(entry_list);
+	free(entry_array);
 	return (directory);
 }
 
 void	free_visited(vd_node *head)
+// Frees the list of visited directories.
+// Args:
+//  - head: pointer to head of visited directories list
 {
 	vd_node	*current;
 	vd_node	*temp;
@@ -137,6 +167,13 @@ void	free_visited(vd_node *head)
 }
 
 vd_node	*get_vd_node(vd_node *visited, char *path)
+// Retrieves the vd_node associated with a given directory path.
+// If no node exists, creates a new one.
+// Args:
+//  - visited:	pointer to head of visited directories list
+//  - path:		full path of directory
+// Returns:
+//  - Pointer to the node associated with the given directory path
 {
 	vd_node	*current;
 
@@ -154,6 +191,11 @@ vd_node	*get_vd_node(vd_node *visited, char *path)
 }
 
 vd_node	*get_parent(vd_node *dir_node)
+// Retrieves the vd_node of a given directory's parent.
+// Args:
+//  - dir_node:	node of the directory who's parent should be retrieved
+// Returns:
+//   - Pointer to the node of the parent directory
 {
 	vd_node	*parent;
 	int		i;
