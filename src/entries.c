@@ -24,7 +24,7 @@ entry_node *init_list(void)
 	return (head);
 }
 
-void    delete_next_entry(entry_node *t)
+void	delete_next_entry(entry_node *t)
 // Deletes a node from the given entry list.
 // Args:
 //  - t:	pointer to the node before the node to be deleted
@@ -56,24 +56,24 @@ entry_node *insertafter(struct dirent *data, entry_node *t)
 	return (new);
 }
 
-void    free_entries(entry_node *head)
+void	free_entries(entry_node *head)
 // Frees a list of entries.
 // Args:
 //  - head:	pointer to the head of a list of entries
 {
-    entry_node	*current;
-    entry_node	*temp;
+	entry_node	*current;
+	entry_node	*temp;
 
-    current = head;
-    while (current->next != current->next->next)
-    {
-        temp = current->next;
-        free(current);
-        current = temp;
-    }
-    temp = current->next;
-    free(current);
-    free(temp);
+	current = head;
+	while (current->next != current->next->next)
+	{
+		temp = current->next;
+		free(current);
+		current = temp;
+	}
+	temp = current->next;
+	free(current);
+	free(temp);
 }
 
 void	swap_adj_nodes(entry_node *a, entry_node *b)

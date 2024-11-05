@@ -15,7 +15,7 @@ void	set_winsize(void)
 {
 	struct winsize w;
 
-    ioctl(0, TIOCGWINSZ, &w);
+	ioctl(0, TIOCGWINSZ, &w);
 	TERM_COLS = w.ws_col;
 	TERM_ROWS = w.ws_row;
 	if (FLAG_PREVIEW == 1)
@@ -42,9 +42,9 @@ void	set_term_settings(void)
 
 	set_winsize();
 	term = g_term_original;
-    term.c_lflag &= ~ECHO;
+	term.c_lflag &= ~ECHO;
 	term.c_lflag &= ~(ICANON);
-    tcsetattr(fileno(stdin), TCSANOW, &term);
+	tcsetattr(fileno(stdin), TCSANOW, &term);
 	printf("\e[?25l");
 }
 
@@ -53,7 +53,7 @@ void	reset_term_settings(void)
 {
 	struct termios term;
 	term = g_term_original;
-    tcsetattr(fileno(stdin), TCSANOW, &term);
+	tcsetattr(fileno(stdin), TCSANOW, &term);
 	printf("\e[?25h");
 }
 
