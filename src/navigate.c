@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
+#include "headers/env.h"
 #include <string.h>
 #include <sys/ioctl.h>
 
@@ -42,19 +43,21 @@ void	open_selected_in_editor(entry_node *selected, char *buf)
 void	toggle_hidden(void)
 // Toggles showing hidden files.
 {
-	FLAG_HIDDEN = !FLAG_HIDDEN;
+	env.FLAGS ^= F_HIDDEN;
 }
 
 void	toggle_preview(void)
 // Toggles previewing parent directory.
 {
-	FLAG_PREVIEW = !FLAG_PREVIEW;
+	env.FLAGS ^= F_PREVIEW;
 }
 
 void	toggle_sort(void)
 // Swaps between sorting by alphabetical order/filesize
 {
-	FLAG_SORT = !FLAG_SORT;
+	env.FLAGS ^= F_SORT;
+	/*printf("\e[2J\e[H%.8b\n", env.FLAGS);*/
+	/*exit(0);*/
 }
 
 void	execute_shell_cmd(char	*buf)
@@ -66,7 +69,7 @@ void	execute_shell_cmd(char	*buf)
 	char	c;
 
 	reset_term_settings();
-	printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
+	printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
 	while ((c = getchar()) != '\n')
 		*(bufp++) = c;
 	if (my_strlen(buf) == 0 || c == 27)
@@ -331,7 +334,7 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 	char	c;
 
 	reset_term_settings();
-	printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
+	printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
 	memset(dir_node->search_term, 0, 255);
 	searchp = dir_node->search_term;
 	while ((c = getchar()) != '\n')
@@ -343,7 +346,7 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 	*selected = *search_result;
 	draw_box();
 	clear_gutter();
-	printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", TERM_ROWS, (SEP_2) - 6, dir_node->search_term);
+	printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", env.TERM_ROWS, (env.SEP_2) - 6, dir_node->search_term);
 	return (0);
 }
 
@@ -394,7 +397,7 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 	strcat(buf, (*selected)->data->d_name);
 	clear_gutter();
 	printf("\e[%d;3H[ \e[1;33mdelete selected file? [y/N] : \e[m%.*s ]",
-		TERM_ROWS, TERM_COLS - 38, (*selected)->data->d_name);
+		env.TERM_ROWS, env.TERM_COLS - 38, (*selected)->data->d_name);
 	if ((c = getchar()) == 'y')
 	{
 		if ((remove(buf)) != 0)
@@ -435,7 +438,7 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 	char	c;
 
 	reset_term_settings();
-	printf("\e[%d;3H[%*s]\e[4G \e[33mrename:\e[m ", TERM_ROWS, (TERM_COLS) - 6, "");
+	printf("\e[%d;3H[%*s]\e[4G \e[33mrename:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
 	while ((c = getchar()) != '\n')
 		*(bufp++) = c;
 	set_term_settings();
@@ -446,7 +449,7 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 		draw_box();
 		display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
 		clear_gutter();
-		printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, buf);
+		printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", env.TERM_ROWS, env.TERM_COLS - 38, buf);
 		if ((c = getchar()) != 'y')
 			return ;
 	}
@@ -564,7 +567,7 @@ int	navigate(vd_node *dir_node)
 				}
 				break;
 			case (']'):
-				if ((selected->lines - preview_offset) <= TERM_ROWS - 4)
+				if ((selected->lines - preview_offset) <= env.TERM_ROWS - 4)
 					continue;
 				preview_offset++;
 				break;

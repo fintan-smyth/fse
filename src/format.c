@@ -1,8 +1,6 @@
 #include "headers/utils.h"
 #include "headers/format.h"
-
-int	FLAG_HIDDEN = 0;
-int	FLAG_PREVIEW = 1;
+#include "headers/env.h"
 
 void	colour_entry(entry_node *entry)
 // Prints the appropriate escape code to colour an entry's
@@ -86,20 +84,20 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	construct_path(buf, dir_node->dir_name, current->data->d_name);
 	switch (level) {
 		case 0:
-			offset = SEP_1 + 2;
-			box_width = (SEP_2 - SEP_1) - 3;
+			offset = env.SEP_1 + 2;
+			box_width = (env.SEP_2 - env.SEP_1) - 3;
 			break;
 		case 1:
-			box_width = (TERM_COLS - SEP_2) - 3;
-			offset = SEP_2 + 2;
+			box_width = (env.TERM_COLS - env.SEP_2) - 3;
+			offset = env.SEP_2 + 2;
 			break;
 		case -1:
-			box_width = SEP_1 - 4;
+			box_width = env.SEP_1 - 4;
 			offset = 3;
 			break;
 		default :
-			offset = SEP_1 + 2;
-			box_width = (SEP_2 - SEP_1) - 3;
+			offset = env.SEP_1 + 2;
+			box_width = (env.SEP_2 - env.SEP_1) - 3;
 			break;
 	}
 	printf("\e[%dG", offset);
@@ -139,7 +137,7 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 	entry_node			*head;
 	entry_node			*current;
 	int					offset;
-	int 				max = TERM_ROWS - 4;
+	int 				max = env.TERM_ROWS - 4;
 
 	head = dir_node->directory->children;
 	if (head->next == head->next->next)
@@ -251,11 +249,11 @@ void	preview_text(entry_node *file, int preview_offset)
 	if (fp == NULL)
 	{
 		free(line);
-		printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
+		printf("\e[3;%dH\e[7m%.*s\e[m\n", env.SEP_2 + 2, (env.TERM_COLS - env.SEP_2) - 2, "Cannot preview file");
 		return;
 	}
 	printf("\e[3;1H");
-	while (line_no < TERM_ROWS - 2 && (getline(&line, &size, fp)) != -1)
+	while (line_no < env.TERM_ROWS - 2 && (getline(&line, &size, fp)) != -1)
 	{
 		if (to_skip-- > 0)
 			continue;
@@ -265,19 +263,19 @@ void	preview_text(entry_node *file, int preview_offset)
 				line[strlen(line) - 1] = '\0';
 		}
 		line = replace_tab(line, size);
-		printf("\e[%dG%.*s\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, line);
+		printf("\e[%dG%.*s\n", env.SEP_2 + 2, (env.TERM_COLS - env.SEP_2) - 2, line);
 		line_no++;
 
 	}
 	if (preview_offset > 0)
 	{
-		printf("\e[3;%dH\e[1;7m%*s", SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
-		printf("\e[%dG^\e[%dG[\e[m", (TERM_COLS + SEP_2) / 2, TERM_COLS - 3);
+		printf("\e[3;%dH\e[1;7m%*s", env.SEP_2 + 1, (env.TERM_COLS - env.SEP_2) - 1, "");
+		printf("\e[%dG^\e[%dG[\e[m", (env.TERM_COLS + env.SEP_2) / 2, env.TERM_COLS - 3);
 	}
-	if ((file->lines - preview_offset) > TERM_ROWS - 4)
+	if ((file->lines - preview_offset) > env.TERM_ROWS - 4)
 	{
-		printf("\e[%d;%dH\e[1;7m%*s", TERM_ROWS - 2, SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
-		printf("\e[%dGv\e[%dG]\e[m", (TERM_COLS + SEP_2) / 2, TERM_COLS - 3);
+		printf("\e[%d;%dH\e[1;7m%*s", env.TERM_ROWS - 2, env.SEP_2 + 1, (env.TERM_COLS - env.SEP_2) - 1, "");
+		printf("\e[%dGv\e[%dG]\e[m", (env.TERM_COLS + env.SEP_2) / 2, env.TERM_COLS - 3);
 	}
 	free(line);
 	fclose(fp);
@@ -301,10 +299,10 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 
 	getcwd(cwd_name, size);
 	print_entries(dir_node, selected, 0);
-	if (FLAG_PREVIEW == 1)
+	if (env.FLAGS & F_PREVIEW)
 		display_parent(dir_node, parent);
 	clear_header();
-	printf("\e[1;3H[ \e[31;1m%.*s", TERM_COLS - 6, cwd_name);
+	printf("\e[1;3H[ \e[31;1m%.*s", env.TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
 		printf("/");
 	if (selected == NULL)
@@ -314,8 +312,8 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 	}
 	// construct_path(buf, dir_node->dir_name, selected->data->d_name);
 	colour_entry(selected);
-	printf("%.*s\e[m ]", (TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
-	printf("\e[%d;3H[ ", TERM_ROWS);
+	printf("%.*s\e[m ]", (env.TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
+	printf("\e[%d;3H[ ", env.TERM_ROWS);
 	print_file_attributes(selected);
 	printf(" ]");
 	clear_sub_box();
@@ -328,13 +326,13 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 			if (is_binary(selected->data->d_name))
 			{
 				selected->lines = -1;
-				printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
+				printf("\e[3;%dH\e[7m%.*s\e[m\n", env.SEP_2 + 2, (env.TERM_COLS - env.SEP_2) - 2, "Cannot preview file");
 			}
 			else
 				selected->lines = count_lines(selected->data->d_name);
 		}
 		if (selected->lines < 0)
-			printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
+			printf("\e[3;%dH\e[7m%.*s\e[m\n", env.SEP_2 + 2, (env.TERM_COLS - env.SEP_2) - 2, "Cannot preview file");
 		else
 			preview_text(selected, preview_offset);
 	}

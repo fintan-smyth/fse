@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "headers/structs.h"
-
-int FLAG_SORT= 0;
+#include "headers/env.h"
 
 entry_node *init_list(void)
 // Initialises a doubly linked list of nodes containing information
@@ -182,6 +181,8 @@ void	swap_entries(entry_node **entry_array, int i, int j)
 {
 	entry_node	*temp;
 
+	if (i == j)
+		return ;
 	swap_nodes(entry_array[i], entry_array[j]);
 	temp = entry_array[i];
 	entry_array[i] = entry_array[j];
@@ -203,8 +204,8 @@ int	comp_entries(entry_node *right, entry_node *left)
 		return (1);
 	if (type_comp < 0)
 		return (0);
-	switch (FLAG_SORT) {
-		case (1):
+	switch (env.FLAGS & F_SORT) {
+		case (F_SORT):
 			if (right->attr == NULL)
 				return (0);
 			if (left->attr == NULL)

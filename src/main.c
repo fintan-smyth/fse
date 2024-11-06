@@ -1,4 +1,5 @@
 #include "headers/format.h"
+#include "headers/env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,6 +21,7 @@ int	main(void)
 	char			cwd_name[500];
 	vd_node			*current;
 	
+	env.FLAGS |= F_PREVIEW;
 	VISITED_DIRS = init_visited();
 	copied = init_path_list();
 	cut = init_path_list();

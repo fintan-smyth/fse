@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/format.h"
 #include "headers/utils.h"
+#include "headers/env.h"
 #include <dirent.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -242,7 +243,7 @@ void	paste(vd_node *dir_node)
 	{
 		if (check_path_exists(dir_node, current->next->path))
 		{
-			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, current->next->path);
+			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", env.TERM_ROWS, env.TERM_COLS - 38, current->next->path);
 			if ((c = getchar()) != 'y')
 			{
 				current = current->next;
@@ -252,7 +253,7 @@ void	paste(vd_node *dir_node)
 			}
 			draw_box();
 			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
-			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
+			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", env.TERM_ROWS);
 		}
 		sprintf(command_buf, "cp -r \"%s\" %s", current->next->path, dir_node->dir_name);
 		system(command_buf);
@@ -264,7 +265,7 @@ void	paste(vd_node *dir_node)
 	{
 		if (check_path_exists(dir_node, current->next->path))
 		{
-			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", TERM_ROWS, TERM_COLS - 38, current->next->path);
+			printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", env.TERM_ROWS, env.TERM_COLS - 38, current->next->path);
 			if ((c = getchar()) != 'y')
 			{
 				current = current->next;
@@ -274,7 +275,7 @@ void	paste(vd_node *dir_node)
 			}
 			draw_box();
 			display_directory(dir_node, get_selected(dir_node), get_parent(dir_node), 0);
-			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", TERM_ROWS);
+			printf("\e[%d;3H[ \e[1;33mFile overwritten!\e[m ]", env.TERM_ROWS);
 		}
 		file_name = get_file_name(current->next->path);
 		construct_path(command_buf, dir_node->dir_name, file_name);

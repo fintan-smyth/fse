@@ -3,11 +3,6 @@
 
 #include "structs.h"
 
-extern int				TERM_COLS;
-extern int				TERM_ROWS;
-extern int				SEP_1;
-extern int				SEP_2;
-
 void	set_winsize(void);
 void	store_term_settings(void);
 void	set_term_settings(void);
@@ -18,10 +13,6 @@ void	clear_parent_box(void);
 void	clear_sub_box(void);
 void	clear_gutter(void);
 void	clear_header(void);
-
-extern int	FLAG_HIDDEN;
-extern int	FLAG_PREVIEW;
-extern int	FLAG_SORT;
 
 void	colour_entry(entry_node *entry);
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level);
