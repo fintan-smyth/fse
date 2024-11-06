@@ -576,6 +576,8 @@ int	navigate(vd_node *dir_node)
 				rename_file(dir_node, selected, buf);
 				cleanup_directory(dir_node);
 				return (0);
+			default:
+				continue;
 		}
 		display_directory(dir_node, selected, parent, preview_offset);
 	}
