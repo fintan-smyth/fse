@@ -5,6 +5,10 @@
 #include <sys/ioctl.h>
 
 void	open_dir_in_editor(char *buf)
+// Opens cwd in $EDITOR.
+// Uses vim if $EDITOR is unset.
+// Args:
+//  - buf:	char array used to construct shell command
 {
 	char	*editor = getenv("EDITOR");
 
@@ -18,6 +22,11 @@ void	open_dir_in_editor(char *buf)
 }
 
 void	open_selected_in_editor(entry_node *selected, char *buf)
+// Opens selected entry in $EDITOR.
+// Uses vim if $EDITOR is unset.
+// Args:
+//  - selcted:	pointer to node of selected entry
+//  - buf:		char array used to construct shell command
 {
 	char	*editor = getenv("EDITOR");
 
@@ -31,16 +40,21 @@ void	open_selected_in_editor(entry_node *selected, char *buf)
 }
 
 void	toggle_hidden(void)
+// Toggles showing hidden files.
 {
 	FLAG_HIDDEN = !FLAG_HIDDEN;
 }
 
 void	toggle_preview(void)
+// Toggles previewing parent directory.
 {
 	FLAG_PREVIEW = !FLAG_PREVIEW;
 }
 
 void	execute_shell_cmd(char	*buf)
+// Prompts the user to execute a shell command.
+// Args:
+//  - buf:	char array used to construct shell command
 {
 	char	*bufp = buf;
 	char	c;
@@ -63,6 +77,7 @@ void	execute_shell_cmd(char	*buf)
 }
 
 void	print_help(void)
+// Prints a list of the program binds.
 {
 	fflush(stdout);
 	printf("\e[2J\e[H\n\t\e[1;4mBINDS\e[m\n\n");
@@ -95,6 +110,11 @@ void	print_help(void)
 }
 
 void	select_next(vd_node *dir_node, entry_node **selected, int *preview_offset)
+// Selects the next entry in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
 {
 	entry_node	*children = dir_node->directory->children;
 
@@ -115,6 +135,11 @@ void	select_next(vd_node *dir_node, entry_node **selected, int *preview_offset)
 }
 
 void	select_prev(vd_node *dir_node, entry_node **selected, int *preview_offset)
+// Selects the previous entry in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
 {
 	clear_gutter();
 	*preview_offset = 0;
@@ -130,6 +155,11 @@ void	select_prev(vd_node *dir_node, entry_node **selected, int *preview_offset)
 }
 
 void	select_next_search_result(vd_node *dir_node, entry_node **selected, int *preview_offset)
+// Selects the next entry matching the search term in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
 {
 	entry_node	*children = dir_node->directory->children;
 
@@ -148,6 +178,11 @@ void	select_next_search_result(vd_node *dir_node, entry_node **selected, int *pr
 }
 
 void	select_prev_search_result(vd_node *dir_node, entry_node **selected, int *preview_offset)
+// Selects the previous entry matching the search term in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
 {
 	if (*dir_node->search_term != 0)
 	{
@@ -167,6 +202,10 @@ void	select_prev_search_result(vd_node *dir_node, entry_node **selected, int *pr
 }
 
 void	open_selected(entry_node *selected, char *buf)
+// Opens the selected entry in a different manner depending on its type.
+// Args:
+//  - selected:	pointer to selected entry node
+//  - buf:		char array used to construct shell command
 {
 	char	*pager = getenv("PAGER");
 
@@ -212,6 +251,11 @@ void	open_selected(entry_node *selected, char *buf)
 }
 
 void	yank_selected(vd_node *dir_node, entry_node *selected, char *buf)
+// Adds selected entry path to 'copied' list.
+// Args:
+//  - dir_node:	pointer to current directory node
+//  - selected:	pointer to selected entry node
+//  - buf:		char array used to construct absolute path of file
 {
 	construct_path(buf, dir_node->dir_name, selected->data->d_name);
 	if (check_path(copied, buf) == 0)
@@ -227,6 +271,11 @@ void	yank_selected(vd_node *dir_node, entry_node *selected, char *buf)
 }
 
 void	cut_selected(vd_node *dir_node, entry_node *selected, char *buf)
+// Adds selected entry path to 'cut' list.
+// Args:
+//  - dir_node:	pointer to current directory node
+//  - selected:	pointer to selected entry node
+//  - buf:		char array used to construct absolute path of file
 {
 	construct_path(buf, dir_node->dir_name, selected->data->d_name);
 	if (check_path(cut, buf) == 0)
@@ -242,6 +291,10 @@ void	cut_selected(vd_node *dir_node, entry_node *selected, char *buf)
 }
 
 void	run_executable(entry_node *selected, char *buf)
+// If executable, runs the selected file.
+// Args:
+//  - selected:	pointer to selected entry node
+//  - buf:		char array used to construct shell command
 {
 	reset_term_settings();
 	printf("\e[2J\e[H");
@@ -258,6 +311,14 @@ void	run_executable(entry_node *selected, char *buf)
 }
 
 int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_result)
+// Prompts the user to enter a string to match entry file names against.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - search_result		pointer to search_result variable in navigate()
+// Returns:
+//  - 0 if a match is found
+//  - 1 if no match is found
 {
 	char 	*searchp;
 	char	c;
@@ -280,6 +341,11 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 }
 
 void	goto_first_entry(vd_node *dir_node, entry_node **selected, int *preview_offset)
+// Selects the first entry in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
 {
 	entry_node *children = dir_node->directory->children;
 
@@ -291,6 +357,11 @@ void	goto_first_entry(vd_node *dir_node, entry_node **selected, int *preview_off
 }
 
 void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offset)
+// Selects the last entry in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
 {
 	*preview_offset = 0;
 	clear_gutter();
@@ -301,6 +372,11 @@ void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offs
 }
 
 void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
+// Deletes the selected file or empty directory.
+// Args:
+//  - dir_node:		pointer to current directory node
+//  - selected:		address of pointer to selected entry
+//  - buf			char array used to construct absolute path
 {
 	char	c;
 	int 	len = strlen(dir_node->dir_name);
@@ -341,6 +417,11 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 }
 
 void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
+// Prompts the user to rename the selected entry.
+// Args:
+//  - dir_node:	pointer to current directory node
+//  - selected:	pointer to selected entry node
+//  - buf:		char array used to store user input
 {
 	char	*bufp = buf;
 	char	command_buf[500];
@@ -372,6 +453,12 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 }
 
 int	navigate(vd_node *dir_node)
+// Displays current state of directory and waits for user input.
+// Args:
+//  - dir_node:	pointer to current directory node
+// Returns:
+//  - 0 when user wishes to continue file system navigation
+//  - 1 when user requests to quit the program
 {
 	char				buf[500];
 	char				c;
