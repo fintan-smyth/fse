@@ -3,6 +3,12 @@
 #include <sys/stat.h>
 
 int	str_printable(char *s)
+// Checks if a string contains only printable characters.
+// Args:
+//  - s:	string to check
+// Returns:
+//  - 1 if string contains only printable characters
+//  - 0 if string contains non-printable characters
 {
 	while (*s != 0)
 	{
@@ -14,6 +20,12 @@ int	str_printable(char *s)
 }
 
 int	is_executable(char *path)
+// Checks if a given file is executable.
+// Args:
+//  - path:	relative path of file
+// Returns:
+//  - 1 if file is executable
+//  - 0 if file is not executable
 {
 	struct stat	fs;
 
@@ -25,6 +37,12 @@ int	is_executable(char *path)
 }
 
 int is_binary(char *path)
+// Checks if a file is not a text file.
+// Args:
+//  - path:	relative path of file
+// Returns:
+//  - 1 if file is not a text file
+//  - 0 if file is a text file
 {
 	FILE	*fileptr;
 	char	buffer[500];
@@ -52,6 +70,11 @@ int is_binary(char *path)
 }
 
 char	*get_extension(char *file_name)
+// Retrieves the file extension of a file
+// Args:
+//  - file_name:	name of the file
+// Returns:
+//  - Memory allocated string containing file extension
 {
 	int		i;
 	char	*ext_buf;
@@ -66,6 +89,11 @@ char	*get_extension(char *file_name)
 }
 
 int	my_strlen(char *s)
+// For some reason I did my own strlen implementation.
+// Args:
+//  - s:	string from which to get the length
+// Returns:
+//  - length of string
 {
 	int	i;
 
@@ -76,6 +104,12 @@ int	my_strlen(char *s)
 }
 
 char	*replace_tab(char *string, size_t size)
+// Replaces tabs in a memory allocated string with 4 spaces.
+// Args:
+//  - string:	memory allocated string whose tabs will be replaced
+//  - size:		maximum size of output string
+// Returns:
+//  - Memory allocated string with tabs replaced
 {
 	int		i;
 	int		j;
@@ -102,6 +136,12 @@ char	*replace_tab(char *string, size_t size)
 }
 
 int count_lines(char *path)
+// Counts the number of lines in a text file.
+// Args:
+//  - path:	relative path of file
+// Returns:
+//  - Number of lines in file
+//  - (-1) if unable to open file
 {
 	FILE	*fileptr;
 	char	buffer[500];

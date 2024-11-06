@@ -6,6 +6,7 @@
 int	navigate(vd_node *dir_node);
 
 void	exit_cleanup()
+// Frees global lists and restores terminal settings on exit.
 {
 	reset_term_settings();
 	free_visited(VISITED_DIRS);
