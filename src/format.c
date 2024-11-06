@@ -5,6 +5,11 @@ int	FLAG_HIDDEN = 0;
 int	FLAG_PREVIEW = 1;
 
 void	colour_entry(char *path, entry_node *entry)
+// Prints the appropriate escape code to colour an entry's
+// file name according to formatting rules.
+// Args:
+//  - path:		absolute path to file
+//  - entry:	pointer to entry node of file
 {
 	char	*ext_buf;
 
@@ -61,6 +66,15 @@ void	colour_entry(char *path, entry_node *entry)
 }
 
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level)
+// Prints the formatted file name of an entry according to formatting rules.
+// Args:
+//  - dir_node:	pointer to node of directory containing entry
+//  - current:	pointer to entry to format
+//  - selected:	pointer to the selected entry in directory
+//  - level:	level of directory containing entry:
+//  			 > 0 if it is the cwd
+//  			 > 1 if it is a subdirectory of cwd
+//  			 > -1 if it is the parent directory of cwd
 {
 	char	buf[500] = {0};
 	char	*search_term_start;
@@ -112,6 +126,14 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 }
 
 void	print_entries(vd_node *dir_node, entry_node *selected, int level)
+// Prints a formatted list of the entries in a directory.
+// Args:
+//  - dir_node:	pointer to directory node
+//  - selected:	pointer to node of selected entry
+//  - level:	level of directory:
+//  			 > 0 if it is the cwd
+//  			 > 1 if it is a subdirectory of cwd
+//  			 > -1 if it is the parent directory of cwd
 {
 	entry_node			*head;
 	entry_node			*current;
@@ -169,16 +191,20 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 	}
 }
 
-void	display_subdirectory(entry_node *selected, char *path)
+void	display_subdirectory(entry_node *dir_entry, char *cwd_path)
+// Prints a formatted list of the entries in a subdirectory of the cwd.
+// Args:
+//  - dir_entry:	pointer to entry node of the subdirectory
+//  - path:			absolute path of cwd
 {
 	vd_node		*current;
 	entry_node	*selected_sub;
 
-	if (strncmp(path, "/", strlen(path)))
-		path = strcat(path, "/");
-	path = strcat(path, selected->data->d_name);
-	current = get_vd_node(VISITED_DIRS, path);
-	current->directory = get_directory(path);
+	if (strncmp(cwd_path, "/", strlen(cwd_path)))
+		cwd_path = strcat(cwd_path, "/");
+	cwd_path = strcat(cwd_path, dir_entry->data->d_name);
+	current = get_vd_node(VISITED_DIRS, cwd_path);
+	current->directory = get_directory(cwd_path);
 	if (current->directory == NULL)
 	{
 		return ;
@@ -189,6 +215,10 @@ void	display_subdirectory(entry_node *selected, char *path)
 }
 
 void	display_parent(vd_node *dir_node, vd_node *parent)
+// Prints a formatted list of the entries in the parent directory of the cwd.
+// Args:
+//  - dir_node:	pointer to directory node of cwd
+//  - parent:	pointer to node of parent directory
 {
 	entry_node	*selected;
 
@@ -204,12 +234,16 @@ void	display_parent(vd_node *dir_node, vd_node *parent)
 }
 
 
-void	preview_text(entry_node *file, int start_line)
+void	preview_text(entry_node *file, int preview_offset)
+// Prints the contents of a text file in the preview box.
+// Args:
+//  - file:				pointer to entry node of file to preview
+//  - preview_offset	number of lines to skip from start of file
 {
 	size_t	size = 511;
 	char	*line = malloc(size);
 	int		line_no = 2;
-	int		to_skip = start_line;
+	int		to_skip = preview_offset;
 	FILE	*fp;
 
 	fp = fopen(file->data->d_name, "r");
@@ -234,12 +268,12 @@ void	preview_text(entry_node *file, int start_line)
 		line_no++;
 
 	}
-	if (start_line > 0)
+	if (preview_offset > 0)
 	{
 		printf("\e[3;%dH\e[1;7m%*s", SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
 		printf("\e[%dG^\e[%dG[\e[m", (TERM_COLS + SEP_2) / 2, TERM_COLS - 3);
 	}
-	if ((file->lines - start_line) > TERM_ROWS - 4)
+	if ((file->lines - preview_offset) > TERM_ROWS - 4)
 	{
 		printf("\e[%d;%dH\e[1;7m%*s", TERM_ROWS - 2, SEP_2 + 1, (TERM_COLS - SEP_2) - 1, "");
 		printf("\e[%dGv\e[%dG]\e[m", (TERM_COLS + SEP_2) / 2, TERM_COLS - 3);
@@ -249,6 +283,17 @@ void	preview_text(entry_node *file, int start_line)
 }
 
 void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_start)
+// Displays all information associated with current directory:
+//  - Path of cwd and selected file
+//  - Contents of cwd
+//  - Attributes of selected entry
+//  - Contents of selected subdirectory/text file
+//  - Contents of parent directory (if enabled)
+// Args:
+//  - dir_node:			pointer to node of current directory
+//  - selected:			pointer to node of selected- entry
+//  - parent:			pointer to node of parent directory
+//  - preview_offset	number of lines to skip from start of text file preview
 {
 	int				size = 500 * sizeof(char);
 	char			cwd_name[size];
