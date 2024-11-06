@@ -5,6 +5,38 @@
 #include "headers/env.h"
 
 struct env_struct	env;
+struct bind_struct	binds;
+
+void	set_default_binds(void)
+// Sets the program binds to their default state.
+{
+	binds.QUIT = 'q';
+	binds.UPDIR = 'h';
+	binds.EDIT_DIR = 'E';
+	binds.EDIT_FILE = 'e';
+	binds.TOGGLE_HDN = 'H';
+	binds.TOGGLE_PRVW = 'P';
+	binds.TOGGLE_SORT = 'S';
+	binds.EXEC_SHELL = ':';
+	binds.HELP = '?';
+	binds.PASTE = 'p';
+	binds.CLEAR_BUF = 'c';
+	binds.SELECT_NEXT = 'j';
+	binds.SELECT_PREV = 'k';
+	binds.SEARCH_NEXT = 'n';
+	binds.SEARCH_PREV = 'N';
+	binds.OPEN = 'l';
+	binds.YANK = 'y';
+	binds.CUT = 'd';
+	binds.EXEC_FILE = 'x';
+	binds.SEARCH_DIR = '/';
+	binds.PREV_DWN = ']';
+	binds.PREV_UP = '[';
+	binds.GO_FIRST = 'g';
+	binds.GO_LAST = 'G';
+	binds.DELETE = 'D';
+	binds.RENAME = 'r';
+}
 
 void	set_winsize(void)
 // Sets global variables containing terminal dimensions

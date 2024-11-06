@@ -3,10 +3,6 @@
 
 #include "structs.h"
 
-void	set_winsize(void);
-void	store_term_settings(void);
-void	set_term_settings(void);
-void	reset_term_settings(void);
 void	draw_box(void);
 void	clear_main_box(void);
 void	clear_parent_box(void);

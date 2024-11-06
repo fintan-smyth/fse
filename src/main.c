@@ -1,4 +1,4 @@
-#include "headers/format.h"
+#include "headers/structs.h"
 #include "headers/env.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +22,7 @@ int	main(void)
 	vd_node			*current;
 	
 	env.FLAGS |= F_PREVIEW;
+	set_default_binds();
 	VISITED_DIRS = init_visited();
 	copied = init_path_list();
 	cut = init_path_list();

@@ -90,32 +90,32 @@ void	print_help(void)
 {
 	fflush(stdout);
 	printf("\e[2J\e[H\n\t\e[1;4mBINDS\e[m\n\n");
-	printf("\t\e[1mq\e[m\tQuit\n");
-	printf("\t\e[1mj\e[m\tSelect next\n");
-	printf("\t\e[1mk\e[m\tSelect previous\n");
-	printf("\t\e[1mh\e[m\tGo to parent directory\n");
-	printf("\t\e[1ml\e[m\tOpen\n");
-	printf("\t\e[1my\e[m\tCopy selected\n");
-	printf("\t\e[1md\e[m\tCut selected\n");
-	printf("\t\e[1mp\e[m\tPaste selected\n");
-	printf("\t\e[1mc\e[m\tClear copy/cut buffer\n");
-	printf("\t\e[1mD\e[m\tDelete selected\n");
-	printf("\t\e[1mr\e[m\tRename selected\n");
-	printf("\t\e[1mx\e[m\tRun selected executable\n");
-	printf("\t\e[1me\e[m\tOpen selected in editor\n");
-	printf("\t\e[1mE\e[m\tOpen current directory in editor\n");
-	printf("\t\e[1m:\e[m\tExecute shell command\n");
-	printf("\t\e[1m/\e[m\tSearch in directory\n");
-	printf("\t\e[1mn\e[m\tNext search result\n");
-	printf("\t\e[1mN\e[m\tPrevious search result\n");
-	printf("\t\e[1mg\e[m\tSelect first entry\n");
-	printf("\t\e[1mG\e[m\tSelect last entry\n");
-	printf("\t\e[1m[\e[m\tScroll up text preview\n");
-	printf("\t\e[1m]\e[m\tScroll down text preview\n");
-	printf("\t\e[1mH\e[m\tToggle hidden file visibility\n");
-	printf("\t\e[1mS\e[m\tToggle between alphabetical/filesize sorting");
-	printf("\t\e[1mP\e[m\tToggle parent directory preview\n");
-	printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
+	printf("\t\e[1m%c\e[m\tQuit\n", binds.QUIT);
+	printf("\t\e[1m%c\e[m\tSelect next\n", binds.SELECT_NEXT);
+	printf("\t\e[1m%c\e[m\tSelect previous\n", binds.SELECT_PREV);
+	printf("\t\e[1m%c\e[m\tGo to parent directory\n", binds.UPDIR);
+	printf("\t\e[1m%c\e[m\tOpen\n", binds.OPEN);
+	printf("\t\e[1m%c\e[m\tCopy selected\n", binds.YANK);
+	printf("\t\e[1m%c\e[m\tCut selected\n", binds.CUT);
+	printf("\t\e[1m%c\e[m\tPaste selected\n", binds.PASTE);
+	printf("\t\e[1m%c\e[m\tClear copy/cut buffer\n", binds.CLEAR_BUF);
+	printf("\t\e[1m%c\e[m\tDelete selected\n", binds.DELETE);
+	printf("\t\e[1m%c\e[m\tRename selected\n", binds.RENAME);
+	printf("\t\e[1m%c\e[m\tRun selected executable\n", binds.EXEC_FILE);
+	printf("\t\e[1m%c\e[m\tOpen selected in editor\n", binds.EDIT_FILE);
+	printf("\t\e[1m%c\e[m\tOpen current directory in editor\n", binds.EDIT_DIR);
+	printf("\t\e[1m%c\e[m\tExecute shell command\n", binds.EXEC_SHELL);
+	printf("\t\e[1m%c\e[m\tSearch in directory\n", binds.SEARCH_DIR);
+	printf("\t\e[1m%c\e[m\tNext search result\n", binds.SEARCH_NEXT);
+	printf("\t\e[1m%c\e[m\tPrevious search result\n", binds.SEARCH_PREV);
+	printf("\t\e[1m%c\e[m\tSelect first entry\n", binds.GO_FIRST);
+	printf("\t\e[1m%c\e[m\tSelect last entry\n", binds.GO_LAST);
+	printf("\t\e[1m%c\e[m\tScroll up text preview\n", binds.PREV_UP);
+	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DWN);
+	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HDN);
+	printf("\t\e[1m%c\e[m\tToggle between alphabetical/filesize sorting\n", binds.TOGGLE_SORT);
+	printf("\t\e[1m%c\e[m\tToggle parent directory preview\n", binds.TOGGLE_PRVW);
+	printf("\t\e[1m%c\e[m\tDisplay this helpful page!\n", binds.HELP);
 	getchar();
 }
 
@@ -486,113 +486,132 @@ int	navigate(vd_node *dir_node)
 	while ((c = getchar()) != 'q')
 	{
 		memset(buf, 0, 500 * sizeof(char));
-		switch (c) {
-			case ('h'):
-				chdir("..");
-				cleanup_directory(dir_node);
-				return (0);
-			case ('E'):
-				open_dir_in_editor(buf);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('H'):
-				toggle_hidden();
-				dir_node->offset = 0;
-				cleanup_directory(dir_node);
-				return (0);
-			case ('P'):
-				toggle_preview();
-				cleanup_directory(dir_node);
-				return (0);
-			case ('S'):
-				toggle_sort();
-				cleanup_directory(dir_node);
-				return (0);
-			case (':'):
-				execute_shell_cmd(buf);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('?'):
-				print_help();
-				cleanup_directory(dir_node);
-				return (0);
-			case ('p'):
-				clear_gutter();
-				paste(dir_node);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('c'):
-				clear_path_list(cut);
-				cleanup_directory(dir_node);
-				return (0);
+		if (c == binds.UPDIR)
+		{
+			chdir("..");
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.EDIT_DIR)
+		{
+			open_dir_in_editor(buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.TOGGLE_HDN)
+		{
+			toggle_hidden();
+			dir_node->offset = 0;
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.TOGGLE_PRVW)
+		{
+			toggle_preview();
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.TOGGLE_SORT)
+		{
+			toggle_sort();
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.EXEC_SHELL)
+		{
+			execute_shell_cmd(buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.HELP)
+		{
+			print_help();
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.PASTE)
+		{
+			clear_gutter();
+			paste(dir_node);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.CLEAR_BUF)
+		{
+			clear_path_list(cut);
+			cleanup_directory(dir_node);
+			return (0);
 		}
 		if (selected == NULL)
 			continue;
-		switch (c) {
-			case ('j'):
-				select_next(dir_node, &selected, &preview_offset);
-				break;
-			case ('k'):
-				select_prev(dir_node, &selected, &preview_offset);
-				break;
-			case ('n'):
-				select_next_search_result(dir_node, &selected, &preview_offset);
-				break;
-			case ('N'):
-				select_prev_search_result(dir_node, &selected, &preview_offset);
-				break;
-			case ('l'):
-				open_selected(selected, buf);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('e'):
-				open_selected_in_editor(selected, buf);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('y'):
-				yank_selected(dir_node, selected, buf);
-				break;
-			case ('d'):
-				cut_selected(dir_node, selected, buf);
-				break;
-			case ('x'):
-				run_executable(selected, buf);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('/'):
-				if (search_in_dir(dir_node, &selected, &search_result) == 1)
-				{
-					cleanup_directory(dir_node);
-					return (0);
-				}
-				break;
-			case (']'):
-				if ((selected->lines - preview_offset) <= env.TERM_ROWS - 4)
-					continue;
-				preview_offset++;
-				break;
-			case ('['):
-				if (preview_offset <= 0)
-					continue;
-				preview_offset--;
-				break;
-			case ('g'):
-				goto_first_entry(dir_node, &selected, &preview_offset);
-				break;
-			case ('G'):
-				goto_last_entry(dir_node, &selected, &preview_offset);
-				break;
-			case ('D'):
-				delete_selected(dir_node, &selected, buf);
-				cleanup_directory(dir_node);
-				return (0);
-			case ('r'):
-				rename_file(dir_node, selected, buf);
-				cleanup_directory(dir_node);
-				return (0);
-			default:
-				continue;
+		if (c == binds.SELECT_NEXT)
+			select_next(dir_node, &selected, &preview_offset);
+		else if (c == binds.SELECT_PREV)
+			select_prev(dir_node, &selected, &preview_offset);
+		else if (c == binds.SEARCH_NEXT)
+			select_next_search_result(dir_node, &selected, &preview_offset);
+		else if (c == binds.SEARCH_PREV)
+			select_prev_search_result(dir_node, &selected, &preview_offset);
+		else if (c == binds.OPEN)
+		{
+			open_selected(selected, buf);
+			cleanup_directory(dir_node);
+			return (0);
 		}
+		else if (c == binds.EDIT_FILE)
+		{
+			open_selected_in_editor(selected, buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.YANK)
+			yank_selected(dir_node, selected, buf);
+		else if (c == binds.CUT)
+			cut_selected(dir_node, selected, buf);
+		else if (c == binds.EXEC_FILE)
+		{
+			run_executable(selected, buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.SEARCH_DIR)
+		{
+			if (search_in_dir(dir_node, &selected, &search_result) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+		}
+		else if (c == binds.PREV_DWN)
+		{
+			if ((selected->lines - preview_offset) <= env.TERM_ROWS - 4)
+				continue;
+			preview_offset++;
+		}
+		else if (c == binds.PREV_UP)
+		{
+			if (preview_offset <= 0)
+				continue;
+			preview_offset--;
+		}
+		else if (c == binds.GO_FIRST)
+			goto_first_entry(dir_node, &selected, &preview_offset);
+		else if (c == binds.GO_LAST)
+			goto_last_entry(dir_node, &selected, &preview_offset);
+		else if (c == binds.DELETE)
+		{
+			delete_selected(dir_node, &selected, buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.RENAME)
+		{
+			rename_file(dir_node, selected, buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else
+			continue;
 		display_directory(dir_node, selected, parent, preview_offset);
 	}
 	cleanup_directory(dir_node);

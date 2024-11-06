@@ -13,11 +13,45 @@ struct env_struct
 	unsigned char	FLAGS;
 } ;
 
+struct bind_struct
+{
+	char	QUIT;
+	char	UPDIR;
+	char	EDIT_DIR;
+	char	EDIT_FILE;
+	char	TOGGLE_HDN;
+	char	TOGGLE_PRVW;
+	char	TOGGLE_SORT;
+	char	EXEC_SHELL;
+	char	HELP;
+	char	PASTE;
+	char	CLEAR_BUF;
+	char	SELECT_NEXT;
+	char	SELECT_PREV;
+	char	SEARCH_NEXT;
+	char	SEARCH_PREV;
+	char	OPEN;
+	char	YANK;
+	char	CUT;
+	char	EXEC_FILE;
+	char	SEARCH_DIR;
+	char	PREV_DWN;
+	char	PREV_UP;
+	char	GO_FIRST;
+	char	GO_LAST;
+	char	DELETE;
+	char	RENAME;
+} ;
+
 enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_SORT = 4};
 
-// extern int 					FLAG_SORT;
-// extern int					FLAG_HIDDEN;
-// extern int					FLAG_PREVIEW;
 extern struct env_struct	env;
+extern struct bind_struct	binds;
+
+void	set_default_binds(void);
+void	set_winsize(void);
+void	store_term_settings(void);
+void	set_term_settings(void);
+void	reset_term_settings(void);
 
 #endif // !ENV_H_
