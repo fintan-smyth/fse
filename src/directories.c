@@ -167,7 +167,7 @@ void	free_visited(vd_node *head)
 }
 
 vd_node	*get_vd_node(vd_node *visited, char *path)
-// Retrieves the vd_node associated with a given directory path.
+// Retrieves the vd_node associated with a given directory absolute path.
 // If no node exists, creates a new one.
 // Args:
 //  - visited:	pointer to head of visited directories list
