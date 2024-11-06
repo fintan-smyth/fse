@@ -111,7 +111,7 @@ struct directory	*get_directory(char *dir_path)
 	}
 	while ((child = readdir(dir)) != NULL)
 	{
-		current = insertafter(child, current);
+		current = insertafter(dir_path, child, current);
 	}
 	current = head;
 	while (current->next != current->next->next)

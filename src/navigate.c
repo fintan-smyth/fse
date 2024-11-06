@@ -51,6 +51,12 @@ void	toggle_preview(void)
 	FLAG_PREVIEW = !FLAG_PREVIEW;
 }
 
+void	toggle_sort(void)
+// Swaps between sorting by alphabetical order/filesize
+{
+	FLAG_SORT = !FLAG_SORT;
+}
+
 void	execute_shell_cmd(char	*buf)
 // Prompts the user to execute a shell command.
 // Args:
@@ -104,6 +110,7 @@ void	print_help(void)
 	printf("\t\e[1m[\e[m\tScroll up text preview\n");
 	printf("\t\e[1m]\e[m\tScroll down text preview\n");
 	printf("\t\e[1mH\e[m\tToggle hidden file visibility\n");
+	printf("\t\e[1mS\e[m\tToggle between alphabetical/filesize sorting");
 	printf("\t\e[1mP\e[m\tToggle parent directory preview\n");
 	printf("\t\e[1m?\e[m\tDisplay this helpful page!\n");
 	getchar();
@@ -492,6 +499,10 @@ int	navigate(vd_node *dir_node)
 				return (0);
 			case ('P'):
 				toggle_preview();
+				cleanup_directory(dir_node);
+				return (0);
+			case ('S'):
+				toggle_sort();
 				cleanup_directory(dir_node);
 				return (0);
 			case (':'):

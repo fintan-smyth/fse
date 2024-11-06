@@ -21,7 +21,7 @@ void	clear_header(void);
 
 extern int	FLAG_HIDDEN;
 extern int	FLAG_PREVIEW;
-extern int	FLAG_SORT_SIZE;
+extern int	FLAG_SORT;
 
 void	colour_entry(entry_node *entry);
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level);

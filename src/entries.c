@@ -3,7 +3,7 @@
 #include <string.h>
 #include "headers/structs.h"
 
-int FLAG_SORT_SIZE = 0;
+int FLAG_SORT= 0;
 
 entry_node *init_list(void)
 // Initialises a doubly linked list of nodes containing information
@@ -41,21 +41,24 @@ void	delete_next_entry(entry_node *t)
 	free(temp);
 }
 
-entry_node *insertafter(struct dirent *data, entry_node *t)
+entry_node *insertafter(char *dir_path, struct dirent *data, entry_node *t)
 // Inserts a node into a list of entries.
 // Args:
-//  - data:	pointer to 'dirent' struct containing information about an entry
-//  - t:	pointer to the node after which the new node will be inserted
+//  - dir_path:	absolute path of directory containing entry
+//  - data:		pointer to 'dirent' struct containing information about an entry
+//  - t:		pointer to the node after which the new node will be inserted
 // Returns:
 //  - Pointer to the newly inserted node
 {
 	entry_node		*new;
 	struct stat 	*attr;
+	char			abs_path[500];
 
 	new = (entry_node *)malloc(sizeof(*new));
 	attr = malloc(sizeof(*attr));
 	new->data = data;
-	if (stat(new->data->d_name, attr) == -1)
+	construct_path(abs_path, dir_path, new->data->d_name);
+	if (stat(abs_path, attr) == -1)
 	{
 		new->attr = NULL;
 		free(attr);
@@ -185,7 +188,7 @@ void	swap_entries(entry_node **entry_array, int i, int j)
 	entry_array[j] = temp;
 }
 
-int	comp_entries(entry_node *a, entry_node *b)
+int	comp_entries(entry_node *right, entry_node *left)
 // Compares entries by type and then alphabetical order, for use in q_sort.
 // Args:
 //  - a:	pointer to entry to compare
@@ -194,12 +197,26 @@ int	comp_entries(entry_node *a, entry_node *b)
 //  - 1 if position of nodes should be swapped
 //  - 0 if position of nodes should not be swapped
 {
-	int	type_comp = b->data->d_type - a->data->d_type;
+	int	type_comp = left->data->d_type - right->data->d_type;
 
 	if (type_comp > 0)
 		return (1);
-	else if (type_comp == 0 && (strcasecmp(a->data->d_name, b->data->d_name) < 0))
-		return (1);
+	if (type_comp < 0)
+		return (0);
+	switch (FLAG_SORT) {
+		case (1):
+			if (right->attr == NULL)
+				return (0);
+			if (left->attr == NULL)
+				return (1);
+			if (right->attr->st_size > left->attr->st_size)
+				return (1);
+			break;
+		default:
+			if (strcasecmp(right->data->d_name, left->data->d_name) < 0)
+				return (1);
+			break;
+	}
 	return (0);
 }
 

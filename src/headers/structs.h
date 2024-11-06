@@ -39,7 +39,7 @@ typedef struct vd_node
 extern vd_node *VISITED_DIRS;
 
 entry_node *init_list(void);
-entry_node *insertafter(struct dirent *data, entry_node *t);
+entry_node *insertafter(char *dir_path, struct dirent *data, entry_node *t);
 entry_node *get_selected(vd_node *dir_node);
 entry_node *get_search_match(vd_node *dir_node);
 void		delete_next_entry(entry_node *t);
