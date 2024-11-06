@@ -282,7 +282,7 @@ void	preview_text(entry_node *file, int preview_offset)
 	fclose(fp);
 }
 
-void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_start)
+void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_offset)
 // Displays all information associated with current directory:
 //  - Path of cwd and selected file
 //  - Contents of cwd
@@ -291,7 +291,7 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 //  - Contents of parent directory (if enabled)
 // Args:
 //  - dir_node:			pointer to node of current directory
-//  - selected:			pointer to node of selected- entry
+//  - selected:			pointer to node of selected entry
 //  - parent:			pointer to node of parent directory
 //  - preview_offset	number of lines to skip from start of text file preview
 {
@@ -336,6 +336,6 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 		if (selected->lines < 0)
 			printf("\e[3;%dH\e[7m%.*s\e[m\n", SEP_2 + 2, (TERM_COLS - SEP_2) - 2, "Cannot preview file");
 		else
-			preview_text(selected, preview_start);
+			preview_text(selected, preview_offset);
 	}
 }
