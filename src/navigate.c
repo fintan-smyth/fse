@@ -25,7 +25,7 @@ void	open_selected_in_editor(entry_node *selected, char *buf)
 // Opens selected entry in $EDITOR.
 // Uses vim if $EDITOR is unset.
 // Args:
-//  - selcted:	pointer to node of selected entry
+//  - selected:	pointer to node of selected entry
 //  - buf:		char array used to construct shell command
 {
 	char	*editor = getenv("EDITOR");
