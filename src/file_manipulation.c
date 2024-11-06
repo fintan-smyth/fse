@@ -440,11 +440,10 @@ void	print_file_attributes(entry_node *entry)
 // Args:
 //  - entry:	pointer to entry node of the file
 {
-	struct stat	fs;
 	char		*user;
 	char		*group;
 
-	if ((stat(entry->data->d_name, &fs)) == -1)
+	if (entry->attr == NULL)
 		return ;
 	switch (entry->data->d_type) {
 		case (DT_LNK):
@@ -457,23 +456,23 @@ void	print_file_attributes(entry_node *entry)
 			printf("\e[1;30m-");
 			break;
 	}
-	printf("%s", (fs.st_mode & S_IRUSR) ? "\e[33mr" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IWUSR) ? "\e[31mw" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IXUSR) ? "\e[32mx" : "\e[30m-");
-	printf("\e[m%s", (fs.st_mode & S_IRGRP) ? "\e[33mr" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IWGRP) ? "\e[31mw" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IXGRP) ? "\e[32mx" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IROTH) ? "\e[33mr" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IWOTH) ? "\e[31mw" : "\e[30m-");
-	printf("%s", (fs.st_mode & S_IXOTH) ? "\e[32mx" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IRUSR) ? "\e[33mr" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IWUSR) ? "\e[31mw" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IXUSR) ? "\e[32mx" : "\e[30m-");
+	printf("\e[m%s", (entry->attr->st_mode & S_IRGRP) ? "\e[33mr" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IWGRP) ? "\e[31mw" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IXGRP) ? "\e[32mx" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IROTH) ? "\e[33mr" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IWOTH) ? "\e[31mw" : "\e[30m-");
+	printf("%s", (entry->attr->st_mode & S_IXOTH) ? "\e[32mx" : "\e[30m-");
 	printf(" \e[m");
-	(entry->data->d_type == DT_REG) ? format_filesize(fs.st_size) : printf("\e[30m   -");
-	user = user_from_uid(fs.st_uid);
-	group = group_from_gid(fs.st_gid);
+	(entry->data->d_type == DT_REG) ? format_filesize(entry->attr->st_size) : printf("\e[30m   -");
+	user = user_from_uid(entry->attr->st_uid);
+	group = group_from_gid(entry->attr->st_gid);
 	printf(" \e[1;33m%s", user);
 	printf(" \e[1;34m%s", group);
 	printf("\e[0;35m");
-	print_time(fs.st_mtime);
+	print_time(entry->attr->st_mtime);
 	printf("\e[m");
 
 	free(user);

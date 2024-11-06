@@ -20,7 +20,7 @@ int	str_printable(char *s)
 }
 
 int	is_executable(char *path)
-// Checks if a given file is executable.
+// Checks if file at a given path is executable.
 // Args:
 //  - path:	relative path of file
 // Returns:

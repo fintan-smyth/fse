@@ -2,12 +2,14 @@
 #define STRUCTS_H_
 
 #include <dirent.h>
+#include <sys/stat.h>
 
 typedef struct entry_node
 {
 	struct entry_node	*prev;
 	struct entry_node	*next;
 	struct dirent		*data;
+	struct stat			*attr;
 	int					pos;
 	int					lines;
 } entry_node;

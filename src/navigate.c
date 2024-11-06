@@ -81,7 +81,7 @@ void	print_help(void)
 {
 	fflush(stdout);
 	printf("\e[2J\e[H\n\t\e[1;4mBINDS\e[m\n\n");
-	printf("\t\e[1mq\e[m\tquit\n");
+	printf("\t\e[1mq\e[m\tQuit\n");
 	printf("\t\e[1mj\e[m\tSelect next\n");
 	printf("\t\e[1mk\e[m\tSelect previous\n");
 	printf("\t\e[1mh\e[m\tGo to parent directory\n");
@@ -299,7 +299,7 @@ void	run_executable(entry_node *selected, char *buf)
 	reset_term_settings();
 	printf("\e[2J\e[H");
 	fflush(stdout);
-	if (selected->data->d_type == DT_REG && is_executable(selected->data->d_name))
+	if (selected->data->d_type == DT_REG && (selected->attr->st_mode & S_IXUSR))
 	{
 		sprintf(buf, "./\"%s\"", selected->data->d_name);
 		system(buf);

@@ -4,11 +4,10 @@
 int	FLAG_HIDDEN = 0;
 int	FLAG_PREVIEW = 1;
 
-void	colour_entry(char *path, entry_node *entry)
+void	colour_entry(entry_node *entry)
 // Prints the appropriate escape code to colour an entry's
 // file name according to formatting rules.
 // Args:
-//  - path:		absolute path to file
 //  - entry:	pointer to entry node of file
 {
 	char	*ext_buf;
@@ -57,7 +56,9 @@ void	colour_entry(char *path, entry_node *entry)
 				}
 				free(ext_buf);
 			}
-			if (is_executable(path))
+			if (entry->attr == NULL)
+				break;
+			if (entry->attr->st_mode & S_IXUSR)
 				printf("\e[1;32m");
 			break;
 		default:
@@ -102,7 +103,7 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 			break;
 	}
 	printf("\e[%dG", offset);
-	colour_entry(buf, current);
+	colour_entry(current);
 	if (current == selected)
 	{
 		if (level == 1)
@@ -297,7 +298,6 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 {
 	int				size = 500 * sizeof(char);
 	char			cwd_name[size];
-	char			buf[size];
 
 	getcwd(cwd_name, size);
 	print_entries(dir_node, selected, 0);
@@ -312,8 +312,8 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 		printf("\e[m ]");
 		return ;
 	}
-	construct_path(buf, dir_node->dir_name, selected->data->d_name);
-	colour_entry(buf, selected);
+	// construct_path(buf, dir_node->dir_name, selected->data->d_name);
+	colour_entry(selected);
 	printf("%.*s\e[m ]", (TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
 	printf("\e[%d;3H[ ", TERM_ROWS);
 	print_file_attributes(selected);

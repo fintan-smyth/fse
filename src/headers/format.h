@@ -21,8 +21,9 @@ void	clear_header(void);
 
 extern int	FLAG_HIDDEN;
 extern int	FLAG_PREVIEW;
+extern int	FLAG_SORT_SIZE;
 
-void	colour_entry(char *path, entry_node *entry);
+void	colour_entry(entry_node *entry);
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level);
 void	print_entries(vd_node *dir_node, entry_node *selected, int level);
 void	display_subdirectory(entry_node *selected, char *path);

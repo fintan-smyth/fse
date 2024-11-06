@@ -3,6 +3,8 @@
 #include <string.h>
 #include "headers/structs.h"
 
+int FLAG_SORT_SIZE = 0;
+
 entry_node *init_list(void)
 // Initialises a doubly linked list of nodes containing information
 // about the entries in a directory.
@@ -16,10 +18,12 @@ entry_node *init_list(void)
 	tail = (entry_node *)malloc(sizeof(*tail));
 	head->next = tail;
 	head->data = NULL;
+	head->attr = NULL;
 	head->pos = -5;
 	tail->next = tail;
 	tail->prev = head;
 	tail->data = NULL;
+	tail->attr = NULL;
 	head->prev = head;
 	return (head);
 }
@@ -33,6 +37,7 @@ void	delete_next_entry(entry_node *t)
 	temp = t->next;
 	t->next = t->next->next;
 	t->next->prev = t;
+	free(temp->attr);
 	free(temp);
 }
 
@@ -44,10 +49,19 @@ entry_node *insertafter(struct dirent *data, entry_node *t)
 // Returns:
 //  - Pointer to the newly inserted node
 {
-	entry_node *new;
+	entry_node		*new;
+	struct stat 	*attr;
 
 	new = (entry_node *)malloc(sizeof(*new));
+	attr = malloc(sizeof(*attr));
 	new->data = data;
+	if (stat(new->data->d_name, attr) == -1)
+	{
+		new->attr = NULL;
+		free(attr);
+	}
+	else
+		new->attr = attr;
 	new->next = t->next;
 	new->prev = t;
 	new->lines = 0;
@@ -68,10 +82,13 @@ void	free_entries(entry_node *head)
 	while (current->next != current->next->next)
 	{
 		temp = current->next;
+		if (current->attr != NULL)
+			free(current->attr);
 		free(current);
 		current = temp;
 	}
 	temp = current->next;
+	free(current->attr);
 	free(current);
 	free(temp);
 }
