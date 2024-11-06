@@ -9,6 +9,7 @@ This is just a fun little project I have been doing to test my skills in C, not 
 Currently there is only basic functionality. Some of the available features are:
 - Navigation of the filesystem
 - Copying/cutting/pasting files and directories
+- Renaming files/directories
 - Permanent deletion of files and empty directories
 - Search within current directory
 - A simple text file preview (scrolling of preview now implemented)
