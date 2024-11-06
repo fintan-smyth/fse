@@ -1,7 +1,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
+#include "headers/env.h"
 
-extern int FLAG_HIDDEN;
 vd_node	*VISITED_DIRS;
 
 struct vd_node	*init_visited(void)
@@ -96,6 +96,7 @@ struct directory	*get_directory(char *dir_path)
 	entry_node			*current;
 	entry_node			**entry_array;
 	int					no_entries;
+	int					left = 0;
 
 	directory = malloc(sizeof(*directory));
 	head = init_list();
@@ -122,7 +123,7 @@ struct directory	*get_directory(char *dir_path)
 			delete_next_entry(current);
 		else if (strncmp(current->next->data->d_name, ".", 1) == 0)
 		{
-			if (FLAG_HIDDEN == 0)
+			if ((env.FLAGS & F_HIDDEN) == 0)
 			{
 				delete_next_entry(current);
 				continue;
@@ -135,7 +136,20 @@ struct directory	*get_directory(char *dir_path)
 	no_entries = number_list(head);
 	entry_array = malloc(no_entries * sizeof(*entry_array));
 	populate_entry_array(entry_array, head->next);
-	q_sort(entry_array, 0, no_entries - 1);
+	if (env.FLAGS & F_HIDDEN)
+	{
+		int i = 0;
+		while (i < no_entries)
+		{
+			if (strcmp(entry_array[i]->data->d_name, ".") == 0)
+				swap_entries(entry_array, i, 0);
+			else if (strcmp(entry_array[i]->data->d_name, "..") == 0)
+				swap_entries(entry_array, i, 1);
+			i++;
+		}
+		left = 2;
+	}
+	q_sort(entry_array, left, no_entries - 1);
 	number_list(head);
 	free(entry_array);
 	return (directory);
