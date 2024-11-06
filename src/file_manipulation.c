@@ -9,6 +9,9 @@ path_node	*copied;
 path_node	*cut;
 
 path_node	*init_path_list(void)
+// Initialises a linked list of paths.
+// Returns:
+//  - Pointer to head of path list
 {
 	path_node	*head;
 	path_node	*tail;
@@ -23,15 +26,24 @@ path_node	*init_path_list(void)
 }
 
 void	delete_next_path(path_node *t)
+// Deletes the next node from a given path list.
+// Args:
+//  - t:	pointer to node before the node to be deleted
 {
 	path_node	*temp;
 	temp = t->next;
 	t->next = t->next->next;
 	free(temp->path);
-    free(temp);
+	free(temp);
 }
 
 path_node	*insert_path_node(char *path, path_node *t)
+// Inserts a node into a path list.
+// Args:
+//  - path:	the path to be inserted into the list
+//  - t:	pointer to the node after which the new node will be inserted
+// Returns:
+//  - Pointer to the newly inserted path node
 {
 	path_node	*new;
 
@@ -43,6 +55,9 @@ path_node	*insert_path_node(char *path, path_node *t)
 }
 
 void	free_path_list(path_node *head)
+// Frees a given path list.
+// Args:
+//  - head:	pointer to the head of the path list
 {
 	path_node	*current;
 	path_node	*temp;
@@ -66,12 +81,22 @@ void	free_path_list(path_node *head)
 }
 
 void	clear_path_list(path_node *head)
+// Removes all members of a given path list.
+// Args:
+//  - head:	pointer to the head of the path list
 {
 	while (head->next != head->next->next)
 		delete_next_path(head);
 }
 
 int	check_path(path_node *path_list, char *path)
+// Checks if a path is in a given path list.
+// Args:
+//  - path_list:	pointer to the head of the path list being checked
+//  - path:			path to be checked
+// Returns:
+//  - 1 if path is in path list
+//  - 0 if path is not in path list
 {
 	path_node	*current;
 
@@ -88,6 +113,14 @@ int	check_path(path_node *path_list, char *path)
 }
 
 int	delete_path(char *path, path_node *head)
+// Searches for a path in a given path list, and if found
+// deletes path from the list.
+// Args:
+//  - path:	path to be deleted
+//  - head:	pointer to head of path list to search
+// Returns:
+//  - 0 if path successfully found and deleted
+//  - 1 if path not found in list
 {
 	path_node	*current;
 
@@ -105,6 +138,13 @@ int	delete_path(char *path, path_node *head)
 }
 
 char	*construct_path(char *buf, char *directory, char *file_name)
+// Constructs an absolute path from a file name and directory path.
+// Args:
+//  - buf:			char array where the path will be constructed
+//  - directory:	full path of directory containing file
+//  - file_name:	name of the file
+// Returns:
+//  - Pointer to array where path was constructed
 {
 	if (my_strlen(directory) == 1 && *directory == '/')
 	{
@@ -117,6 +157,11 @@ char	*construct_path(char *buf, char *directory, char *file_name)
 }
 
 char	*get_file_name(char *path)
+// Gets the file name from an absolute path.
+// Args:
+//  - path:	absolute path of file
+// Returns:
+//  - Pointer to memory allocated string containing file name
 {
 	int		i;
 	char	*file_name;
@@ -131,6 +176,13 @@ char	*get_file_name(char *path)
 }
 
 int	check_path_exists(vd_node *dir_node, char *path)
+// Checks if a file with a given absolute path exists within a directory.
+// Args:
+//  - dir_node:	pointer to node of directory to check
+//  - path:		absolute path of file to check
+// Returns:
+//  - 1 if file exists in directory
+//  - 0 if file doesn not exist in directory
 {
 	char		*file_name;
 	entry_node	*current = dir_node->directory->children->next;
@@ -151,6 +203,13 @@ int	check_path_exists(vd_node *dir_node, char *path)
 }
 
 int	check_file_exists(vd_node *dir_node, char *file_name)
+// Checks if a file with a given file name exists within a directory.
+// Args:
+//  - dir_node:	pointer to node of directory to check
+//  - path:		name of file to check
+// Returns:
+//  - 1 if file exists in directory
+//  - 0 if file doesn not exist in directory
 {
 	entry_node	*current = dir_node->directory->children->next;
 
@@ -165,6 +224,13 @@ int	check_file_exists(vd_node *dir_node, char *file_name)
 
 
 void	paste(vd_node *dir_node)
+// Copies all files from 'copied' list into given directory.
+// Moves all files from 'cut' list into given directory.
+// If a file already exists with the same name, asks user what action
+// should be taken.
+// Removes all pasted files from their respective lists.
+// Args:
+//  - dir_node:	pointer to node of directory to paste in
 {
 	path_node	*current;
 	char		command_buf[500];
@@ -219,19 +285,12 @@ void	paste(vd_node *dir_node)
 	}
 }
 
-void	print_copied(path_node *copied)
-{
-	path_node *current = copied->next;
-	printf("<addr: %p>\t<next: %p>\t<path: %s>\n",copied, copied->next, copied->path);
-	while (current != current->next)
-	{
-		printf("<addr: %p>\t<next: %p>\t<path: %s>\n",current, current->next, current->path);
-		current = current->next;
-	}
-	printf("<addr: %p>\t<next: %p>\t<path: %s>\n",current, current->next, current->path);
-}
-
 char	*user_from_uid(uid_t uid)
+// Retrieves the username of a given uid.
+// Args:
+//  - uid:	uid of user
+// Returns:
+//  - memory allocated string containing username
 {
 	size_t	size = 200;
 	FILE	*fp;
@@ -267,6 +326,11 @@ char	*user_from_uid(uid_t uid)
 }
 
 char	*group_from_gid(gid_t gid)
+// Retrieves the groupname of a given gid.
+// Args:
+//  - gid:	gid of group
+// Returns:
+//  - memory allocated string containing groupname
 {
 	size_t	size = 200;
 	FILE	*fp;
@@ -302,6 +366,9 @@ char	*group_from_gid(gid_t gid)
 }
 
 void	print_time(time_t time)
+// Prints formatted time.
+// Args:
+//  - time:	the time to print
 {
 	struct tm	*timeinfo;
 	char 		*time_str;
@@ -319,6 +386,9 @@ void	print_time(time_t time)
 }
 
 void	format_filesize(off_t filesize)
+// Prints a filesize formatted with appropriate SI prefixes.
+// Args:
+//  - filesize:	the filesize to print
 {
 	double	size = (double) filesize;
 	int		power = 0;
@@ -361,6 +431,14 @@ void	format_filesize(off_t filesize)
 }
 
 void	print_file_attributes(entry_node *entry)
+// Prints the following attributes of a file:
+//  - file permissions
+//  - (formatted) filesize
+//  - username of file owner
+//  - groupname of file group
+//  - modified time of file
+// Args:
+//  - entry:	pointer to entry node of the file
 {
 	struct stat	fs;
 	char		*user;

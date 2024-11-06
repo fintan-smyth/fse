@@ -25,7 +25,7 @@ entry_node *init_list(void)
 }
 
 void	delete_next_entry(entry_node *t)
-// Deletes a node from the given entry list.
+// Deletes the next node from the given entry list.
 // Args:
 //  - t:	pointer to the node before the node to be deleted
 {
