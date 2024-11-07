@@ -124,6 +124,10 @@ char	*match_keyword(char *keyword)
 }
 
 int	check_double_binds(void)
+// Checks the bind struct to see if any keys are assigned to multiple commands.
+// Returns:
+//  - 0 if all commands have unique keys
+//  - 1 if a key is assigned to multiple commands
 {
 	union bind_u	binds_u;
 	int				no_binds = (int) sizeof(binds);
