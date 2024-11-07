@@ -538,6 +538,7 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == binds.CLEAR_BUF)
 		{
+			clear_path_list(copied);
 			clear_path_list(cut);
 			cleanup_directory(dir_node);
 			return (0);
