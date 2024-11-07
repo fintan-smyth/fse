@@ -42,8 +42,8 @@ Currently there is only basic functionality. Some of the available features are:
 | N | SEARCH_PREV |  Previous Search result |
 | g | GO_FIRST |  Select first entry |
 | G | GO_LAST |  Select last entry |
-| [ | PREV_UP |  Scroll up text preview |
 | ] | PREV_DOWN |  Scroll down text preview |
+| [ | PREV_UP |  Scroll up text preview |
 | H | TOGGLE_HIDDEN |  Toggle hidden file visibility |
 | S | TOGGLE_SORT |  Toggle between alphabetical/filesize sorting |
 | P | TOGGLE_PARENT |  Toggle parent directory preview |
