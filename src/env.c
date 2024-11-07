@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include "headers/env.h"
 
 struct env_struct	env;
@@ -14,8 +17,8 @@ void	set_default_binds(void)
 	binds.UPDIR = 'h';
 	binds.EDIT_DIR = 'E';
 	binds.EDIT_FILE = 'e';
-	binds.TOGGLE_HDN = 'H';
-	binds.TOGGLE_PRVW = 'P';
+	binds.TOGGLE_HIDDEN = 'H';
+	binds.TOGGLE_PARENT = 'P';
 	binds.TOGGLE_SORT = 'S';
 	binds.EXEC_SHELL = ':';
 	binds.HELP = '?';
@@ -30,12 +33,192 @@ void	set_default_binds(void)
 	binds.CUT = 'd';
 	binds.EXEC_FILE = 'x';
 	binds.SEARCH_DIR = '/';
-	binds.PREV_DWN = ']';
+	binds.PREV_DOWN = ']';
 	binds.PREV_UP = '[';
 	binds.GO_FIRST = 'g';
 	binds.GO_LAST = 'G';
 	binds.DELETE = 'D';
 	binds.RENAME = 'r';
+}
+
+int	is_whitespace(char c)
+// Checks if a character is whitepace.
+// Args:
+//  - c:	the character to check
+// Returns:
+//  - 0 if character is not whitespace
+//  - 1 if character is space or tab
+//  - 2 if character is newline
+{
+	if (c == ' ' || c == '\t')
+		return (1);
+	if (c == '\n')
+		return (2);
+	return (0);
+}
+
+char	*match_keyword(char *keyword)
+// Retrieves the corresponding entry in the bind struct 
+// for a bind keyword.
+// Args:
+//  - keyword:	a string containing the bind keyword
+// Returns:
+//  - pointer to char in the bind struct corresponding to that keyword
+//  - NULL if no match is found
+{
+	if (strcmp("QUIT", keyword) == 0)
+		return (&binds.QUIT);
+	if (strcmp("UPDIR", keyword) == 0)
+		return (&binds.UPDIR);
+	if (strcmp("EDIT_DIR", keyword) == 0)
+		return (&binds.EDIT_DIR);
+	if (strcmp("EDIT_FILE", keyword) == 0)
+		return (&binds.EDIT_FILE);
+	if (strcmp("TOGGLE_HIDDEN", keyword) == 0)
+		return (&binds.TOGGLE_HIDDEN);
+	if (strcmp("TOGGLE_PARENT", keyword) == 0)
+		return (&binds.TOGGLE_PARENT);
+	if (strcmp("TOGGLE_SORT", keyword) == 0)
+		return (&binds.TOGGLE_SORT);
+	if (strcmp("EXEC_SHELL", keyword) == 0)
+		return (&binds.EXEC_SHELL);
+	if (strcmp("HELP", keyword) == 0)
+		return (&binds.HELP);
+	if (strcmp("PASTE", keyword) == 0)
+		return (&binds.PASTE);
+	if (strcmp("PASTE", keyword) == 0)
+		return (&binds.PASTE);
+	if (strcmp("YANK", keyword) == 0)
+		return (&binds.YANK);
+	if (strcmp("CUT", keyword) == 0)
+		return (&binds.CUT);
+	if (strcmp("CLEAR_BUF", keyword) == 0)
+		return (&binds.CLEAR_BUF);
+	if (strcmp("SELECT_NEXT", keyword) == 0)
+		return (&binds.SELECT_NEXT);
+	if (strcmp("SELECT_PREV", keyword) == 0)
+		return (&binds.SELECT_PREV);
+	if (strcmp("SEARCH_NEXT", keyword) == 0)
+		return (&binds.SEARCH_NEXT);
+	if (strcmp("SEARCH_PREV", keyword) == 0)
+		return (&binds.SEARCH_PREV);
+	if (strcmp("OPEN", keyword) == 0)
+		return (&binds.OPEN);
+	if (strcmp("EXEC_FILE", keyword) == 0)
+		return (&binds.EXEC_FILE);
+	if (strcmp("SEARCH_DIR", keyword) == 0)
+		return (&binds.SEARCH_DIR);
+	if (strcmp("PREV_DOWN", keyword) == 0)
+		return (&binds.PREV_DOWN);
+	if (strcmp("PREV_UP", keyword) == 0)
+		return (&binds.PREV_UP);
+	if (strcmp("GO_FIRST", keyword) == 0)
+		return (&binds.GO_FIRST);
+	if (strcmp("GO_LAST", keyword) == 0)
+		return (&binds.GO_LAST);
+	if (strcmp("DELETE", keyword) == 0)
+		return (&binds.DELETE);
+	if (strcmp("RENAME", keyword) == 0)
+		return (&binds.RENAME);
+	return (NULL);
+}
+
+int	load_config(void)
+// Reads the config file located at ~/.config/fse/ and applies the 
+// bind options contained within.
+// Returns:
+//  - 0 if config loaded without error or does not exist
+//  - 1 if config contains errors
+{
+	struct stat	fs;
+	FILE		*fileptr;
+	char		*config;
+	char		path[120];
+	char		keyword[20];
+	char		*home = getenv("HOME");
+	char		*keybind;
+	char		key;
+	int			i;
+	int			j;
+	size_t		size;
+	
+	strncpy(path, home, 100);
+	strcat(path, "/.config/fse/config");
+	if (stat(path, &fs) == 1)
+	{
+		return (0);
+	}
+	size = fs.st_size;
+	config = malloc(size + 1);
+	fileptr = fopen(path, "r");
+	if (fileptr == NULL)
+	{
+		free(config);
+		return (0);
+	}
+	fread(config, size, 1, fileptr);
+	fclose(fileptr);
+	config[size] = 0;
+	i = 0;
+	while (i < (int) size && config[i] != 0)
+	{
+		while (is_whitespace(config[i]))
+			i++;
+		if (config[i] == 0)
+		{
+			free(config);
+			return (0);
+		}
+		j = 0;
+		while (!is_whitespace(config[i]) && config[i] != '=')
+		{
+			if (config[i] == 0)
+			{
+				free(config);
+				return (1);
+			}
+			keyword[j++] = config[i++];
+		}
+		keyword[j] = 0;
+		while (is_whitespace(config[i]) == 1)
+			i++;
+		if (config[i] != '=')
+		{
+			free(config);
+			return (1);
+		}
+		i++;
+		while (is_whitespace(config[i]) == 1)
+			i++;
+		key = config[i++];
+		if (key < 32 || key > 126)
+		{
+			free(config);
+			return (1);
+		}
+		while (is_whitespace(config[i]) == 1)
+			i++;
+		if (config[i] != '\n')
+		{
+			free(config);
+			return (1);
+		}
+		keybind = match_keyword(keyword);
+		if (keybind == NULL)
+		{
+			free(config);
+			return (1);
+		}
+		*keybind = key;
+		i++;
+		if (config[i] == 0)
+		{
+			free(config);
+			return (0);
+		}
+	}
+	free(config);
+	return (0);
 }
 
 void	set_winsize(void)

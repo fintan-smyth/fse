@@ -23,6 +23,11 @@ int	main(void)
 	
 	env.FLAGS |= F_PREVIEW;
 	set_default_binds();
+	if (load_config() == 1)
+	{
+		printf("\e[2J\e[HError: invalid config\n");
+		exit(1);
+	}
 	VISITED_DIRS = init_visited();
 	copied = init_path_list();
 	cut = init_path_list();

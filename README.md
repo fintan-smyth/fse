@@ -16,37 +16,48 @@ Currently there is only basic functionality. Some of the available features are:
 - A (heavily) exa/eza inspired file attribute display
 - File-dependent highlighting
 - Running executable files
+- Editable config
 
 ### Default Binds
 
-|Key|Action|
-|:---:|---|
-| q | Quit |
-| j | Select next |
-| k | Select previous |
-| h | Go to parent directory |
-| l | Open |
-| y | Copy selected |
-| d | Cut selected |
-| p | Paste copy/cut buffer |
-| c | Clear copy/cut buffer |
-| D | Delete selected |
-| r | Rename selected |
-| x | Run selected executable |
-| e | Open selected in editor |
-| E | Open current directory in editor |
-| : | Execute shell command |
-| / | Search in directory |
-| n | Next search result |
-| N | Previous Search result |
-| g | Select first entry |
-| G | Select last entry |
-| [ | Scroll up text preview |
-| ] | Scroll down text preview |
-| H | Toggle hidden file visibility |
-| S | Toggle between alphabetical/filesize sorting |
-| P | Toggle parent directory preview |
-| ? | Display these helpful instructions! |
+|Default Key|Keyword|Action|
+|:---:|:---:|---|
+| q | QUIT | Quit |
+| j | SELECT_NEXT |  Select next |
+| k | SELECT_PREV |  Select previous |
+| h | UPDIR |  Go to parent directory |
+| l | OPEN |  Open |
+| y | YANK |  Copy selected |
+| d | CUT |  Cut selected |
+| p | PASTE |  Paste copy/cut buffer |
+| c | CLEAR_BUF |  Clear copy/cut buffer |
+| D | DELETE |  Delete selected |
+| r | RENAME |  Rename selected |
+| x | EXEC_FILE |  Run selected executable |
+| e | EDIT_FILE |  Open selected in editor |
+| E | EDIT_DIR |  Open current directory in editor |
+| : | EXEC_SHELL |  Execute shell command |
+| / | SEARCH_DIR |  Search in directory |
+| n | SEARCH_NEXT |  Next search result |
+| N | SEARCH_PREV |  Previous Search result |
+| g | GO_FIRST |  Select first entry |
+| G | GO_LAST |  Select last entry |
+| [ | PREV_UP |  Scroll up text preview |
+| ] | PREV_DOWN |  Scroll down text preview |
+| H | TOGGLE_HIDDEN |  Toggle hidden file visibility |
+| S | TOGGLE_SORT |  Toggle between alphabetical/filesize sorting |
+| P | TOGGLE_PARENT |  Toggle parent directory preview |
+| ? | HELP |  Display these helpful instructions! |
+
+## Config
+
+The program binds can now be edited by adjusting the config file, which must be located at `~/.config/fse/`.
+A config file containing the default binds is included in this repository, and will be copied to its correct location on installation.
+Any unset options will use their default binds.
+The format for the config file is:
+	`{KEYWORD} = {key}`
+where {KEYWORD} is a keyword specified in the table of binds above, and {KEY} is any printable character.
+Elements of a line in the config file can be separated by an indeterminate amount of non-newline whitespace.
 
 ## Building
 

@@ -111,10 +111,10 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tSelect first entry\n", binds.GO_FIRST);
 	printf("\t\e[1m%c\e[m\tSelect last entry\n", binds.GO_LAST);
 	printf("\t\e[1m%c\e[m\tScroll up text preview\n", binds.PREV_UP);
-	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DWN);
-	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HDN);
+	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DOWN);
+	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HIDDEN);
 	printf("\t\e[1m%c\e[m\tToggle between alphabetical/filesize sorting\n", binds.TOGGLE_SORT);
-	printf("\t\e[1m%c\e[m\tToggle parent directory preview\n", binds.TOGGLE_PRVW);
+	printf("\t\e[1m%c\e[m\tToggle parent directory preview\n", binds.TOGGLE_PARENT);
 	printf("\t\e[1m%c\e[m\tDisplay this helpful page!\n", binds.HELP);
 	getchar();
 }
@@ -498,14 +498,14 @@ int	navigate(vd_node *dir_node)
 			cleanup_directory(dir_node);
 			return (0);
 		}
-		else if (c == binds.TOGGLE_HDN)
+		else if (c == binds.TOGGLE_HIDDEN)
 		{
 			toggle_hidden();
 			dir_node->offset = 0;
 			cleanup_directory(dir_node);
 			return (0);
 		}
-		else if (c == binds.TOGGLE_PRVW)
+		else if (c == binds.TOGGLE_PARENT)
 		{
 			toggle_preview();
 			cleanup_directory(dir_node);
@@ -583,7 +583,7 @@ int	navigate(vd_node *dir_node)
 				return (0);
 			}
 		}
-		else if (c == binds.PREV_DWN)
+		else if (c == binds.PREV_DOWN)
 		{
 			if ((selected->lines - preview_offset) <= env.TERM_ROWS - 4)
 				continue;

@@ -26,11 +26,12 @@ clean:
 
 fclean: clean	
 	rm -f $(NAME)
-#	rm -f $(OBJ) $(NAME)
 
 install: 
 	mkdir -p ~/.local/bin/
 	cp ./fse ~/.local/bin/fse
+	mkdir -p ~/.config/fse/
+	cp ./config ~/.config/fse/config
 
 re: fclean all
 .PHONY: all clean fclean re

@@ -19,8 +19,8 @@ struct bind_struct
 	char	UPDIR;
 	char	EDIT_DIR;
 	char	EDIT_FILE;
-	char	TOGGLE_HDN;
-	char	TOGGLE_PRVW;
+	char	TOGGLE_HIDDEN;
+	char	TOGGLE_PARENT;
 	char	TOGGLE_SORT;
 	char	EXEC_SHELL;
 	char	HELP;
@@ -35,7 +35,7 @@ struct bind_struct
 	char	CUT;
 	char	EXEC_FILE;
 	char	SEARCH_DIR;
-	char	PREV_DWN;
+	char	PREV_DOWN;
 	char	PREV_UP;
 	char	GO_FIRST;
 	char	GO_LAST;
@@ -49,6 +49,7 @@ extern struct env_struct	env;
 extern struct bind_struct	binds;
 
 void	set_default_binds(void);
+int		load_config(void);
 void	set_winsize(void);
 void	store_term_settings(void);
 void	set_term_settings(void);
