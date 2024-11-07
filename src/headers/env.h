@@ -13,6 +13,8 @@ struct env_struct
 	unsigned char	FLAGS;
 } ;
 
+enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_SORT = 4};
+
 struct bind_struct
 {
 	char	QUIT;
@@ -41,15 +43,20 @@ struct bind_struct
 	char	GO_LAST;
 	char	DELETE;
 	char	RENAME;
-} ;
+};
 
-enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_SORT = 4};
+union bind_u
+{
+	struct bind_struct bstruct;
+	char barr[sizeof(struct bind_struct)];
+} ;
 
 extern struct env_struct	env;
 extern struct bind_struct	binds;
 
 void	set_default_binds(void);
 int		load_config(void);
+int		check_double_binds(void);
 void	set_winsize(void);
 void	store_term_settings(void);
 void	set_term_settings(void);

@@ -123,8 +123,32 @@ char	*match_keyword(char *keyword)
 	return (NULL);
 }
 
+int	check_double_binds(void)
+{
+	union bind_u	binds_u;
+	int				no_binds = (int) sizeof(binds);
+	int				i;
+	int				j;
+
+	binds_u.bstruct = binds;
+	i = 0;
+	printf("\e[2J\e[H");
+	while (i < no_binds)
+	{
+		j = i + 1;
+		while (j < no_binds)
+		{
+			if (binds_u.barr[i] == binds_u.barr[j])
+				return (1);
+			j++;
+		}
+		i++;
+	}
+	return (0);
+}
+
 int	load_config(void)
-// Reads the config file located at ~/.config/fse/ and applies the 
+// Reads the config file located at ~/.config/fse/ and applies the
 // bind options contained within.
 // Returns:
 //  - 0 if config loaded without error or does not exist

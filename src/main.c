@@ -25,7 +25,12 @@ int	main(void)
 	set_default_binds();
 	if (load_config() == 1)
 	{
-		printf("\e[2J\e[HError: invalid config\n");
+		printf("\e[2J\e[HConfig error: invalid syntax\n");
+		exit(1);
+	}
+	if (check_double_binds() == 1)
+	{
+		printf("\e[2J\e[HConfig error: cannot have multiple binds to single key\n");
 		exit(1);
 	}
 	VISITED_DIRS = init_visited();
