@@ -52,12 +52,18 @@ Currently there is only basic functionality. Some of the available features are:
 ## Config
 
 The program binds can now be edited by adjusting the config file, which must be located at `~/.config/fse/`.
+
 A config file containing the default binds is included in this repository, and will be copied to its correct location on installation.
-Any unset options will use their default binds.
+
 The format for the config file is:
+
 	`{KEYWORD} = {key}`
+
 where {KEYWORD} is a keyword specified in the table of binds above, and {KEY} is any printable character.
+
 Elements of a line in the config file can be separated by an indeterminate amount of non-newline whitespace.
+
+Any unset options will use their default binds.
 
 ## Building
 
