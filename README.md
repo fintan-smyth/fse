@@ -17,7 +17,7 @@ Currently there is only basic functionality. Some of the available features are:
 - File-dependent highlighting
 - Running executable files
 
-### Binds
+### Default Binds
 
 |Key|Action|
 |:---:|---|
