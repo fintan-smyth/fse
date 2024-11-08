@@ -42,7 +42,7 @@ int	main(void)
 	do {
 		getcwd(cwd_name, size);
 		current = get_vd_node(VISITED_DIRS, cwd_name);
-		current->directory = get_directory(cwd_name);
+		get_directory(current);
 	} while (navigate(current) == 0);
 	printf("\e[2J\e[H");
 }

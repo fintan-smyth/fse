@@ -28,12 +28,13 @@ struct directory
 
 typedef struct vd_node
 {
-	struct vd_node	 *next;
-	struct directory *directory;
-	int				  offset;
-	char			 *dir_name;
-	char			 *selected_name;
-	char			  search_term[255];
+	struct vd_node		*next;
+	struct directory	*directory;
+	int					offset;
+	int					no_entries;
+	char				*dir_name;
+	char				*selected_name;
+	char				search_term[255];
 } vd_node;
 
 extern vd_node *VISITED_DIRS;
@@ -54,7 +55,7 @@ void		q_sort(entry_node **entry_array, int left, int right);
 int			number_list(entry_node *head);
 int			comp_entries(entry_node *a, entry_node *b);
 
-struct directory *get_directory(char *dir_name);
+struct directory *get_directory(vd_node *dir_node);
 vd_node			 *init_visited(void);
 vd_node			 *vd_insert(vd_node *visited, char *dir_name);
 vd_node			 *get_vd_node(vd_node *visited, char *path);

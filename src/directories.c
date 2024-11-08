@@ -44,6 +44,7 @@ vd_node	*vd_insert(vd_node *visited, char *dir_path)
 	new->selected_name = malloc(1 * sizeof(char));
 	memset(new->selected_name, 0, 1 * sizeof(char));
 	new->offset = 0;
+	new->no_entries = 0;
 	return (new);
 }
 
@@ -81,11 +82,11 @@ void	cleanup_directory(vd_node *dir_node)
 	dir_node->directory = NULL;
 }
 
-struct directory	*get_directory(char *dir_path)
+struct directory	*get_directory(vd_node *dir_node)
 // Creates a list of the entries in a directory, sorts them, and 
 // puts the list in a 'directory' struct.
 // Args:
-//  - dir_path:	full path to directory
+//  - dir_node:	pointer to directory node of the directory to be retrieved
 // Returns:
 //  - 'directory' struct containing doubly linked list of entries
 {
@@ -95,14 +96,14 @@ struct directory	*get_directory(char *dir_path)
 	entry_node			*head;
 	entry_node			*current;
 	entry_node			**entry_array;
-	int					no_entries;
 	int					left = 0;
 
+	dir_node->no_entries = 0;
 	directory = malloc(sizeof(*directory));
 	head = init_list();
 	directory->children = head;
 	current = head;
- 	dir = opendir(dir_path);
+ 	dir = opendir(dir_node->dir_name);
 	directory->dir = dir;
 	if (dir == NULL)
 	{
@@ -112,7 +113,7 @@ struct directory	*get_directory(char *dir_path)
 	}
 	while ((child = readdir(dir)) != NULL)
 	{
-		current = insertafter(dir_path, child, current);
+		current = insertafter(dir_node->dir_name, child, current);
 	}
 	current = head;
 	while (current->next != current->next->next)
@@ -133,13 +134,13 @@ struct directory	*get_directory(char *dir_path)
 		else
 			current = current->next;
 	}
-	no_entries = number_list(head);
-	entry_array = malloc(no_entries * sizeof(*entry_array));
+	dir_node->no_entries = number_list(head);
+	entry_array = malloc(dir_node->no_entries * sizeof(*entry_array));
 	populate_entry_array(entry_array, head->next);
 	if (env.FLAGS & F_HIDDEN)
 	{
 		int i = 0;
-		while (i < no_entries)
+		while (i < dir_node->no_entries)
 		{
 			if (strcmp(entry_array[i]->data->d_name, ".") == 0)
 				swap_entries(entry_array, i, 0);
@@ -149,9 +150,10 @@ struct directory	*get_directory(char *dir_path)
 		}
 		left = 2;
 	}
-	q_sort(entry_array, left, no_entries - 1);
-	number_list(head);
+	q_sort(entry_array, left, dir_node->no_entries - 1);
+	dir_node->no_entries = number_list(head);
 	free(entry_array);
+	dir_node->directory = directory;
 	return (directory);
 }
 

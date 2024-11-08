@@ -13,5 +13,6 @@ int		my_strlen(char *s);
 int		str_printable(char *s);
 int		count_lines(char *path);
 int 	is_binary(char *path);
+int		count_digits(int num);
 
 #endif // !UTILS_H_

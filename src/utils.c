@@ -165,3 +165,24 @@ int count_lines(char *path)
 	fclose(fileptr);
 	return (lines);
 }
+
+int	count_digits(int num)
+//	Counts the number of characters in an integer.
+//	Args:
+//	 - num:	the integer to count characters of
+//	Returns:
+//	 - The number of characters required to print the integer
+{
+	int	digits = 0;
+
+	if (num == 0)
+		return (1);
+	if (num < 0)
+		digits++;
+	while (num != 0)
+	{
+		digits++;
+		num /= 10;
+	}
+	return (digits);
+}

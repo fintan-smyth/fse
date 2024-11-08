@@ -196,21 +196,21 @@ void	display_subdirectory(entry_node *dir_entry, char *cwd_path)
 //  - dir_entry:	pointer to entry node of the subdirectory
 //  - path:			absolute path of cwd
 {
-	vd_node		*current;
+	vd_node		*subdir_node;
 	entry_node	*selected_sub;
 
 	if (strncmp(cwd_path, "/", strlen(cwd_path)))
 		cwd_path = strcat(cwd_path, "/");
 	cwd_path = strcat(cwd_path, dir_entry->data->d_name);
-	current = get_vd_node(VISITED_DIRS, cwd_path);
-	current->directory = get_directory(cwd_path);
-	if (current->directory == NULL)
+	subdir_node = get_vd_node(VISITED_DIRS, cwd_path);
+	get_directory(subdir_node);
+	if (subdir_node->directory == NULL)
 	{
 		return ;
 	}
-	selected_sub = get_selected(current);
-	print_entries(current, selected_sub, 1);
-	cleanup_directory(current);
+	selected_sub = get_selected(subdir_node);
+	print_entries(subdir_node, selected_sub, 1);
+	cleanup_directory(subdir_node);
 }
 
 void	display_parent(vd_node *dir_node, vd_node *parent)
@@ -226,7 +226,7 @@ void	display_parent(vd_node *dir_node, vd_node *parent)
 		clear_parent_box();
 		return ;
 	}
-	parent->directory = get_directory(parent->dir_name);
+	get_directory(parent);
 	selected = get_selected(parent);
 	print_entries(parent, selected, -1);
 	cleanup_directory(parent);
@@ -281,6 +281,28 @@ void	preview_text(entry_node *file, int preview_offset)
 	fclose(fp);
 }
 
+void	print_entry_no(vd_node *dir_node, entry_node *selected)
+// Prints the position of the current entry in the directory
+// and the total number of entries in the gutter.
+// Args:
+//  - dir_node:	pointer to the node of the directory
+//  - selected:	pointer to the node of the selected entry
+{
+	int	len;
+	int	pos;
+	int	no_entries = dir_node->no_entries;
+	int	entries_digits;
+
+	if (selected == NULL)
+		pos = 0;
+	else
+		pos = selected->pos;
+	entries_digits = count_digits(no_entries);
+	len = 5 + (2 * entries_digits);
+	printf("\e[%d;%dH[ \e[1;33m%0*d/%d\e[m ]",
+		env.TERM_ROWS, (env.TERM_COLS - len), entries_digits, pos, no_entries);
+}
+
 void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_offset)
 // Displays all information associated with current directory:
 //  - Path of cwd and selected file
@@ -301,6 +323,7 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 	print_entries(dir_node, selected, 0);
 	if (env.FLAGS & F_PREVIEW)
 		display_parent(dir_node, parent);
+	print_entry_no(dir_node, selected);
 	clear_header();
 	printf("\e[1;3H[ \e[31;1m%.*s", env.TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
