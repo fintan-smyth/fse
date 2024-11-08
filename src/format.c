@@ -270,12 +270,12 @@ void	preview_text(entry_node *file, int preview_offset)
 	if (preview_offset > 0)
 	{
 		printf("\e[3;%dH\e[1;7m%*s", env.SEP_2 + 1, (env.TERM_COLS - env.SEP_2) - 1, "");
-		printf("\e[%dG^\e[%dG[\e[m", (env.TERM_COLS + env.SEP_2) / 2, env.TERM_COLS - 3);
+		printf("\e[%dG^\e[%dG%c\e[m", (env.TERM_COLS + env.SEP_2) / 2, env.TERM_COLS - 3, binds.PREV_UP);
 	}
 	if ((file->lines - preview_offset) > env.TERM_ROWS - 4)
 	{
 		printf("\e[%d;%dH\e[1;7m%*s", env.TERM_ROWS - 2, env.SEP_2 + 1, (env.TERM_COLS - env.SEP_2) - 1, "");
-		printf("\e[%dGv\e[%dG]\e[m", (env.TERM_COLS + env.SEP_2) / 2, env.TERM_COLS - 3);
+		printf("\e[%dGv\e[%dG%c\e[m", (env.TERM_COLS + env.SEP_2) / 2, env.TERM_COLS - 3, binds.PREV_DOWN);
 	}
 	free(line);
 	fclose(fp);
