@@ -298,7 +298,7 @@ void	print_entry_no(vd_node *dir_node, entry_node *selected)
 	else
 		pos = selected->pos;
 	entries_digits = count_digits(no_entries);
-	len = 5 + (2 * entries_digits);
+	len = 6 + (2 * entries_digits);
 	printf("\e[%d;%dH[ \e[1;33m%0*d/%d\e[m ]",
 		env.TERM_ROWS, (env.TERM_COLS - len), entries_digits, pos, no_entries);
 }
