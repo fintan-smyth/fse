@@ -19,7 +19,7 @@ void	set_default_binds(void)
 	binds.EDIT_FILE = 'e';
 	binds.TOGGLE_HIDDEN = 'H';
 	binds.TOGGLE_PARENT = 'P';
-	binds.PICK_SORT = 'S';
+	binds.PICK_SORT = 'z';
 	binds.EXEC_SHELL = ':';
 	binds.HELP = '?';
 	binds.PASTE = 'p';
