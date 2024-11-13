@@ -65,10 +65,10 @@ void	pick_sort_method(void)
 
 	spawn_popup(5);
 	printf("\e[%d;3H\e[1mKeys\tCommand\e[m", env.TERM_ROWS - 6);
-	printf("\e[%d;3H%ca\tSort alphabetical", env.TERM_ROWS - 5, binds.PICK_SORT);
-	printf("\e[%d;3H%cf\tSort by filesize", env.TERM_ROWS - 4, binds.PICK_SORT);
-	printf("\e[%d;3H%ct\tSort by mtime", env.TERM_ROWS - 3, binds.PICK_SORT);
-	printf("\e[%d;3H%cr\tReverse sort order", env.TERM_ROWS - 2, binds.PICK_SORT);
+	printf("\e[%d;3H%ca\t(%s) Sort alphabetical", env.TERM_ROWS - 5, binds.PICK_SORT, (env.SORT == SORT_ALPHA) ? "\e[1;32mX\e[m" : " ");
+	printf("\e[%d;3H%cf\t(%s) Sort by filesize", env.TERM_ROWS - 4, binds.PICK_SORT, (env.SORT == SORT_SIZE) ? "\e[1;32mX\e[m" : " ");
+	printf("\e[%d;3H%ct\t(%s) Sort by mtime", env.TERM_ROWS - 3, binds.PICK_SORT, (env.SORT == SORT_MTIME) ? "\e[1;32mX\e[m" : " ");
+	printf("\e[%d;3H%cr\t[%s] Reverse sort order", env.TERM_ROWS - 2, binds.PICK_SORT, (env.FLAGS & F_REVERSE) ? "\e[1;31mX\e[m" : " ");
 	c = getchar();
 	if (c == 'a')
 		env.SORT = SORT_ALPHA;
