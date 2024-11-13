@@ -133,7 +133,7 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DOWN);
 	printf("\t\e[1m%c\e[m\tScroll up text preview\n", binds.PREV_UP);
 	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HIDDEN);
-	printf("\t\e[1m%c\e[m\tPick from a variety of sorting options\n", binds.PICK_SORT);
+	printf("\t\e[1m%c\e[m\tPick sorting options\n", binds.PICK_SORT);
 	printf("\t\e[1m%c\e[m\tToggle parent directory preview\n", binds.TOGGLE_PARENT);
 	printf("\t\e[1m%c\e[m\tDisplay this helpful page!\n", binds.HELP);
 	getchar();

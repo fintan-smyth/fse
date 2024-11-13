@@ -45,7 +45,7 @@ Currently there is only basic functionality. Some of the available features are:
 | ] | PREV_DOWN |  Scroll down text preview |
 | [ | PREV_UP |  Scroll up text preview |
 | H | TOGGLE_HIDDEN |  Toggle hidden file visibility |
-| z | PICK_SORT |  Choose from a variety of sorting options |
+| z | PICK_SORT |  Choose sorting options |
 | P | TOGGLE_PARENT |  Toggle parent directory preview |
 | ? | HELP |  Display these helpful instructions! |
 
