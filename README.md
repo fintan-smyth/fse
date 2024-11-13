@@ -57,8 +57,8 @@ A config file containing the default binds is included in this repository, and w
 
 The format for the config file is:
 ```
-	# Comment
-	{KEYWORD} = {key}
+# Comment
+{KEYWORD} = {key}
 ```
 
 where {KEYWORD} is a keyword specified in the table of binds above, and {KEY} is any printable character.
