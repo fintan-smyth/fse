@@ -1,3 +1,5 @@
+# Default config for FSE
+
 QUIT 			= q
 SELECT_NEXT		= j
 SELECT_PREV		= k
