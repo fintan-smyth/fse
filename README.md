@@ -45,7 +45,7 @@ Currently there is only basic functionality. Some of the available features are:
 | ] | PREV_DOWN |  Scroll down text preview |
 | [ | PREV_UP |  Scroll up text preview |
 | H | TOGGLE_HIDDEN |  Toggle hidden file visibility |
-| S | TOGGLE_SORT |  Toggle between alphabetical/filesize sorting |
+| z | PICK_SORT |  Choose from a variety of sorting options |
 | P | TOGGLE_PARENT |  Toggle parent directory preview |
 | ? | HELP |  Display these helpful instructions! |
 
@@ -56,8 +56,10 @@ The program binds can now be edited by adjusting the config file, which must be 
 A config file containing the default binds is included in this repository, and will be copied to its correct location on installation.
 
 The format for the config file is:
-
-	`{KEYWORD} = {key}`
+```
+	# Comment
+	{KEYWORD} = {key}
+```
 
 where {KEYWORD} is a keyword specified in the table of binds above, and {KEY} is any printable character.
 
