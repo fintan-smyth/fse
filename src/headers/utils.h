@@ -6,6 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define Apply_reverse(x) env.FLAGS & F_REVERSE ? !x : x
+
 char	*get_extension(char *file_name);
 int		is_executable(char *path);
 char	*replace_tab(char *string, size_t size);

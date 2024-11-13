@@ -1,8 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "headers/structs.h"
 #include "headers/env.h"
+#include "headers/utils.h"
 
 entry_node *init_list(void)
 // Initialises a doubly linked list of nodes containing information
@@ -199,26 +197,41 @@ int	comp_entries(entry_node *right, entry_node *left)
 //  - 0 if position of nodes should not be swapped
 {
 	int	type_comp = left->data->d_type - right->data->d_type;
-
 	if (type_comp > 0)
 		return (1);
 	if (type_comp < 0)
 		return (0);
-	switch (env.FLAGS & F_SORT) {
-		case (F_SORT):
+	switch (env.SORT) {
+		case (SORT_SIZE):
 			if (right->attr == NULL)
-				return (0);
+				return (Apply_reverse(0));
 			if (left->attr == NULL)
-				return (1);
+				return (Apply_reverse(1));
 			if (right->attr->st_size > left->attr->st_size)
-				return (1);
+				return (Apply_reverse(1));
+			break;
+		case (SORT_MTIME):
+			if (right->attr == NULL)
+				return (Apply_reverse(0));
+			if (left->attr == NULL)
+				return (Apply_reverse(1));
+			if (right->attr->st_mtime > left->attr->st_mtime)
+				return (Apply_reverse(1));
+			break;
+		case (SORT_ATIME):
+			if (right->attr == NULL)
+				return (Apply_reverse(0));
+			if (left->attr == NULL)
+				return (Apply_reverse(1));
+			if (right->attr->st_atime > left->attr->st_atime)
+				return (Apply_reverse(1));
 			break;
 		default:
 			if (strcasecmp(right->data->d_name, left->data->d_name) < 0)
-				return (1);
+				return (Apply_reverse(1));
 			break;
 	}
-	return (0);
+	return (Apply_reverse(0));
 }
 
 void q_sort(entry_node **entry_array, int left, int right)

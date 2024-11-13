@@ -21,6 +21,8 @@ int	main(void)
 	char			cwd_name[500];
 	vd_node			*current;
 	
+	env.FLAGS = 0;
+	env.SORT = 0;
 	env.FLAGS |= F_PREVIEW;
 	set_default_binds();
 	if (load_config() == 1)

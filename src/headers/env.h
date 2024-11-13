@@ -10,10 +10,12 @@ struct env_struct
 	int 			TERM_ROWS;
 	int				SEP_1;
 	int				SEP_2;
+	char			SORT;
 	unsigned char	FLAGS;
 } ;
 
-enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_SORT = 4};
+enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_REVERSE = 4};
+enum	{SORT_ALPHA = 0, SORT_SIZE = 1, SORT_MTIME = 2, SORT_ATIME = 3};
 
 struct bind_struct
 {
@@ -23,7 +25,7 @@ struct bind_struct
 	char	EDIT_FILE;
 	char	TOGGLE_HIDDEN;
 	char	TOGGLE_PARENT;
-	char	TOGGLE_SORT;
+	char	PICK_SORT;
 	char	EXEC_SHELL;
 	char	HELP;
 	char	PASTE;

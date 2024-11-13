@@ -52,12 +52,32 @@ void	toggle_preview(void)
 	env.FLAGS ^= F_PREVIEW;
 }
 
-void	toggle_sort(void)
-// Swaps between sorting by alphabetical order/filesize
+void	toggle_reverse_sort(void)
+// Reverses order of  the sort.
 {
-	env.FLAGS ^= F_SORT;
-	/*printf("\e[2J\e[H%.8b\n", env.FLAGS);*/
-	/*exit(0);*/
+	env.FLAGS ^= F_REVERSE;
+}
+
+void	pick_sort_method(void)
+// Spawns a popup prompting the user to pick sorting options.
+{
+	char	c;
+
+	spawn_popup(5);
+	printf("\e[%d;3H\e[1mKeys\tCommand\e[m", env.TERM_ROWS - 6);
+	printf("\e[%d;3H%ca\tSort alphabetical", env.TERM_ROWS - 5, binds.PICK_SORT);
+	printf("\e[%d;3H%cf\tSort by filesize", env.TERM_ROWS - 4, binds.PICK_SORT);
+	printf("\e[%d;3H%ct\tSort by mtime", env.TERM_ROWS - 3, binds.PICK_SORT);
+	printf("\e[%d;3H%cr\tReverse sort order", env.TERM_ROWS - 2, binds.PICK_SORT);
+	c = getchar();
+	if (c == 'a')
+		env.SORT = SORT_ALPHA;
+	else if (c == 'f')
+		env.SORT = SORT_SIZE;
+	else if (c == 't')
+		env.SORT = SORT_MTIME;
+	else if (c == 'r')
+		toggle_reverse_sort();
 }
 
 void	execute_shell_cmd(char	*buf)
@@ -113,7 +133,7 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DOWN);
 	printf("\t\e[1m%c\e[m\tScroll up text preview\n", binds.PREV_UP);
 	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HIDDEN);
-	printf("\t\e[1m%c\e[m\tToggle between alphabetical/filesize sorting\n", binds.TOGGLE_SORT);
+	printf("\t\e[1m%c\e[m\tToggle between alphabetical/filesize sorting\n", binds.PICK_SORT);
 	printf("\t\e[1m%c\e[m\tToggle parent directory preview\n", binds.TOGGLE_PARENT);
 	printf("\t\e[1m%c\e[m\tDisplay this helpful page!\n", binds.HELP);
 	getchar();
@@ -511,9 +531,9 @@ int	navigate(vd_node *dir_node)
 			cleanup_directory(dir_node);
 			return (0);
 		}
-		else if (c == binds.TOGGLE_SORT)
+		else if (c == binds.PICK_SORT)
 		{
-			toggle_sort();
+			pick_sort_method();
 			cleanup_directory(dir_node);
 			return (0);
 		}

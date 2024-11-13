@@ -19,7 +19,7 @@ void	set_default_binds(void)
 	binds.EDIT_FILE = 'e';
 	binds.TOGGLE_HIDDEN = 'H';
 	binds.TOGGLE_PARENT = 'P';
-	binds.TOGGLE_SORT = 'S';
+	binds.PICK_SORT = 'S';
 	binds.EXEC_SHELL = ':';
 	binds.HELP = '?';
 	binds.PASTE = 'p';
@@ -78,8 +78,8 @@ char	*match_keyword(char *keyword)
 		return (&binds.TOGGLE_HIDDEN);
 	if (strcmp("TOGGLE_PARENT", keyword) == 0)
 		return (&binds.TOGGLE_PARENT);
-	if (strcmp("TOGGLE_SORT", keyword) == 0)
-		return (&binds.TOGGLE_SORT);
+	if (strcmp("PICK_SORT", keyword) == 0)
+		return (&binds.PICK_SORT);
 	if (strcmp("EXEC_SHELL", keyword) == 0)
 		return (&binds.EXEC_SHELL);
 	if (strcmp("HELP", keyword) == 0)
