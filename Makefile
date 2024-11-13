@@ -10,7 +10,7 @@ OBJ := $(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(SRC:.c=.o))
 
 NAME = fse
 
-all: directories $(NAME) install
+all: directories $(NAME)
 
 directories: 
 	mkdir -p build
