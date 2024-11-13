@@ -125,3 +125,32 @@ void	clear_header(void)
 	printf("╮");
 	printf("\e[m");
 }
+
+void	spawn_popup(int	lines)
+// Spawns a popup window with a given number of lines.
+// Args:
+//  - lines:	the number of lines within the popup that can contain text
+{
+	int	i;
+
+	printf("\e[%d;1H├", env.TERM_ROWS - (2 + lines));
+	i = 2;
+	while (i < env.TERM_COLS)
+	{
+		if ( i == env.SEP_1 || i == env.SEP_2)
+			printf("┴");
+		else
+			printf("─");
+		i++;
+	}
+	printf("┤");
+	printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_1);
+	printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_2);
+	i = 0;
+	while (i < lines)
+	{
+		printf("\e[%d;2H", env.TERM_ROWS - (2 + i));
+		printf("%*s", env.TERM_COLS - 2, "");
+		i++;
+	}
+}

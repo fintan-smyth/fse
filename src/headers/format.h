@@ -9,6 +9,7 @@ void	clear_parent_box(void);
 void	clear_sub_box(void);
 void	clear_gutter(void);
 void	clear_header(void);
+void	spawn_popup(int lines);
 
 void	colour_entry(entry_node *entry);
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level);
