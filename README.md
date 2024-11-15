@@ -19,7 +19,15 @@ Currently there is only basic functionality. Some of the available features are:
 - Editable config
 - Vim-like number modifiers
 
-## Vim-like number modifiers
+## Building
+
+Simply clone this repository and run `make`, then `make install` should you want it added to your path. 
+
+The only dependencies should be a C compiler and GNU coreutils (or equivalent).
+
+## Controls
+
+### Vim-like number modifiers
 
 Certain commands can be modified, in a manner inspired by vim, by prefixing them with a number i.e. with default binds
 
@@ -36,7 +44,7 @@ The commands currently supporting number modification are:
 - YANK (add next `number` entries to copy buffer)
 - CUT (add next `number` entries to cut buffer)
 
-## Default Binds
+### Default Binds
 
 |Default Key|Keyword|Action|
 |:---:|:---:|---|
@@ -86,9 +94,3 @@ where {KEYWORD} is a keyword specified in the table of binds above, and {KEY} is
 Elements of a line in the config file can be separated by an indeterminate amount of non-newline whitespace.
 
 Any unset options will use their default binds.
-
-## Building
-
-Simply clone this repository and run `make`, then `make install` should you want it added to your path. 
-
-The only dependencies should be a C compiler and GNU coreutils (or equivalent).
