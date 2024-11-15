@@ -36,12 +36,12 @@ The commands currently supporting number modification are:
 - YANK (add next `number` entries to copy buffer)
 - CUT (add next `number` entries to cut buffer)
 
-### Default Binds
+## Default Binds
 
 |Default Key|Keyword|Action|
 |:---:|:---:|---|
 | q | QUIT | Quit |
-| <0-9> |  | Input number to modify applicable commands  |
+| < 0 - 9 > |  | Input number to modify applicable commands  |
 | j | SELECT_NEXT |  Select next |
 | k | SELECT_PREV |  Select previous |
 | h | UPDIR |  Go to parent directory |
