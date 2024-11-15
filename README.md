@@ -70,6 +70,7 @@ The commands currently supporting number modification are:
 | N | SEARCH_PREV |  Previous Search result |
 | g | GO_FIRST |  Select first entry |
 | G | GO_LAST |  Select last entry |
+| ~ | GO_HOME | Go to home directory |
 | ] | PREV_DOWN |  Scroll down text preview |
 | [ | PREV_UP |  Scroll up text preview |
 | H | TOGGLE_HIDDEN |  Toggle hidden file visibility |
