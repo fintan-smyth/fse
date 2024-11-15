@@ -315,6 +315,7 @@ void	open_selected(entry_node *selected, char *buf)
 			sprintf(buf, "%s \"%s\"", "bat --paging=always", selected->data->d_name);
 		else
 			sprintf(buf, "%s \"%s\"", pager, selected->data->d_name);
+		printf("\e[2J\e[H");
 		system(buf);
 		return ;
 	}
