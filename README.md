@@ -52,6 +52,7 @@ The commands currently supporting number modification are:
 | c | CLEAR_BUF |  Clear copy/cut buffer |
 | D | DELETE |  Delete selected |
 | r | RENAME |  Rename selected |
+| i | INSERT | Insert new entry |
 | x | EXEC_FILE |  Run selected executable |
 | e | EDIT_FILE |  Open selected in editor |
 | E | EDIT_DIR |  Open current directory in editor |
