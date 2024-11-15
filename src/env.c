@@ -250,10 +250,15 @@ void	set_winsize(void)
 	env.TERM_COLS = w.ws_col;
 	env.TERM_ROWS = w.ws_row;
 	if (env.FLAGS & F_PREVIEW)
+	{
 		env.SEP_1 = env.TERM_COLS / 6;
+		env.SEP_2 = env.TERM_COLS / 2;
+	}
 	else
+	{
 		env.SEP_1 = 1;
-	env.SEP_2 = env.TERM_COLS / 2;
+		env.SEP_2 = env.TERM_COLS / 3;
+	}
 }
 
 void	store_term_settings(void)
