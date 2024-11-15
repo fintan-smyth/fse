@@ -144,7 +144,8 @@ void	spawn_popup(int	lines)
 		i++;
 	}
 	printf("┤");
-	printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_1);
+	if (env.FLAGS & F_PREVIEW)
+		printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_1);
 	printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_2);
 	i = 0;
 	while (i < lines)
