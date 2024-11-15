@@ -2,8 +2,6 @@
 #include "headers/utils.h"
 #include "headers/format.h"
 #include "headers/env.h"
-#include <string.h>
-#include <sys/ioctl.h>
 
 void	open_dir_in_editor(char *buf)
 // Opens cwd in $EDITOR.
@@ -139,47 +137,48 @@ void	print_help(void)
 	getchar();
 }
 
-void	select_next(vd_node *dir_node, entry_node **selected, int *preview_offset)
+void	select_next(vd_node *dir_node, entry_node **selected, int cmd_count, int *preview_offset)
 // Selects the next entry in the current directory.
 // Args:
 //  - dir_node:			pointer to current directory node
 //  - selected:			address of pointer to selected entry
+//  - cmd_count			the number of entries to move selection down by
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
-	entry_node	*children = dir_node->directory->children;
+	int			i = 0;
 
+	if (cmd_count == 0)
+		cmd_count = 1;
 	clear_gutter();
 	*preview_offset = 0;
-	if ((*selected)->next == (*selected)->next->next)
-	{
-		(*selected) = children->next;
-		free(dir_node->selected_name);
-		dir_node->selected_name = strdup((*selected)->data->d_name);
-	}
-	else
+	while (i < cmd_count && (*selected)->next != (*selected)->next->next)
 	{
 		(*selected) = (*selected)->next;
-		free(dir_node->selected_name);
-		dir_node->selected_name = strdup((*selected)->data->d_name);
+		i++;
 	}
+	free(dir_node->selected_name);
+	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
 
-void	select_prev(vd_node *dir_node, entry_node **selected, int *preview_offset)
+void	select_prev(vd_node *dir_node, entry_node **selected, int cmd_count, int *preview_offset)
 // Selects the previous entry in the current directory.
 // Args:
 //  - dir_node:			pointer to current directory node
 //  - selected:			address of pointer to selected entry
+//  - cmd_count			the number of entries to move selection down by
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
+	int			i = 0;
+
+	if (cmd_count == 0)
+		cmd_count = 1;
 	clear_gutter();
 	*preview_offset = 0;
-	if ((*selected)->prev == (*selected)->prev->prev)
+	while (i < cmd_count && (*selected)->prev != (*selected)->prev->prev)
 	{
-		while ((*selected)->next != (*selected)->next->next)
-			(*selected) = (*selected)->next;
-	}
-	else
 		(*selected) = (*selected)->prev;
+		i++;
+	}
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
@@ -280,43 +279,61 @@ void	open_selected(entry_node *selected, char *buf)
 	}
 }
 
-void	yank_selected(vd_node *dir_node, entry_node *selected, char *buf)
+void	yank_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char *buf)
 // Adds selected entry path to 'copied' list.
 // Args:
 //  - dir_node:	pointer to current directory node
 //  - selected:	pointer to selected entry node
 //  - buf:		char array used to construct absolute path of file
 {
-	construct_path(buf, dir_node->dir_name, selected->data->d_name);
-	if (check_path(copied, buf) == 0)
+	int	i = 0;
+
+	if (cmd_count == 0)
+		cmd_count = 1;
+	while (i < cmd_count && selected != selected->next)
 	{
-		insert_path_node(buf, copied);
-		if (check_path(cut, buf))
-			delete_path(buf, cut);
-	}
-	else {
-		delete_path(buf, copied);
-		clear_main_box();
+		construct_path(buf, dir_node->dir_name, selected->data->d_name);
+		if (check_path(copied, buf) == 0)
+		{
+			insert_path_node(buf, copied);
+			if (check_path(cut, buf))
+				delete_path(buf, cut);
+		}
+		else {
+			delete_path(buf, copied);
+			clear_main_box();
+		}
+		selected = selected->next;
+		i++;
 	}
 }
 
-void	cut_selected(vd_node *dir_node, entry_node *selected, char *buf)
+void	cut_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char *buf)
 // Adds selected entry path to 'cut' list.
 // Args:
 //  - dir_node:	pointer to current directory node
 //  - selected:	pointer to selected entry node
 //  - buf:		char array used to construct absolute path of file
 {
-	construct_path(buf, dir_node->dir_name, selected->data->d_name);
-	if (check_path(cut, buf) == 0)
+	int	i = 0;
+
+	if (cmd_count == 0)
+		cmd_count = 1;
+	while (i < cmd_count && selected != selected->next)
 	{
-		insert_path_node(buf, cut);
-		if (check_path(copied, buf))
-			delete_path(buf, copied);
-	}
-	else {
-		delete_path(buf, cut);
-		clear_main_box();
+		construct_path(buf, dir_node->dir_name, selected->data->d_name);
+		if (check_path(cut, buf) == 0)
+		{
+			insert_path_node(buf, cut);
+			if (check_path(copied, buf))
+				delete_path(buf, copied);
+		}
+		else {
+			delete_path(buf, cut);
+			clear_main_box();
+		}
+		selected = selected->next;
+		i++;
 	}
 }
 
@@ -382,6 +399,25 @@ void	goto_first_entry(vd_node *dir_node, entry_node **selected, int *preview_off
 	*preview_offset = 0;
 	clear_gutter();
 	*selected = children->next;
+	free(dir_node->selected_name);
+	dir_node->selected_name = strdup((*selected)->data->d_name);
+}
+
+void	goto_entry_no(vd_node *dir_node, entry_node **selected, int *preview_offset, int entry_no)
+// Selects the entry at a specific position in the current directory.
+// Args:
+//  - dir_node:			pointer to current directory node
+//  - selected:			address of pointer to selected entry
+//  - preview_offset	pointer to preview_offset variable in navigate()
+//  - entry_no			position of the entry to select
+{
+	entry_node *children = dir_node->directory->children;
+
+	*preview_offset = 0;
+	clear_gutter();
+	*selected = children->next;
+	while (((*selected)->next != (*selected)->next->next) && entry_no != (*selected)->pos)
+		*selected = (*selected)->next;
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
@@ -493,6 +529,7 @@ int	navigate(vd_node *dir_node)
 	char				buf[500];
 	char				c;
 	int					preview_offset = 0;
+	int					cmd_count;
 	vd_node				*parent;
 	entry_node			*selected;
 	entry_node			*search_result;
@@ -506,6 +543,19 @@ int	navigate(vd_node *dir_node)
 	while ((c = getchar()) != 'q')
 	{
 		memset(buf, 0, 500 * sizeof(char));
+		cmd_count = 0;
+		if (c > '0' && c <= '9')
+		{
+			int	i = 0;
+
+			buf[i++] = c;
+			while (is_digit(c = getchar()))
+				buf[i++] = c;
+			buf[i] = 0;
+			cmd_count = my_atoi(buf);
+			// printf("\e[2J\e[H%d%c\n", cmd_count, c);
+			// exit(0);
+		}
 		if (c == binds.UPDIR)
 		{
 			chdir("..");
@@ -566,9 +616,9 @@ int	navigate(vd_node *dir_node)
 		if (selected == NULL)
 			continue;
 		if (c == binds.SELECT_NEXT)
-			select_next(dir_node, &selected, &preview_offset);
+			select_next(dir_node, &selected, cmd_count, &preview_offset);
 		else if (c == binds.SELECT_PREV)
-			select_prev(dir_node, &selected, &preview_offset);
+			select_prev(dir_node, &selected, cmd_count, &preview_offset);
 		else if (c == binds.SEARCH_NEXT)
 			select_next_search_result(dir_node, &selected, &preview_offset);
 		else if (c == binds.SEARCH_PREV)
@@ -586,9 +636,9 @@ int	navigate(vd_node *dir_node)
 			return (0);
 		}
 		else if (c == binds.YANK)
-			yank_selected(dir_node, selected, buf);
+			yank_selected(dir_node, selected, cmd_count, buf);
 		else if (c == binds.CUT)
-			cut_selected(dir_node, selected, buf);
+			cut_selected(dir_node, selected, cmd_count, buf);
 		else if (c == binds.EXEC_FILE)
 		{
 			run_executable(selected, buf);
@@ -616,9 +666,19 @@ int	navigate(vd_node *dir_node)
 			preview_offset--;
 		}
 		else if (c == binds.GO_FIRST)
-			goto_first_entry(dir_node, &selected, &preview_offset);
+		{
+			if (cmd_count == 0)
+				goto_first_entry(dir_node, &selected, &preview_offset);
+			else
+				goto_entry_no(dir_node, &selected, &preview_offset, cmd_count);
+		}
 		else if (c == binds.GO_LAST)
-			goto_last_entry(dir_node, &selected, &preview_offset);
+		{
+			if (cmd_count == 0)
+				goto_last_entry(dir_node, &selected, &preview_offset);
+			else
+				goto_entry_no(dir_node, &selected, &preview_offset, cmd_count);
+		}
 		else if (c == binds.DELETE)
 		{
 			delete_selected(dir_node, &selected, buf);

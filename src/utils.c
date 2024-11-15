@@ -186,3 +186,42 @@ int	count_digits(int num)
 	}
 	return (digits);
 }
+
+int	my_atoi(char *s)
+// Converts a given string representing a positive integer to its value.
+// Args:
+//  - s:	the string to convert
+// Returns:
+//  - the string's integer value
+//  - 0 if string contains no numbers or integer overflows
+{
+	int	num;
+
+	while (!is_digit(*s) && *s != 0)
+		s++;
+	if (*s == 0)
+		return (0);
+	num = *(s++) - '0';
+	while (is_digit(*s))
+	{
+		num *= 10;
+		num += *s - '0';
+		s++;
+	}
+	if (num < 0)
+		return (0);
+	return (num);
+}
+
+int	is_digit(char c)
+// Checks if a character is a digit.
+// Args:
+//  - c:	the character to check
+// Returns:
+//  - 1 if character is a digits
+//  - 0 if character is not a digit
+{
+	if (c >= '0' && c <= '9')
+		return(1);
+	return (0);
+}
