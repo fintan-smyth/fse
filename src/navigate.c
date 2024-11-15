@@ -168,7 +168,7 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tPrevious search result\n", binds.SEARCH_PREV);
 	printf("\t\e[1m%c\e[m\tSelect first entry\n", binds.GO_FIRST);
 	printf("\t\e[1m%c\e[m\tSelect last entry\n", binds.GO_LAST);
-	printf("\t\e[1m%c\e[m\tChange current directory to ~\n", binds.GO_HOME);
+	printf("\t\e[1m%c\e[m\tGo to home directory\n", binds.GO_HOME);
 	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DOWN);
 	printf("\t\e[1m%c\e[m\tScroll up text preview\n", binds.PREV_UP);
 	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HIDDEN);
