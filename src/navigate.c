@@ -316,6 +316,7 @@ void	open_selected(entry_node *selected, char *buf)
 		else
 			sprintf(buf, "%s \"%s\"", pager, selected->data->d_name);
 		printf("\e[2J\e[H");
+		fflush(stdout);
 		system(buf);
 		return ;
 	}
