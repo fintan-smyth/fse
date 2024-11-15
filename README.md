@@ -17,6 +17,24 @@ Currently there is only basic functionality. Some of the available features are:
 - File-dependent highlighting
 - Running executable files
 - Editable config
+- Vim-like number modifiers
+
+### Vim-like number modifiers
+
+Certain commands can be modified, in a manner inspired by vim, by prefixing them with a number i.e. with default binds
+
+```
+100g
+```
+
+will select the 100th entry in the current directory (or last entry if there are fewer than 100).
+
+The commands currently supporting number modification are:
+- SELECT_NEXT (move selection down by `number` entries)
+- SELECT_PREV (move selection up by `number` entries)
+- GO_FIRST/GO_LAST (select entry with position `number` in directory)
+- YANK (add next `number` entries to copy buffer)
+- CUT (add next `number` entries to cut buffer)
 
 ### Default Binds
 
