@@ -109,6 +109,7 @@ void	print_help(void)
 	fflush(stdout);
 	printf("\e[2J\e[H\n\t\e[1;4mBINDS\e[m\n\n");
 	printf("\t\e[1m%c\e[m\tQuit\n", binds.QUIT);
+	printf("\t\e[1m<0-9>\e[m\tInput number to modify applicable commands\n");
 	printf("\t\e[1m%c\e[m\tSelect next\n", binds.SELECT_NEXT);
 	printf("\t\e[1m%c\e[m\tSelect previous\n", binds.SELECT_PREV);
 	printf("\t\e[1m%c\e[m\tGo to parent directory\n", binds.UPDIR);
@@ -616,9 +617,17 @@ int	navigate(vd_node *dir_node)
 		if (selected == NULL)
 			continue;
 		if (c == binds.SELECT_NEXT)
+		{
+			if (selected->next == selected->next->next)
+				continue ;
 			select_next(dir_node, &selected, cmd_count, &preview_offset);
+		}
 		else if (c == binds.SELECT_PREV)
+		{
+			if (selected->prev == selected->prev->prev)
+				continue ;
 			select_prev(dir_node, &selected, cmd_count, &preview_offset);
+		}
 		else if (c == binds.SEARCH_NEXT)
 			select_next_search_result(dir_node, &selected, &preview_offset);
 		else if (c == binds.SEARCH_PREV)
