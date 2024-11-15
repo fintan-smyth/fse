@@ -37,9 +37,10 @@ void	set_default_binds(void)
 	binds.PREV_UP = '[';
 	binds.GO_FIRST = 'g';
 	binds.GO_LAST = 'G';
+	binds.GO_HOME = '~';
 	binds.DELETE = 'D';
 	binds.RENAME = 'r';
-	binds.RENAME = 'i';
+	binds.INSERT = 'i';
 }
 
 int	is_whitespace(char c)
@@ -117,6 +118,8 @@ char	*match_keyword(char *keyword)
 		return (&binds.GO_FIRST);
 	if (strcmp("GO_LAST", keyword) == 0)
 		return (&binds.GO_LAST);
+	if (strcmp("GO_HOME", keyword) == 0)
+		return (&binds.GO_HOME);
 	if (strcmp("DELETE", keyword) == 0)
 		return (&binds.DELETE);
 	if (strcmp("RENAME", keyword) == 0)

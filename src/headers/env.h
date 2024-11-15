@@ -43,6 +43,7 @@ struct bind_struct
 	char	PREV_UP;
 	char	GO_FIRST;
 	char	GO_LAST;
+	char	GO_HOME;
 	char	DELETE;
 	char	RENAME;
 	char	INSERT;

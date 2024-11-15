@@ -168,6 +168,7 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tPrevious search result\n", binds.SEARCH_PREV);
 	printf("\t\e[1m%c\e[m\tSelect first entry\n", binds.GO_FIRST);
 	printf("\t\e[1m%c\e[m\tSelect last entry\n", binds.GO_LAST);
+	printf("\t\e[1m%c\e[m\tChange current directory to ~\n", binds.GO_HOME);
 	printf("\t\e[1m%c\e[m\tScroll down text preview\n", binds.PREV_DOWN);
 	printf("\t\e[1m%c\e[m\tScroll up text preview\n", binds.PREV_UP);
 	printf("\t\e[1m%c\e[m\tToggle hidden file visibility\n", binds.TOGGLE_HIDDEN);
@@ -602,7 +603,14 @@ int	navigate(vd_node *dir_node)
 			cleanup_directory(dir_node);
 			return (0);
 		}
-		else if (c == 'i')
+		else if (c == binds.GO_HOME)
+		{
+			char *home = getenv("HOME");
+			chdir(home);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.INSERT)
 		{
 			insert_entry(dir_node, buf);
 			cleanup_directory(dir_node);

@@ -21,6 +21,7 @@ SEARCH_NEXT		= n
 SEARCH_PREV		= N
 GO_FIRST		= g
 GO_LAST			= G
+GO_HOME			= ~
 PREV_DOWN		= ]
 PREV_UP			= [
 TOGGLE_HIDDEN 	= H
