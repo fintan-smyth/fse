@@ -2,6 +2,7 @@
 #include "headers/utils.h"
 #include "headers/format.h"
 #include "headers/env.h"
+#include <stdio.h>
 
 void	open_dir_in_editor(char *buf)
 // Opens cwd in $EDITOR.
@@ -78,6 +79,43 @@ void	pick_sort_method(void)
 		toggle_reverse_sort();
 }
 
+void	insert_entry(vd_node *dir_node, char *buf)
+// Prompts the user to insert a new entry into the directory.
+// Args:
+//  - buf:	char array used to construct shell command
+{
+	char	*bufp = buf;
+	char	command_buf[500];
+	char	c;
+	int		len;
+	int		is_dir = 0;
+
+	reset_term_settings();
+	printf("\e[%d;3H[%*s]\e[4G \e[33minsert:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
+	while ((c = getchar()) != '\n')
+		*(bufp++) = c;
+	set_term_settings();
+	len = my_strlen(buf);
+	if (len == 0 || c == 27 || str_printable(buf) == 0)
+		return ;
+	if (buf[len - 1] == '/')
+	{
+		buf[len - 1] = 0;
+		is_dir = 1;
+	}
+	if (check_file_exists(dir_node, buf))
+		return ;
+	if (is_dir)
+	{
+		sprintf(command_buf, "mkdir -p \"%s\"", buf);
+		system(command_buf);
+		return ;
+	}
+	sprintf(command_buf, "touch \"%s\"", buf);
+	system(command_buf);
+	return ;
+}
+
 void	execute_shell_cmd(char	*buf)
 // Prompts the user to execute a shell command.
 // Args:
@@ -120,6 +158,7 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tClear copy/cut buffer\n", binds.CLEAR_BUF);
 	printf("\t\e[1m%c\e[m\tDelete selected\n", binds.DELETE);
 	printf("\t\e[1m%c\e[m\tRename selected\n", binds.RENAME);
+	printf("\t\e[1m%c\e[m\tInsert new entry\n", binds.INSERT);
 	printf("\t\e[1m%c\e[m\tRun selected executable\n", binds.EXEC_FILE);
 	printf("\t\e[1m%c\e[m\tOpen selected in editor\n", binds.EDIT_FILE);
 	printf("\t\e[1m%c\e[m\tOpen current directory in editor\n", binds.EDIT_DIR);
@@ -560,6 +599,12 @@ int	navigate(vd_node *dir_node)
 		if (c == binds.UPDIR)
 		{
 			chdir("..");
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == 'i')
+		{
+			insert_entry(dir_node, buf);
 			cleanup_directory(dir_node);
 			return (0);
 		}

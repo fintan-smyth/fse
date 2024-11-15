@@ -11,6 +11,7 @@ PASTE			= p
 CLEAR_BUF		= c
 DELETE			= D
 RENAME 			= r
+INSERT 			= i
 EXEC_FILE		= x
 EDIT_FILE 		= e
 EDIT_DIR 		= E

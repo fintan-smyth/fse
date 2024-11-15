@@ -45,6 +45,7 @@ struct bind_struct
 	char	GO_LAST;
 	char	DELETE;
 	char	RENAME;
+	char	INSERT;
 };
 
 union bind_u
