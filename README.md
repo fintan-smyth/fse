@@ -19,7 +19,7 @@ Currently there is only basic functionality. Some of the available features are:
 - Editable config
 - Vim-like number modifiers
 
-### Vim-like number modifiers
+## Vim-like number modifiers
 
 Certain commands can be modified, in a manner inspired by vim, by prefixing them with a number i.e. with default binds
 
@@ -36,7 +36,7 @@ The commands currently supporting number modification are:
 - YANK (add next `number` entries to copy buffer)
 - CUT (add next `number` entries to cut buffer)
 
-### Default Binds
+## Default Binds
 
 |Default Key|Keyword|Action|
 |:---:|:---:|---|
