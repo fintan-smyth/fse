@@ -274,8 +274,9 @@ void	display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, 
 		 current->pos + start_line - *offset, current->name, longest_name - my_strlen(current->name), "");
 		if (selected != current)
 			printf("\e[m");
-		printf(" %.*s%*s",
-		 env.TERM_COLS - (longest_name + 6), current->path, env.TERM_COLS - (longest_name + 6 + my_strlen(current->path)), "");
+		printf(" %.*s", env.TERM_COLS - (longest_name + 6), current->path);
+		if (longest_name + 6 + my_strlen(current->path) < env.TERM_COLS)
+			printf("%*s", env.TERM_COLS - (longest_name + 6 + my_strlen(current->path)), "");
 		printf("\e[m");
 		current = current->next;
 	}
