@@ -6,7 +6,7 @@ This is just a fun little project I have been doing to test my skills in C, not 
 
 ## Features
 
-Currently there is only basic functionality. Some of the available features are:
+At this point all basic functionality you would expect of a terminal file manager has been implemented. Some of the available features are:
 - Navigation of the filesystem
 - Copying/cutting/pasting files and directories
 - Renaming files/directories
@@ -18,6 +18,7 @@ Currently there is only basic functionality. Some of the available features are:
 - Running executable files
 - Editable config
 - Vim-like number modifiers
+- Bookmarking directories
 
 ## Building
 
