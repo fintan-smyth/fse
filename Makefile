@@ -29,8 +29,9 @@ fclean: clean
 
 install: 
 	mkdir -p ~/.local/bin/
-	cp ./fse ~/.local/bin/fse
+	mkdir -p ~/.local/share/fse
 	mkdir -p ~/.config/fse/
+	cp ./fse ~/.local/bin/fse
 	cp ./config ~/.config/fse/config
 
 re: fclean all
