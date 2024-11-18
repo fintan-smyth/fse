@@ -47,6 +47,8 @@ struct bind_struct
 	char	DELETE;
 	char	RENAME;
 	char	INSERT;
+	char	VIEW_BOOKMARKS;
+	char	BOOKMARK_CURRENT;
 };
 
 union bind_u

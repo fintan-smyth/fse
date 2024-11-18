@@ -1,5 +1,6 @@
 #include "headers/structs.h"
 #include "headers/env.h"
+#include "headers/bookmarks.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,6 +14,7 @@ void	exit_cleanup()
 	free_visited(VISITED_DIRS);
 	free_path_list(copied);
 	free_path_list(cut);
+	free_bookmarks(bookmarks);
 }
 
 int	main(void)
@@ -38,6 +40,8 @@ int	main(void)
 	VISITED_DIRS = init_visited();
 	copied = init_path_list();
 	cut = init_path_list();
+	bookmarks = init_bookmarks();
+	load_bookmarks_file();
 	store_term_settings();
 	set_term_settings();
 	atexit(exit_cleanup);

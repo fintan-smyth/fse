@@ -1,3 +1,4 @@
+#include "headers/bookmarks.h"
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
@@ -62,7 +63,7 @@ void	pick_sort_method(void)
 {
 	char	c;
 
-	spawn_popup(5);
+	spawn_popup("Sort", 5);
 	printf("\e[%d;3H\e[1mKeys\tCommand\e[m", env.TERM_ROWS - 6);
 	printf("\e[%d;3H%ca\t(%s) Sort alphabetical", env.TERM_ROWS - 5, binds.PICK_SORT, (env.SORT == SORT_ALPHA) ? "\e[1;32m*\e[m" : " ");
 	printf("\e[%d;3H%cf\t(%s) Sort by filesize", env.TERM_ROWS - 4, binds.PICK_SORT, (env.SORT == SORT_SIZE) ? "\e[1;32m*\e[m" : " ");
@@ -166,6 +167,8 @@ void	print_help(void)
 	printf("\t\e[1m%c\e[m\tSearch in directory\n", binds.SEARCH_DIR);
 	printf("\t\e[1m%c\e[m\tNext search result\n", binds.SEARCH_NEXT);
 	printf("\t\e[1m%c\e[m\tPrevious search result\n", binds.SEARCH_PREV);
+	printf("\t\e[1m%c\e[m\tView and traverse to bookmarked directories\n", binds.VIEW_BOOKMARKS);
+	printf("\t\e[1m%c\e[m\tBookmark current directory\n", binds.BOOKMARK_CURRENT);
 	printf("\t\e[1m%c\e[m\tSelect first entry\n", binds.GO_FIRST);
 	printf("\t\e[1m%c\e[m\tSelect last entry\n", binds.GO_LAST);
 	printf("\t\e[1m%c\e[m\tGo to home directory\n", binds.GO_HOME);
@@ -561,6 +564,25 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 	}
 }
 
+void	bookmark_current_dir(vd_node *dir_node, char *buf)
+{
+	char	*bufp;
+	char	c;
+
+	bufp = buf;
+	clear_gutter();
+	printf("\e[%d;3H[%*s]\e[4G \e[33mName new bookmark:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
+	reset_term_settings();
+	while ((c = getchar()) != '\n')
+		*(bufp++) = c;
+	*bufp = 0;
+	set_term_settings();
+	if (my_strlen(buf) == 0 || c == 27 || str_printable(buf) == 0)
+		return ;
+	insert_bookmark(buf, dir_node->dir_name, bookmarks);
+	write_bookmarks();
+}
+
 int	navigate(vd_node *dir_node)
 // Displays current state of directory and waits for user input.
 // Args:
@@ -602,6 +624,18 @@ int	navigate(vd_node *dir_node)
 		if (c == binds.UPDIR)
 		{
 			chdir("..");
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == 'B')
+		{
+			bookmark_current_dir(dir_node, buf);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == 'b')
+		{
+			navigate_bookmarks(bookmarks);
 			cleanup_directory(dir_node);
 			return (0);
 		}
@@ -687,7 +721,7 @@ int	navigate(vd_node *dir_node)
 			select_next_search_result(dir_node, &selected, &preview_offset);
 		else if (c == binds.SEARCH_PREV)
 			select_prev_search_result(dir_node, &selected, &preview_offset);
-		else if (c == binds.OPEN)
+		else if (c == binds.OPEN || c == '\n')
 		{
 			open_selected(selected, buf);
 			cleanup_directory(dir_node);
@@ -756,7 +790,11 @@ int	navigate(vd_node *dir_node)
 			return (0);
 		}
 		else
+		{
+			/*printf("\e[2J\e[H%c\t%d\n", c, c);*/
+			/*exit(0);*/
 			continue;
+		}
 		display_directory(dir_node, selected, parent, preview_offset);
 	}
 	cleanup_directory(dir_node);

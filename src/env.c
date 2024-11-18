@@ -37,6 +37,8 @@ void	set_default_binds(void)
 	binds.DELETE = 'D';
 	binds.RENAME = 'r';
 	binds.INSERT = 'i';
+	binds.VIEW_BOOKMARKS = 'b';
+	binds.BOOKMARK_CURRENT = 'B';
 }
 
 char	*match_keyword(char *keyword)
@@ -106,6 +108,10 @@ char	*match_keyword(char *keyword)
 		return (&binds.RENAME);
 	if (strcmp("INSERT", keyword) == 0)
 		return (&binds.INSERT);
+	if (strcmp("VIEW_BOOKMARKS", keyword) == 0)
+		return (&binds.VIEW_BOOKMARKS);
+	if (strcmp("BOOKMARK_CURRENT", keyword) == 0)
+		return (&binds.BOOKMARK_CURRENT);
 	return (NULL);
 }
 
