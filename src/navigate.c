@@ -565,6 +565,10 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 }
 
 void	bookmark_current_dir(vd_node *dir_node, char *buf)
+// Adds current directory to bookmarks list.
+// Args:
+//  - dir_node:	pointer to current directory node
+//  - buf:		char buf used to store user input
 {
 	char	*bufp;
 	char	c;
