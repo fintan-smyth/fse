@@ -44,6 +44,10 @@ void	delete_next_bookmark(bookmark_node *t)
 }
 
 void	delete_selected_bookmark(bookmark_node *head, bookmark_node *to_delete)
+// Deletes the given node from a given bookmark list.
+// Args:
+//  - head:			pointer to the head of the bookmarks list
+//  - to_delete:	pointer to the node to be deleted
 {
 	bookmark_node	*current;
 
@@ -85,6 +89,13 @@ bookmark_node *insert_bookmark(char *name, char *path, bookmark_node *head)
 }
 
 int	check_bookmark_exists(char *path, bookmark_node *head)
+// Checks if a bookmark with the given path exists.
+// Args:
+//  - path:	string containing the path to check
+//  - head:	pointer to the head of the bookmarks list
+// Returns:
+//  - 1 if a bookmark with this path exists
+//  - 0 if no bookmark with this path exists
 {
 	bookmark_node *current;
 
@@ -110,6 +121,8 @@ void	free_bookmarks(bookmark_node *head)
 }
 
 void	write_bookmarks(void)
+// Writes the current state of the bookmarks list to a file to allow persistence
+// between sessions.
 {
 	bookmark_node	*current;
 	FILE			*fptr;
@@ -134,6 +147,7 @@ void	write_bookmarks(void)
 }
 
 void	load_bookmarks_file(void)
+// Loads in the bookmarks list from file.
 {
 	FILE			*fptr;
 	char			*home = getenv("HOME");
@@ -172,6 +186,11 @@ void	load_bookmarks_file(void)
 }
 
 int	count_bookmarks(bookmark_node *head)
+// Counts the number of bookmarks in the bookmarks list.
+// Args:
+//  - head:	pointer to the head of the bookmarks list
+// Returns:
+//  - The number of bookmarks in the list
 {
 	bookmark_node	*current;
 
@@ -182,6 +201,9 @@ int	count_bookmarks(bookmark_node *head)
 }
 
 void	number_bookmarks(bookmark_node *head)
+// Numbers the position of each bookmark in the list.
+// Args:
+//  - head:	pointer to the head of the bookmarks list
 {
 	bookmark_node	*current;
 	int				i;
@@ -196,6 +218,12 @@ void	number_bookmarks(bookmark_node *head)
 }
 
 int	longest_bookmark_name(bookmark_node *head)
+// Returns the length of the longest bookmark name.
+// Args:
+//  - head:	pointer to the head of the bookmarks list
+// Returns:
+//  - Length of the longest bookmark name
+//  - 0 if there are no bookmarks
 {
 	bookmark_node	*current;
 	int				len = 0;
@@ -211,6 +239,12 @@ int	longest_bookmark_name(bookmark_node *head)
 }
 
 void	display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, int *offset)
+// Displays the bookmarks list.
+// Args:
+//  - head:		pointer to the head of the bookmarks list
+//  - selected:	pointer to the selected bookmark node
+//  - lines:	the number of lines in the bookmarks popup
+//  - offset:	pointer to the number of bookmarks to skip when displaying bookmarks
 {
 	bookmark_node	*current;
 	int				start_line = env.TERM_ROWS - (lines + 2);
@@ -248,6 +282,9 @@ void	display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, 
 }
 
 void	navigate_bookmarks(bookmark_node *head)
+// Navigate and edit the user's bookmarks.
+// Args:
+//  - head:	pointer to the head of the bookmarks list
 {
 	bookmark_node	*selected = head->next;
 	bookmark_node	*temp;

@@ -159,6 +159,9 @@ void	spawn_popup(char *title, int	lines)
 }
 
 void	clear_popup(int lines)
+// Clears a popup window with a given number of lines.
+// Args:
+//  - lines:	the number of lines within the popup that can contain text
 {
 	int	i = 0;
 
