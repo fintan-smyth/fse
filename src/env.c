@@ -1,11 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 #include <sys/stat.h>
 #include "headers/env.h"
+#include "headers/utils.h"
 
 struct env_struct	env;
 struct bind_struct	binds;
@@ -41,22 +37,6 @@ void	set_default_binds(void)
 	binds.DELETE = 'D';
 	binds.RENAME = 'r';
 	binds.INSERT = 'i';
-}
-
-int	is_whitespace(char c)
-// Checks if a character is whitepace.
-// Args:
-//  - c:	the character to check
-// Returns:
-//  - 0 if character is not whitespace
-//  - 1 if character is space or tab
-//  - 2 if character is newline
-{
-	if (c == ' ' || c == '\t')
-		return (1);
-	if (c == '\n')
-		return (2);
-	return (0);
 }
 
 char	*match_keyword(char *keyword)
@@ -190,7 +170,7 @@ int	load_config(void)
 	line = malloc(size);
 	while (getline(&line, &size, fileptr) != -1)
 	{
-		printf("%s", line);
+		// printf("%s", line);
 		i = 0;
 		while (is_whitespace(line[i]))
 			i++;

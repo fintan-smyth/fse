@@ -225,3 +225,20 @@ int	is_digit(char c)
 		return(1);
 	return (0);
 }
+
+int	is_whitespace(char c)
+// Checks if a character is whitepace.
+// Args:
+//  - c:	the character to check
+// Returns:
+//  - 0 if character is not whitespace
+//  - 1 if character is space or tab
+//  - 2 if character is newline
+{
+	if (c == ' ' || c == '\t')
+		return (1);
+	if (c == '\n')
+		return (2);
+	return (0);
+}
+

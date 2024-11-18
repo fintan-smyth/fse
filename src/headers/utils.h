@@ -18,5 +18,6 @@ int 	is_binary(char *path);
 int		count_digits(int num);
 int		my_atoi(char *s);
 int		is_digit(char c);
+int		is_whitespace(char c);
 
 #endif // !UTILS_H_
