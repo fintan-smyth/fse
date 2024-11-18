@@ -126,7 +126,7 @@ void	clear_header(void)
 	printf("\e[m");
 }
 
-void	spawn_popup(int	lines)
+void	spawn_popup(char *title, int	lines)
 // Spawns a popup window with a given number of lines.
 // Args:
 //  - lines:	the number of lines within the popup that can contain text
@@ -144,10 +144,24 @@ void	spawn_popup(int	lines)
 		i++;
 	}
 	printf("┤");
+	if (title != NULL)
+		printf("\e[%d;3H[ \e[33;1m%s\e[m ]", env.TERM_ROWS - (2 + lines), title);
 	if (env.FLAGS & F_PREVIEW)
 		printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_1);
 	printf("\e[%d;%dH─", env.TERM_ROWS - 1, env.SEP_2);
 	i = 0;
+	while (i < lines)
+	{
+		printf("\e[%d;2H", env.TERM_ROWS - (2 + i));
+		printf("%*s", env.TERM_COLS - 2, "");
+		i++;
+	}
+}
+
+void	clear_popup(int lines)
+{
+	int	i = 0;
+
 	while (i < lines)
 	{
 		printf("\e[%d;2H", env.TERM_ROWS - (2 + i));
