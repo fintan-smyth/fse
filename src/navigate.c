@@ -4,6 +4,7 @@
 #include "headers/format.h"
 #include "headers/env.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 void	open_dir_in_editor(char *buf)
 // Opens cwd in $EDITOR.
@@ -496,7 +497,7 @@ void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offs
 }
 
 void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
-// Deletes the selected file or empty directory.
+// Moves selected file or directory to trash.
 // Args:
 //  - dir_node:		pointer to current directory node
 //  - selected:		address of pointer to selected entry
@@ -504,6 +505,8 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 {
 	char	c;
 	int 	len = strlen(dir_node->dir_name);
+	char	command_buf[500];
+	char	*home = getenv("HOME");
 
 	memcpy(buf, dir_node->dir_name, len);
 	if (strncmp(buf, "/", strlen(buf)))
@@ -514,9 +517,10 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 		env.TERM_ROWS, env.TERM_COLS - 38, (*selected)->data->d_name);
 	if ((c = getchar()) == 'y')
 	{
-		if ((remove(buf)) != 0)
+		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/trash/%s_%d\"", buf, home, (*selected)->data->d_name, (int) (*selected)->attr->st_ctime);
+		if ((system(command_buf)) != 0)
 			return ;
-		sprintf(env.gutter_pushback, "\e[33mDeleted file:\e[m %s", (*selected)->data->d_name);
+		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->data->d_name);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		if ((*selected)->next == (*selected)->next->next)
 		{

@@ -10,7 +10,7 @@ At this point all basic functionality you would expect of a terminal file manage
 - Navigation of the filesystem
 - Copying/cutting/pasting files and directories
 - Renaming files/directories
-- Permanent deletion of files and empty directories
+- Deletion of files and directories (moving to trash)
 - Search within current directory
 - A simple text file preview (scrolling of preview now implemented)
 - A (heavily) exa/eza inspired file attribute display
@@ -59,7 +59,7 @@ The commands currently supporting number modification are:
 | d | CUT |  Cut selected |
 | p | PASTE |  Paste copy/cut buffer |
 | c | CLEAR_BUF |  Clear copy/cut buffer |
-| D | DELETE |  Delete selected |
+| D | DELETE |  Move selected to trash |
 | r | RENAME |  Rename selected |
 | i | INSERT | Insert new entry |
 | x | EXEC_FILE |  Run selected executable |
