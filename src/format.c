@@ -303,42 +303,55 @@ void	print_entry_no(vd_node *dir_node, entry_node *selected)
 		env.TERM_ROWS, (env.TERM_COLS - len), entries_digits, pos, no_entries);
 }
 
-void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_offset)
-// Displays all information associated with current directory:
-//  - Path of cwd and selected file
-//  - Contents of cwd
-//  - Attributes of selected entry
-//  - Contents of selected subdirectory/text file
-//  - Contents of parent directory (if enabled)
+void	print_header(entry_node *selected, char *cwd_name)
+// Prints header showing cwd and selected file.
 // Args:
-//  - dir_node:			pointer to node of current directory
 //  - selected:			pointer to node of selected entry
-//  - parent:			pointer to node of parent directory
-//  - preview_offset	number of lines to skip from start of text file preview
+//  - cwd_name:			string containing the path of cwd
 {
-	int				size = 500 * sizeof(char);
-	char			cwd_name[size];
-
-	getcwd(cwd_name, size);
-	print_entries(dir_node, selected, 0);
-	if (env.FLAGS & F_PREVIEW)
-		display_parent(dir_node, parent);
-	print_entry_no(dir_node, selected);
 	clear_header();
 	printf("\e[1;3H[ \e[31;1m%.*s", env.TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
 		printf("/");
-	if (selected == NULL)
+	if (selected != NULL)
 	{
-		printf("\e[m ]");
-		return ;
+		colour_entry(selected);
+		printf("%.*s", (env.TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
 	}
-	// construct_path(buf, dir_node->dir_name, selected->data->d_name);
-	colour_entry(selected);
-	printf("%.*s\e[m ]", (env.TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
-	printf("\e[%d;3H[ ", env.TERM_ROWS);
-	print_file_attributes(selected);
-	printf(" ]");
+	printf("\e[m ]");
+}
+
+void	print_gutter(vd_node *dir_node, entry_node *selected)
+// Prints gutter, including file attribute display or status message.
+// Args:
+//  - dir_node:			pointer to node of current directory
+//  - selected:			pointer to node of selected entry
+{
+	clear_gutter();
+	if (!(env.FLAGS & F_GUTTER_PUSHBACK))
+	{
+		if (selected != NULL)
+		{
+			printf("\e[%d;3H[ ", env.TERM_ROWS);
+			print_file_attributes(selected);
+			printf(" ]");
+		}
+	}
+	else
+	{
+		printf("\e[%d;3H[ %.*s ]", env.TERM_ROWS, env.TERM_COLS - 10, env.gutter_pushback);
+		env.FLAGS ^= F_GUTTER_PUSHBACK;
+	}
+	print_entry_no(dir_node, selected);
+}
+
+void	preview_entry(entry_node *selected, char *cwd_name, int preview_offset)
+// Previews the selected entry with the appropriate function.
+// Args:
+//  - selected:			pointer to node of selected entry
+//  - cwd_name:			string containing the path of cwd
+//  - preview_offset	number of lines to skip from start of text file preview
+{
 	clear_sub_box();
 	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
 		display_subdirectory(selected, cwd_name);
@@ -359,4 +372,31 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 		else
 			preview_text(selected, preview_offset);
 	}
+}
+
+void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_offset)
+// Displays all information associated with current directory:
+//  - Path of cwd and selected file
+//  - Contents of cwd
+//  - Attributes of selected entry
+//  - Contents of selected subdirectory/text file
+//  - Contents of parent directory (if enabled)
+// Args:
+//  - dir_node:			pointer to node of current directory
+//  - selected:			pointer to node of selected entry
+//  - parent:			pointer to node of parent directory
+//  - preview_offset	number of lines to skip from start of text file preview
+{
+	int				size = 500 * sizeof(char);
+	char			cwd_name[size];
+
+	getcwd(cwd_name, size);
+	print_entries(dir_node, selected, 0);
+	if (env.FLAGS & F_PREVIEW)
+		display_parent(dir_node, parent);
+	print_header(selected, cwd_name);
+	print_gutter(dir_node, selected);
+	if (selected == NULL)
+		return ;
+	preview_entry(selected, cwd_name, preview_offset);
 }

@@ -11,10 +11,11 @@ struct env_struct
 	int				SEP_1;
 	int				SEP_2;
 	char			SORT;
+	char			gutter_pushback[500];
 	unsigned char	FLAGS;
 } ;
 
-enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_REVERSE = 4};
+enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_REVERSE = 4, F_GUTTER_PUSHBACK = 8};
 enum	{SORT_ALPHA = 0, SORT_SIZE = 1, SORT_MTIME = 2, SORT_ATIME = 3};
 
 struct bind_struct

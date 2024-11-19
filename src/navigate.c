@@ -105,14 +105,24 @@ void	insert_entry(vd_node *dir_node, char *buf)
 		is_dir = 1;
 	}
 	if (check_file_exists(dir_node, buf))
+	{
+		sprintf(env.gutter_pushback, "\e[33mEntry already exists:\e[m %s", buf);
+		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		return ;
+	}
+	free(dir_node->selected_name);
+	dir_node->selected_name = strdup(buf);
 	if (is_dir)
 	{
 		sprintf(command_buf, "mkdir -p \"%s\"", buf);
+		sprintf(env.gutter_pushback, "\e[33mNew dir created: \e[34;1m%s\e[m", buf);
+		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		system(command_buf);
 		return ;
 	}
 	sprintf(command_buf, "touch \"%s\"", buf);
+	sprintf(env.gutter_pushback, "\e[33mNew file created: \e[m%s", buf);
+	env.FLAGS ^= F_GUTTER_PUSHBACK;
 	system(command_buf);
 	return ;
 }
@@ -425,11 +435,13 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 	*searchp++ = 0;
 	set_term_settings();
 	if ((*search_result = get_search_match(dir_node)) == NULL)
+	{
+		sprintf(env.gutter_pushback, "\e[33mNo match found\e[m");
+		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		return (1);
+	}
 	*selected = *search_result;
 	draw_box();
-	clear_gutter();
-	printf("\e[%d;3H[ \e[33msearch:\e[m %.*s ]", env.TERM_ROWS, (env.SEP_2) - 6, dir_node->search_term);
 	return (0);
 }
 
@@ -503,8 +515,10 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 	if ((c = getchar()) == 'y')
 	{
 		if ((remove(buf)) != 0)
-			;
-		else if ((*selected)->next == (*selected)->next->next)
+			return ;
+		sprintf(env.gutter_pushback, "\e[33mDeleted file:\e[m %s", (*selected)->data->d_name);
+		env.FLAGS ^= F_GUTTER_PUSHBACK;
+		if ((*selected)->next == (*selected)->next->next)
 		{
 			if ((*selected)->prev == (*selected)->prev->prev)
 			{
@@ -559,6 +573,8 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 	sprintf(command_buf, "mv \"%s\" \"%s\"", selected->data->d_name, buf);
 	if (system(command_buf) == 0)
 	{
+		sprintf(env.gutter_pushback, "\e[33mRenamed file:\e[m %s -> %s",  selected->data->d_name, buf);
+		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		free(dir_node->selected_name);
 		dir_node->selected_name = strdup(buf);
 	}
@@ -583,8 +599,12 @@ void	bookmark_current_dir(vd_node *dir_node, char *buf)
 	set_term_settings();
 	if (my_strlen(buf) == 0 || c == 27 || str_printable(buf) == 0)
 		return ;
-	insert_bookmark(buf, dir_node->dir_name, bookmarks);
+	if (insert_bookmark(buf, dir_node->dir_name, bookmarks) == NULL)
+		sprintf(env.gutter_pushback, "\e[33;1mBookmark already exists\e[m");
+	else
+		sprintf(env.gutter_pushback, "\e[33mNew bookmark created: \e[36m%s \e[m-> %s\e[m", buf, dir_node->dir_name);
 	write_bookmarks();
+	env.FLAGS ^= F_GUTTER_PUSHBACK;
 }
 
 int	navigate(vd_node *dir_node)
@@ -607,7 +627,7 @@ int	navigate(vd_node *dir_node)
 	selected = get_selected(dir_node);
 	set_winsize();
 	draw_box();
-	clear_gutter();
+	// clear_gutter();
 	display_directory(dir_node, selected, parent, preview_offset);
 	while ((c = getchar()) != 'q')
 	{

@@ -444,6 +444,8 @@ void	print_file_attributes(entry_node *entry)
 	char		*user;
 	char		*group;
 
+	if (entry == NULL)
+		return ;
 	if (entry->attr == NULL)
 		return ;
 	switch (entry->data->d_type) {
