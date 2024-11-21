@@ -71,6 +71,7 @@ The commands currently supporting number modification are:
 | N | SEARCH_PREV |  Previous Search result |
 | b | VIEW_BOOKMARKS | View and traverse to bookmarked directories |
 | B | BOOKMARK_CURRENT | Bookmark current directory |
+| t | OPEN_TRASH | View and edit contents of trash folder |
 | g | GO_FIRST |  Select first entry |
 | G | GO_LAST |  Select last entry |
 | ~ | GO_HOME | Go to home directory |
