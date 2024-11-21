@@ -237,6 +237,22 @@ int	longest_bookmark_name(bookmark_node *head)
 	}
 	return (len);
 }
+void	print_bookmark_no(bookmark_node *selected)
+{
+	int	len;
+	int	pos;
+	int	total = count_bookmarks(bookmarks);
+	int	entries_digits;
+
+	if (selected == NULL)
+		pos = 0;
+	else
+		pos = selected->pos;
+	entries_digits = count_digits(total);
+	len = 6 + (2 * entries_digits);
+	printf("\e[%d;%dH[ \e[1;33m%0*d/%d\e[m ]",
+		env.TERM_ROWS, (env.TERM_COLS - len), entries_digits, pos, total);
+}
 
 void	display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, int *offset)
 // Displays the bookmarks list.
@@ -251,7 +267,7 @@ void	display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, 
 	int				longest_name = longest_bookmark_name(head);
 
 	current = head->next;
-	// clear_popup(lines);
+	print_bookmark_no(selected);
 	if (selected == NULL)
 		return ;
 	if (selected->pos > lines + *offset)
@@ -299,28 +315,30 @@ void	navigate_bookmarks(bookmark_node *head)
 		selected = NULL;
 	if (lines < 5)
 		lines = 5;
-	else if (lines > env.TERM_ROWS / 2)
-		lines = env.TERM_ROWS / 2;
+	if (lines > env.TERM_ROWS / 2 - 2)
+		lines = env.TERM_ROWS / 2 - 2;
 	spawn_popup("Bookmarks", lines);
 	clear_gutter();
 	display_bookmarks(head, selected, lines, &offset);
 	while ((c = getchar()) != binds.QUIT)
 	{
-		if (c == 'b')
+		if (c == binds.VIEW_BOOKMARKS)
 			return ;
+		clear_gutter();
 		if (selected == NULL)
+		{
+			print_bookmark_no(selected);
 			continue ;
+		}
 		else if (c == binds.SELECT_NEXT)
 		{
-			if (selected->next == selected->next->next)
-				continue ;
-			selected = selected->next;
+			if (selected->next != selected->next->next)
+				selected = selected->next;
 		}
 		else if (c == binds.SELECT_PREV)
 		{
-			if (selected->prev == selected->prev->prev)
-				continue ;
-			selected = selected->prev;
+			if (selected->prev != selected->prev->prev)
+				selected = selected->prev;
 		}
 		else if (c == binds.OPEN || c == '\n')
 		{
@@ -330,23 +348,30 @@ void	navigate_bookmarks(bookmark_node *head)
 		else if (c == binds.DELETE)
 		{
 			temp = selected;
-			if (selected->next != selected->next->next)
-				selected = selected->next;
-			else if (selected->prev != selected->prev->prev)
-				selected = selected->prev;
+			offset = 0;
+			printf("\e[%d;3H[ \e[33mDelete bookmark? [y/N] :\e[m \e[36;1m%s\e[m ]", env.TERM_ROWS, temp->name);
+			if ((c = getchar()) == 'y')
+			{
+				if (selected->next != selected->next->next)
+					selected = selected->next;
+				else if (selected->prev != selected->prev->prev)
+					selected = selected->prev;
+				else
+					selected = NULL;
+				clear_gutter();
+				printf("\e[%d;3H[ \e[33mDeleted bookmark:\e[m \e[36;1m%s\e[m ]", env.TERM_ROWS, temp->name);
+				delete_selected_bookmark(head, temp);
+				number_bookmarks(head);
+				write_bookmarks();
+				clear_popup(lines);
+			}
 			else
-				selected = NULL;
-			printf("\e[%d;3H[ \e[33mDeleted bookmark:\e[m \"%s\" ]", env.TERM_ROWS, temp->name);
-			delete_selected_bookmark(head, temp);
-			number_bookmarks(head);
-			write_bookmarks();
-			clear_popup(lines);
+				clear_gutter();
 		}
 		else if (c == binds.RENAME)
 		{
-			clear_gutter();
 			bufp = buf;
-			printf("\e[%d;3H[%*s]\e[4G \e[33mrename:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
+			printf("\e[%d;3H[%*s]\e[4G \e[33mRename:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
 			printf("\e[?25h");
 			while ((c = getchar()) != '\n')
 			{
@@ -359,6 +384,7 @@ void	navigate_bookmarks(bookmark_node *head)
 			{
 				clear_gutter();
 				printf("\e[%d;3H[ \e[33mFile not renamed\e[m ]", env.TERM_ROWS);
+				print_bookmark_no(selected);
 				continue ;
 			}
 			clear_gutter();
@@ -368,7 +394,10 @@ void	navigate_bookmarks(bookmark_node *head)
 			write_bookmarks();
 		}
 		else
-			return ;
+		{
+			print_bookmark_no(selected);
+			continue ;
+		}
 		display_bookmarks(head, selected, lines, &offset);
 	}
 	return ;

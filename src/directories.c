@@ -75,6 +75,8 @@ void	cleanup_directory(vd_node *dir_node)
 // Args:
 //  - dir_node:	pointer to node in visited directories list
 {
+	if (dir_node->directory == NULL)
+		return ;
 	free_entries(dir_node->directory->children);
 	closedir(dir_node->directory->dir);
 	free(dir_node->directory);
@@ -89,6 +91,7 @@ struct directory	*get_directory(vd_node *dir_node)
 //  - dir_node:	pointer to directory node of the directory to be retrieved
 // Returns:
 //  - 'directory' struct containing doubly linked list of entries
+//  - NULL if directory has already been retrieved
 {
 	struct dirent		*child;
 	struct directory	*directory;
@@ -98,6 +101,10 @@ struct directory	*get_directory(vd_node *dir_node)
 	entry_node			**entry_array;
 	int					left = 0;
 
+	if (dir_node->directory != NULL)
+	{
+		return (NULL);
+	}
 	dir_node->no_entries = 0;
 	directory = malloc(sizeof(*directory));
 	head = init_list();

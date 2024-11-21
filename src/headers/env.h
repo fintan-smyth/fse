@@ -50,6 +50,7 @@ struct bind_struct
 	char	INSERT;
 	char	VIEW_BOOKMARKS;
 	char	BOOKMARK_CURRENT;
+	char	OPEN_TRASH;
 };
 
 union bind_u

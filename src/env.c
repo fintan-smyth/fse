@@ -19,7 +19,7 @@ void	set_default_binds(void)
 	binds.EXEC_SHELL = ':';
 	binds.HELP = '?';
 	binds.PASTE = 'p';
-	binds.CLEAR_BUF = 'c';
+	binds.CLEAR_BUF = 'C';
 	binds.SELECT_NEXT = 'j';
 	binds.SELECT_PREV = 'k';
 	binds.SEARCH_NEXT = 'n';
@@ -39,6 +39,7 @@ void	set_default_binds(void)
 	binds.INSERT = 'i';
 	binds.VIEW_BOOKMARKS = 'b';
 	binds.BOOKMARK_CURRENT = 'B';
+	binds.OPEN_TRASH = 't';
 }
 
 char	*match_keyword(char *keyword)
@@ -112,6 +113,8 @@ char	*match_keyword(char *keyword)
 		return (&binds.VIEW_BOOKMARKS);
 	if (strcmp("BOOKMARK_CURRENT", keyword) == 0)
 		return (&binds.BOOKMARK_CURRENT);
+	if (strcmp("OPEN_TRASH", keyword) == 0)
+		return (&binds.OPEN_TRASH);
 	return (NULL);
 }
 

@@ -3,6 +3,8 @@
 #include "headers/utils.h"
 #include "headers/env.h"
 #include <dirent.h>
+#include <stddef.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <time.h>
 
@@ -480,4 +482,49 @@ void	print_file_attributes(entry_node *entry)
 
 	free(user);
 	free(group);
+}
+
+
+void	recursive_dir_size(vd_node *dir_node, size_t *total, char **buf)
+{
+	vd_node		*child;
+	entry_node	*current;
+
+	get_directory(dir_node);
+	current = dir_node->directory->children->next;
+	while (current != current->next)
+	{
+		if (current->data->d_type == DT_DIR)
+		{
+			if (strcmp(current->data->d_name, ".") != 0 && strcmp(current->data->d_name, "..") != 0)
+			{
+				construct_path(*buf, dir_node->dir_name, current->data->d_name);
+				child = get_vd_node(VISITED_DIRS, *buf);
+				recursive_dir_size(child, total, buf);
+			}
+		}
+		else
+		{
+			if (current->attr != NULL)
+				*total += current->attr->st_size;
+		}
+		current = current->next;
+	}
+	cleanup_directory(dir_node);
+}
+
+size_t	recursive_dir_size_wrapper(vd_node *dir_node)
+{
+	size_t	*total = malloc(sizeof(*total));
+	char	*buf = malloc(500);
+	size_t	output;
+
+	*total = 0;
+	env.FLAGS ^= F_HIDDEN;
+	recursive_dir_size(dir_node, total, &buf);
+	output = *total;
+	free(total);
+	free(buf);
+	env.FLAGS ^= F_HIDDEN;
+	return (output);
 }

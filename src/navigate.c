@@ -3,6 +3,7 @@
 #include "headers/utils.h"
 #include "headers/format.h"
 #include "headers/env.h"
+#include "headers/trash.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -520,6 +521,8 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/trash/%s_%d\"", buf, home, (*selected)->data->d_name, (int) (*selected)->attr->st_ctime);
 		if ((system(command_buf)) != 0)
 			return ;
+		insert_selected_trash(dir_node, *selected, trash_list);
+		write_trash_file();
 		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->data->d_name);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		if ((*selected)->next == (*selected)->next->next)
@@ -655,15 +658,21 @@ int	navigate(vd_node *dir_node)
 			cleanup_directory(dir_node);
 			return (0);
 		}
-		else if (c == 'B')
+		else if (c == binds.BOOKMARK_CURRENT)
 		{
 			bookmark_current_dir(dir_node, buf);
 			cleanup_directory(dir_node);
 			return (0);
 		}
-		else if (c == 'b')
+		else if (c == binds.VIEW_BOOKMARKS)
 		{
 			navigate_bookmarks(bookmarks);
+			cleanup_directory(dir_node);
+			return (0);
+		}
+		else if (c == binds.OPEN_TRASH)
+		{
+			navigate_trash(trash_list);
 			cleanup_directory(dir_node);
 			return (0);
 		}

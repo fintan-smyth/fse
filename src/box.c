@@ -109,6 +109,7 @@ void	clear_gutter(void)
 		printf("─");
 	printf("╯");
 	printf("\e[m");
+	fflush(stdout);
 }
 
 void	clear_header(void)
