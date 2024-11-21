@@ -293,6 +293,8 @@ void	display_trash(trash_node *head, trash_node *selected, int lines, int *offse
 				printf("\e[36m");
 				break;
 			default:
+				if (colour_extension(current->old_name) == 1)
+					break;
 				printf("\e[39m");
 				break;
 		}
@@ -377,7 +379,7 @@ void	navigate_trash(trash_node *head)
 				else
 					selected = NULL;
 				clear_gutter();
-				sprintf(buf, "rm -rf %s/.local/share/fse/trash/%s", home, temp->name);
+				sprintf(buf, "rm -rf \"%s/.local/share/fse/trash/%s\"", home, temp->name);
 				printf("\e[%d;3H[ \e[33mPermanently deleted file:\e[m %s ]", env.TERM_ROWS, temp->old_name);
 				system(buf);
 				delete_selected_trash_node(head, temp);
@@ -425,7 +427,7 @@ void	navigate_trash(trash_node *head)
 				selected = trash_list->next;
 				while (selected != selected->next)
 				{
-					sprintf(buf, "rm -rf %s/.local/share/fse/trash/%s", home, selected->name);
+					sprintf(buf, "rm -rf \"%s/.local/share/fse/trash/%s\"", home, selected->name);
 					system(buf);
 					delete_selected_trash_node(head, selected);
 					selected = trash_list->next;
@@ -436,7 +438,7 @@ void	navigate_trash(trash_node *head)
 				format_filesize(trash_size);
 				printf(" ]");
 				write_trash_file();
-				print_trash_size(buf, lines, home);
+				trash_size = print_trash_size(buf, lines, home);
 				clear_popup(lines);
 			}
 			else
