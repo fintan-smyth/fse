@@ -12,6 +12,7 @@ void	clear_header(void);
 void	spawn_popup(char *title, int lines);
 void	clear_popup(int lines);
 
+int		colour_extension(char *filename);
 void	colour_entry(entry_node *entry);
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level);
 void	print_entries(vd_node *dir_node, entry_node *selected, int level);

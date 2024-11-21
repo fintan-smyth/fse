@@ -2,14 +2,54 @@
 #include "headers/format.h"
 #include "headers/env.h"
 
+int	colour_extension(char *filename)
+{
+	char	*ext_buf;
+
+	if ((ext_buf = get_extension(filename)) != NULL)
+	{
+		if (strcasecmp(ext_buf, "mp4") == 0
+			|| strcasecmp(ext_buf, "mkv") == 0
+			|| strcasecmp(ext_buf, "png") == 0
+			|| strcasecmp(ext_buf, "jpg") == 0
+			|| strcasecmp(ext_buf, "jpeg") == 0
+			|| strcasecmp(ext_buf, "xcf") == 0
+			|| strcasecmp(ext_buf, "tif") == 0
+			|| strcasecmp(ext_buf, "gif") == 0
+		) {
+			printf("\e[35m");
+			free(ext_buf);
+		}
+		else if (strcasecmp(ext_buf, "mp3") == 0
+			|| strcasecmp(ext_buf, "flac") == 0
+			|| strcasecmp(ext_buf, "m4a") == 0
+		) {
+			printf("\e[36m");
+			free(ext_buf);
+		}
+		else if (strcasecmp(ext_buf, "xz") == 0
+			|| strcasecmp(ext_buf, "gz") == 0
+			|| strcasecmp(ext_buf, "zstd") == 0
+			|| strcasecmp(ext_buf, "tar") == 0
+			|| strcasecmp(ext_buf, "zip") == 0
+		) {
+			printf("\e[31m");
+			free(ext_buf);
+		}
+		else
+			free(ext_buf);
+		return (1);
+	}
+	else
+		return (0);
+}
+
 void	colour_entry(entry_node *entry)
 // Prints the appropriate escape code to colour an entry's
 // file name according to formatting rules.
 // Args:
 //  - entry:	pointer to entry node of file
 {
-	char	*ext_buf;
-
 	printf("\e[m");
 	switch (entry->data->d_type) {
 		case DT_DIR:
@@ -19,41 +59,8 @@ void	colour_entry(entry_node *entry)
 			printf("\e[1;36m");
 			break;
 		case DT_REG:
-			if ((ext_buf = get_extension(entry->data->d_name)) != NULL)
-			{
-				if (strcasecmp(ext_buf, "mp4") == 0
-					|| strcasecmp(ext_buf, "mkv") == 0
-					|| strcasecmp(ext_buf, "png") == 0
-					|| strcasecmp(ext_buf, "jpg") == 0
-					|| strcasecmp(ext_buf, "jpeg") == 0
-					|| strcasecmp(ext_buf, "xcf") == 0
-					|| strcasecmp(ext_buf, "tif") == 0
-					|| strcasecmp(ext_buf, "gif") == 0
-				) {
-					printf("\e[35m");
-					free(ext_buf);
-					break;
-				}
-				else if (strcasecmp(ext_buf, "mp3") == 0
-					|| strcasecmp(ext_buf, "flac") == 0
-					|| strcasecmp(ext_buf, "m4a") == 0
-				) {
-					printf("\e[36m");
-					free(ext_buf);
-					break;
-				}
-				else if (strcasecmp(ext_buf, "xz") == 0
-					|| strcasecmp(ext_buf, "gz") == 0
-					|| strcasecmp(ext_buf, "zstd") == 0
-					|| strcasecmp(ext_buf, "tar") == 0
-					|| strcasecmp(ext_buf, "zip") == 0
-				) {
-					printf("\e[31m");
-					free(ext_buf);
-					break;
-				}
-				free(ext_buf);
-			}
+			if (colour_extension(entry->data->d_name) == 1)
+				break;
 			if (entry->attr == NULL)
 				break;
 			if (entry->attr->st_mode & S_IXUSR)
