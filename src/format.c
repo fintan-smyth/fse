@@ -19,6 +19,7 @@ int	colour_extension(char *filename)
 		) {
 			printf("\e[35m");
 			free(ext_buf);
+			return (1);
 		}
 		else if (strcasecmp(ext_buf, "mp3") == 0
 			|| strcasecmp(ext_buf, "flac") == 0
@@ -26,6 +27,7 @@ int	colour_extension(char *filename)
 		) {
 			printf("\e[36m");
 			free(ext_buf);
+			return (1);
 		}
 		else if (strcasecmp(ext_buf, "xz") == 0
 			|| strcasecmp(ext_buf, "gz") == 0
@@ -35,13 +37,12 @@ int	colour_extension(char *filename)
 		) {
 			printf("\e[31m");
 			free(ext_buf);
+			return (1);
 		}
 		else
 			free(ext_buf);
-		return (1);
 	}
-	else
-		return (0);
+	return (0);
 }
 
 void	colour_entry(entry_node *entry)
@@ -61,9 +62,9 @@ void	colour_entry(entry_node *entry)
 		case DT_REG:
 			if (colour_extension(entry->data->d_name) == 1)
 				break;
-			if (entry->attr == NULL)
+			else if (entry->attr == NULL)
 				break;
-			if (entry->attr->st_mode & S_IXUSR)
+			else if (entry->attr->st_mode & S_IXUSR)
 				printf("\e[1;32m");
 			break;
 		default:
@@ -317,7 +318,7 @@ void	print_header(entry_node *selected, char *cwd_name)
 //  - cwd_name:			string containing the path of cwd
 {
 	clear_header();
-	printf("\e[1;3H[ \e[31;1m%.*s", env.TERM_COLS - 6, cwd_name);
+	printf("\e[1;3H[ \e[33;1m%.*s", env.TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
 		printf("/");
 	if (selected != NULL)
@@ -334,7 +335,6 @@ void	print_gutter(vd_node *dir_node, entry_node *selected)
 //  - dir_node:			pointer to node of current directory
 //  - selected:			pointer to node of selected entry
 {
-	clear_gutter();
 	if (!(env.FLAGS & F_GUTTER_PUSHBACK))
 	{
 		if (selected != NULL)
