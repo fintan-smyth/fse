@@ -82,7 +82,7 @@ void		paste(vd_node *dir_node);
 void		print_copied(path_node *copied);
 void		print_file_attributes(entry_node *entry);
 void		recursive_dir_size(vd_node *dir_node, size_t *total, char **buf);
-size_t		recursive_dir_size_wrapper(vd_node *dir_node);
+size_t		get_dir_size(vd_node *dir_node);
 void		format_filesize(off_t filesize);
 
 #endif // !STRUCTS_H_

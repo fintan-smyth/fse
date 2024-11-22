@@ -513,18 +513,23 @@ void	recursive_dir_size(vd_node *dir_node, size_t *total, char **buf)
 	cleanup_directory(dir_node);
 }
 
-size_t	recursive_dir_size_wrapper(vd_node *dir_node)
+size_t	get_dir_size(vd_node *dir_node)
 {
 	size_t	*total = malloc(sizeof(*total));
 	char	*buf = malloc(500);
 	size_t	output;
+	int		hidden = 0;
 
 	*total = 0;
-	env.FLAGS ^= F_HIDDEN;
+	if (env.FLAGS & F_HIDDEN)
+		hidden = 1;
+	else
+		env.FLAGS ^= F_HIDDEN;
 	recursive_dir_size(dir_node, total, &buf);
 	output = *total;
 	free(total);
 	free(buf);
-	env.FLAGS ^= F_HIDDEN;
+	if (hidden == 0)
+		env.FLAGS ^= F_HIDDEN;
 	return (output);
 }
