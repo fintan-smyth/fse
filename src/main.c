@@ -46,6 +46,8 @@ int	main(void)
 	trash_list = init_trash_list();
 	load_bookmarks_file();
 	load_trash_file();
+	// check_trash_nodes_valid(trash_list);
+	// check_unindexed_trash(trash_list);
 	store_term_settings();
 	set_term_settings();
 	atexit(exit_cleanup);

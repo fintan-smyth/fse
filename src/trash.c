@@ -4,6 +4,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include <dirent.h>
+#include <string.h>
 
 trash_node	*trash_list;
 
@@ -67,7 +68,7 @@ void	delete_selected_trash_node(trash_node *head, trash_node *to_delete)
 	return ;
 }
 
-trash_node *insert_trash_node(char *name, char *old_name, char *old_location, int type, trash_node *head)
+trash_node *insert_trash_node(char *name, char *old_name, char *old_location, int type, int executable, trash_node *head)
 {
 	trash_node	*new;
 	trash_node	*current;
@@ -80,21 +81,32 @@ trash_node *insert_trash_node(char *name, char *old_name, char *old_location, in
 	new->prev = current;
 	new->name = strdup(name);
 	new->old_name = strdup(old_name);
-	new->old_location = strdup(old_location);
+	if (old_location == NULL)
+		new->old_location = NULL;
+	else if (strcmp(old_location, "(null)") == 0)
+		new->old_location = NULL;
+	else
+		new->old_location = strdup(old_location);
 	new->pos = current->pos + 1;
 	new->type = type;
+	new->executable = executable;
 	current->next = new;
 	new->next->prev = new;
 	return (new);
 }
 
-trash_node *insert_selected_trash(vd_node *dir_node, entry_node *selected, trash_node *head)
+trash_node *insert_selected_trash(char *old_location, entry_node *selected, trash_node *head)
 {
 	trash_node	*new;
-	char		buf[500];
 
-	sprintf(buf, "%s_%d", selected->data->d_name, (int) selected->attr->st_ctime);
-	new = insert_trash_node(buf, selected->data->d_name, dir_node->dir_name, selected->data->d_type, head);
+	if (old_location != NULL)
+	{
+		char		buf[500];
+		sprintf(buf, "%s_%d", selected->data->d_name, (int) selected->attr->st_ctime);
+		new = insert_trash_node(buf, selected->data->d_name, old_location, selected->data->d_type, selected->attr->st_mode & S_IXUSR, head);
+		return (new);
+	}
+	new = insert_trash_node(selected->data->d_name, selected->data->d_name, old_location, selected->data->d_type, selected->attr->st_mode & S_IXUSR, head);
 	return (new);
 }
 
@@ -127,7 +139,7 @@ void	write_trash_file(void)
 	current = trash_list->next;
 	while (current != current->next)
 	{
-		fprintf(fptr, "%s\t%s\t%s\t%d\n", current->name, current->old_name, current->old_location, current->type);
+		fprintf(fptr, "%s\t%s\t%s\t%d\t%d\n", current->name, current->old_name, current->old_location, current->type, current->executable);
 		current = current->next;
 	}
 	fclose(fptr);
@@ -141,8 +153,9 @@ void	load_trash_file(void)
 	char			name[200];
 	char			old_name[200];
 	char			old_location[200];
-	char			type_buf[200];
+	char			buf[200];
 	int				type;
+	int				executable;
 	char			*line;
 	size_t			size = 500;
 	int				i;
@@ -175,15 +188,110 @@ void	load_trash_file(void)
 		old_location[j] = 0;
 		j = 0;
 		i++;
+		while (line[i] != '\t')
+			buf[j++] = line[i++];
+		buf[j] = 0;
+		type = my_atoi(buf);
+		j = 0;
+		i++;
 		while (line[i] != '\n')
-			type_buf[j++] = line[i++];
-		type_buf[j] = 0;
-		type = my_atoi(type_buf);
-		insert_trash_node(name, old_name, old_location, type, trash_list);
+			buf[j++] = line[i++];
+		buf[j] = 0;
+		executable = my_atoi(buf);
+		insert_trash_node(name, old_name, old_location, type, executable, trash_list);
 	}
 	fclose(fptr);
 	free(line);
 }
+
+int	check_trash_nodes_valid(trash_node *trash_list)
+{
+	trash_node	*current;
+	vd_node		*trash_dir;
+	entry_node	*entry;
+	char		*home = getenv("HOME");
+	char		trash_path[256];
+	int			out = 0;
+	int			hidden = 0;
+
+	sprintf(trash_path, "%s/.local/share/fse/.trash", home);
+	trash_dir = get_vd_node(VISITED_DIRS, trash_path);
+	if (env.FLAGS & F_HIDDEN)
+		hidden = 1;
+	else
+		env.FLAGS ^= F_HIDDEN;
+	get_directory(trash_dir);
+	current = trash_list;
+	while (current->next != current->next->next)
+	{
+		entry = trash_dir->directory->children->next;
+		while (entry != entry->next)
+		{
+			if (strcmp(current->next->name, entry->data->d_name) == 0)
+				break ;
+			entry = entry->next;
+		}
+		if (entry == entry->next)
+		{
+			delete_next_trash_node(current);
+			out = 1;
+			continue ;
+		}
+		current = current->next;
+	}
+	if (hidden == 0)
+		env.FLAGS ^= F_HIDDEN;
+	if (out == 1)
+	{
+		number_trash_nodes(trash_list);
+		write_trash_file();
+	}
+	return (out);
+}
+
+ int	check_unindexed_trash(trash_node *trash_list)
+ {
+ 	trash_node	*current;
+ 	vd_node		*trash_dir;
+ 	entry_node	*entry;
+ 	char		*home = getenv("HOME");
+ 	char		trash_path[256];
+ 	int			out = 0;
+	int			hidden = 0;
+
+ 	sprintf(trash_path, "%s/.local/share/fse/.trash", home);
+ 	trash_dir = get_vd_node(VISITED_DIRS, trash_path);
+	if (env.FLAGS & F_HIDDEN)
+		hidden = 1;
+	else
+		env.FLAGS ^= F_HIDDEN;
+	get_directory(trash_dir);
+ 	entry = trash_dir->directory->children->next->next->next;
+ 	while (entry != entry->next)
+ 	{
+ 		current = trash_list->next;
+		while (current != current->next)
+		{
+			if (strcmp(current->name, entry->data->d_name) == 0)
+				break ;
+			current = current->next;
+		}
+		if (current == current->next)
+		{
+			insert_selected_trash(NULL, entry, trash_list);
+			out = 1;
+		}
+		entry = entry->next;
+ 	}
+	if (hidden == 0)
+		env.FLAGS ^= F_HIDDEN;
+	if (out == 1)
+	{
+		number_trash_nodes(trash_list);
+		write_trash_file();
+	}
+	return (out);
+ }
 
 int	count_trash_nodes(trash_node *head)
 // Count the number of nodes in the trash list.
@@ -295,16 +403,28 @@ void	display_trash(trash_node *head, trash_node *selected, int lines, int *offse
 			default:
 				if (colour_extension(current->old_name) == 1)
 					break;
-				printf("\e[39m");
+				else if (current->executable)
+					printf("\e[32m");
 				break;
 		}
 		printf("\e[%d;3H\e[1m%s%*s\e[22m ",
 		 current->pos + start_line - *offset, current->old_name, longest_name - my_strlen(current->old_name), "");
-		if (selected != current)
-			printf("\e[m");
-		printf(" %.*s/", env.TERM_COLS - (longest_name + 6), current->old_location);
-		if (longest_name + 7 + my_strlen(current->old_location) < env.TERM_COLS)
-			printf("%*s", env.TERM_COLS - (longest_name + 7 + my_strlen(current->old_location)), "");
+		if (current->old_location != NULL)
+		{
+			if (selected != current)
+				printf("\e[m");
+			printf(" %.*s/", env.TERM_COLS - (longest_name + 6), current->old_location);
+			if (longest_name + 7 + my_strlen(current->old_location) < env.TERM_COLS)
+				printf("%*s", env.TERM_COLS - (longest_name + 7 + my_strlen(current->old_location)), "");
+		}
+		else
+		{
+			if (selected != current)
+				printf("\e[31m");
+			printf(" %.*s", env.TERM_COLS - (longest_name + 6), "[NONE]");
+			if (longest_name + 12 < env.TERM_COLS)
+				printf("%*s", env.TERM_COLS - (longest_name + 12), "");
+		}
 		printf("\e[m");
 		current = current->next;
 	}
@@ -314,9 +434,9 @@ size_t	print_trash_size(char *buf, int lines, char *home)
 {
 	size_t		trash_size;
 
-	sprintf(buf, "%s/.local/share/fse/trash", home);
+	sprintf(buf, "%s/.local/share/fse/.trash", home);
 	printf("\e[%d;11H", env.TERM_ROWS - (lines + 2));
-	trash_size = recursive_dir_size_wrapper(get_vd_node(VISITED_DIRS, buf));
+	trash_size = get_dir_size(get_vd_node(VISITED_DIRS, buf));
 	format_filesize(trash_size);
 	printf(" ]");
 	return (trash_size);
@@ -324,16 +444,19 @@ size_t	print_trash_size(char *buf, int lines, char *home)
 
 void	navigate_trash(trash_node *head)
 {
-	trash_node	*selected = head->next;
+	trash_node	*selected;
 	trash_node	*temp;
 	char		*home = getenv("HOME");
-	int			lines = count_trash_nodes(trash_list);
+	int			lines;
 	char		c;
 	char		buf[500];
-	// char		*bufp;
 	int			offset = 0;
 	size_t		trash_size;
 
+	check_trash_nodes_valid(trash_list);
+	check_unindexed_trash(trash_list);
+	lines = count_trash_nodes(head);
+	selected = head->next;
 	if (selected == selected->next)
 		selected = NULL;
 	if (lines < 5)
@@ -379,7 +502,7 @@ void	navigate_trash(trash_node *head)
 				else
 					selected = NULL;
 				clear_gutter();
-				sprintf(buf, "rm -rf \"%s/.local/share/fse/trash/%s\"", home, temp->name);
+				sprintf(buf, "rm -rf \"%s/.local/share/fse/.trash/%s\"", home, temp->name);
 				printf("\e[%d;3H[ \e[33mPermanently deleted file:\e[m %s ]", env.TERM_ROWS, temp->old_name);
 				system(buf);
 				delete_selected_trash_node(head, temp);
@@ -396,6 +519,12 @@ void	navigate_trash(trash_node *head)
 			temp = selected;
 			offset = 0;
 			clear_gutter();
+			if (selected->old_location == NULL)
+			{
+				printf("\e[%d;3H[ \e[31;1mError:\e[22;33m No restore location available\e[m]", env.TERM_ROWS);
+				print_trash_no(selected);
+				continue ;
+			}
 			printf("\e[%d;3H[ \e[33mRestore file? [y/N] :\e[m %s -> %s/ ]", env.TERM_ROWS, temp->old_name, temp->old_location);
 			if ((c = getchar()) == 'y')
 			{
@@ -406,7 +535,7 @@ void	navigate_trash(trash_node *head)
 				else
 					selected = NULL;
 				clear_gutter();
-				sprintf(buf, "mv \"%s/.local/share/fse/trash/%s\" \"%s/%s\"", home, temp->name, temp->old_location, temp->old_name);
+				sprintf(buf, "mv \"%s/.local/share/fse/.trash/%s\" \"%s/%s\"", home, temp->name, temp->old_location, temp->old_name);
 				printf("\e[%d;3H[ \e[33mRestored file: \e[m \"%s\" ]", env.TERM_ROWS, temp->old_name);
 				system(buf);
 				delete_selected_trash_node(head, temp);
@@ -427,7 +556,7 @@ void	navigate_trash(trash_node *head)
 				selected = trash_list->next;
 				while (selected != selected->next)
 				{
-					sprintf(buf, "rm -rf \"%s/.local/share/fse/trash/%s\"", home, selected->name);
+					sprintf(buf, "rm -rf \"%s/.local/share/fse/.trash/%s\"", home, selected->name);
 					system(buf);
 					delete_selected_trash_node(head, selected);
 					selected = trash_list->next;
