@@ -146,11 +146,11 @@ void	execute_shell_cmd(char	*buf)
 		set_term_settings();
 		return ;
 	}
-	printf("\e[2J\e[H\e[31m###OUTPUT###\e[m\n");
+	printf("\e[2J\e[H\e[31m###OUTPUT###\e[m\n\n");
 	fflush(stdout);
 	system(buf);
 	set_term_settings();
-	printf("Press any key to continue...");
+	printf("\nPress any key to continue...");
 	c = getchar();
 }
 
@@ -518,10 +518,10 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 		env.TERM_ROWS, env.TERM_COLS - 38, (*selected)->data->d_name);
 	if ((c = getchar()) == 'y')
 	{
-		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/trash/%s_%d\"", buf, home, (*selected)->data->d_name, (int) (*selected)->attr->st_ctime);
+		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/.trash/%s_%d\"", buf, home, (*selected)->data->d_name, (int) (*selected)->attr->st_ctime);
 		if ((system(command_buf)) != 0)
 			return ;
-		insert_selected_trash(dir_node, *selected, trash_list);
+		insert_selected_trash(dir_node->dir_name, *selected, trash_list);
 		write_trash_file();
 		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->data->d_name);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
