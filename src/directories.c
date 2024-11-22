@@ -102,9 +102,7 @@ struct directory	*get_directory(vd_node *dir_node)
 	int					left = 0;
 
 	if (dir_node->directory != NULL)
-	{
 		return (NULL);
-	}
 	dir_node->no_entries = 0;
 	directory = malloc(sizeof(*directory));
 	head = init_list();
