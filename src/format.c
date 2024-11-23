@@ -60,6 +60,12 @@ void	colour_entry(entry_node *entry)
 		case DT_LNK:
 			printf("\e[1;36m");
 			break;
+		case DT_CHR:
+			printf("\e[1;33m");
+			break;
+		case DT_BLK:
+			printf("\e[1;33m");
+			break;
 		case DT_REG:
 			if (colour_extension(entry->data->d_name) == 1)
 				break;
