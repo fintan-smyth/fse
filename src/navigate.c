@@ -410,12 +410,12 @@ int	run_executable(entry_node *selected, char *buf)
 	int	out = 0;
 	if (selected->data->d_type == DT_REG && (selected->attr->st_mode & S_IXUSR))
 	{
+		out = 1;
 		reset_term_settings();
 		printf("\e[2J\e[H");
 		fflush(stdout);
 		sprintf(buf, "./\"%s\"", selected->data->d_name);
-		if (system(buf) == 0)
-			out = 1;
+		system(buf);
 		set_term_settings();
 		printf("Press any key to continue...");
 		getchar();
