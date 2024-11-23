@@ -22,5 +22,6 @@ int		count_digits(int num);
 int		my_atoi(char *s);
 int		is_digit(char c);
 int		is_whitespace(char c);
+int		str_is_whitespace(char *s);
 
 #endif // !UTILS_H_

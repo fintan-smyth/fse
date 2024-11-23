@@ -54,6 +54,7 @@ int	main(void)
 	do {
 		getcwd(cwd_name, size);
 		current = get_vd_node(VISITED_DIRS, cwd_name);
+		cleanup_directory(current);
 		get_directory(current);
 	} while (navigate(current) == 0);
 	printf("\e[2J\e[H");

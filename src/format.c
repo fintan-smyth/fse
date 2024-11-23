@@ -239,7 +239,7 @@ void	display_parent(vd_node *dir_node, vd_node *parent)
 	get_directory(parent);
 	selected = get_selected(parent);
 	print_entries(parent, selected, -1);
-	cleanup_directory(parent);
+	// cleanup_directory(parent);
 }
 
 

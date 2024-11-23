@@ -64,6 +64,8 @@ int			comp_entries(entry_node *a, entry_node *b);
 
 struct directory *get_directory(vd_node *dir_node);
 gen_node	*insert_child_vd(gen_node *children, vd_node *child);
+void	cleanup_vd_children(vd_node *dir_node);
+void	delete_children_list(vd_node *dir_node);
 vd_node			 *init_visited(void);
 vd_node			 *vd_insert(vd_node *visited, char *dir_name);
 vd_node			 *get_vd_node(vd_node *visited, char *path);

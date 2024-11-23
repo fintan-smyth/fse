@@ -272,3 +272,11 @@ int	is_whitespace(char c)
 	return (0);
 }
 
+int	str_is_whitespace(char *s)
+{
+	while (is_whitespace(*s))
+		s++;
+	if (*s == 0)
+		return (1);
+	return (0);
+}

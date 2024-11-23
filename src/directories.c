@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/env.h"
+#include <dirent.h>
 
 vd_node	*VISITED_DIRS;
 
@@ -51,6 +52,22 @@ vd_node	*vd_insert(vd_node *visited, char *dir_path)
 	return (new);
 }
 
+void	delete_next_vd(vd_node *t)
+{
+	vd_node	*temp;
+
+	temp = t->next;
+	cleanup_directory(temp);
+	if (temp->dir_name != NULL)
+		free(temp->dir_name);
+	if (temp->selected_name != NULL)
+		free(temp->selected_name);
+	if (temp->children != NULL)
+		delete_children_list(temp);
+	t->next = t->next->next;
+	free(temp);
+}
+
 gen_node	*insert_child_vd(gen_node *children, vd_node *child)
 {
 	gen_node *new;
@@ -61,7 +78,6 @@ gen_node	*insert_child_vd(gen_node *children, vd_node *child)
 	children->next = new;
 	return (new);
 }
-
 
 void	cleanup_vd_children(vd_node *dir_node)
 {
@@ -160,16 +176,14 @@ struct directory	*get_directory(vd_node *dir_node)
 	}
 	while ((child = readdir(dir)) != NULL)
 	{
-		current = insertafter(dir_node->dir_name, child, current);
+		insertafter(dir_node->dir_name, child, current);
 	}
 	current = head;
 	while (current->next != current->next->next)
 	{
-		if (!str_printable(current->next->data->d_name))
-			delete_next_entry(current);
-		else if (current->next->data->d_type < 4 || current->next->data->d_type > 10)
-			delete_next_entry(current);
-		else if (strncmp(current->next->data->d_name, ".", 1) == 0)
+		// if (current->next->data->d_type < 4 || current->next->data->d_type > 10)
+		// 	delete_next_entry(current);
+		if (strncmp(current->next->data->d_name, ".", 1) == 0)
 		{
 			if ((env.FLAGS & F_HIDDEN) == 0)
 			{
@@ -201,6 +215,8 @@ struct directory	*get_directory(vd_node *dir_node)
 	dir_node->no_entries = number_list(head);
 	free(entry_array);
 	dir_node->directory = directory;
+	closedir(dir);
+	directory->dir = NULL;
 	return (directory);
 }
 
@@ -209,25 +225,10 @@ void	free_visited(vd_node *head)
 // Args:
 //  - head: pointer to head of visited directories list
 {
-	vd_node	*current;
-	vd_node	*temp;
-
-	current = head->next;
-	while (current != current->next)
-	{
-		free(current->dir_name);
-		free(current->selected_name);
-		delete_children_list(current);
-		current = current->next;
-	}
-	current = head;
-	while (current != current->next)
-	{
-		temp = current;
-		current = current->next;
-		free(temp);
-	}
-	free(current);
+	while (head->next != head->next->next)
+		delete_next_vd(head);
+	free(head->next);
+	free(head);
 }
 
 vd_node	*get_vd_node(vd_node *visited, char *path)

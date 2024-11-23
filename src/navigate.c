@@ -643,6 +643,7 @@ int	navigate(vd_node *dir_node)
 	entry_node			*search_result;
 
 	parent = get_parent(dir_node);
+	// cleanup_directory(parent);
 	selected = get_selected(dir_node);
 	set_winsize();
 	draw_box();
@@ -731,6 +732,7 @@ int	navigate(vd_node *dir_node)
 			toggle_hidden();
 			dir_node->offset = 0;
 			cleanup_directory(dir_node);
+			cleanup_directory(parent);
 			return (0);
 		}
 		else if (c == binds.TOGGLE_PARENT)
@@ -744,6 +746,7 @@ int	navigate(vd_node *dir_node)
 		{
 			pick_sort_method();
 			cleanup_directory(dir_node);
+			cleanup_directory(parent);
 			return (0);
 		}
 		else if (c == binds.EXEC_SHELL)
@@ -767,6 +770,7 @@ int	navigate(vd_node *dir_node)
 			clear_gutter();
 			paste(dir_node);
 			cleanup_directory(dir_node);
+			cleanup_directory(parent);
 			return (0);
 		}
 		else if (c == binds.CLEAR_BUF)
@@ -775,6 +779,7 @@ int	navigate(vd_node *dir_node)
 			clear_path_list(cut);
 			// cleanup_directory(dir_node);
 			// return (0);
+			draw_box();
 		}
 		else if (selected == NULL)
 			continue;
@@ -799,7 +804,8 @@ int	navigate(vd_node *dir_node)
 			open_selected(selected, buf);
 			if (selected->data->d_type != DT_REG)
 			{
-				cleanup_directory(dir_node);
+				// cleanup_directory(dir_node);
+				cleanup_vd_children(dir_node);
 				return (0);
 			}
 			draw_box();

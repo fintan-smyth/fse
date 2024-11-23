@@ -34,8 +34,20 @@ void	delete_next_entry(entry_node *t)
 	temp = t->next;
 	t->next = t->next->next;
 	t->next->prev = t;
-	free(temp->attr);
+	if (temp->attr != NULL)
+		free(temp->attr);
+	if (temp->data != NULL)
+		free(temp->data);
 	free(temp);
+}
+
+struct dirent	*copy_dirent(struct dirent *data)
+{
+	struct dirent *new = malloc(sizeof(*data));
+
+	new->d_type = data->d_type;
+	strcpy(new->d_name, data->d_name);
+	return (new);
 }
 
 entry_node *insertafter(char *dir_path, struct dirent *data, entry_node *t)
@@ -51,17 +63,25 @@ entry_node *insertafter(char *dir_path, struct dirent *data, entry_node *t)
 	struct stat 	*attr;
 	char			abs_path[500];
 
+	if (data == NULL)
+		return (NULL);
+	else if (!str_printable(data->d_name))
+		return (NULL);
+	else if (str_is_whitespace(data->d_name))
+		return (NULL);
 	new = (entry_node *)malloc(sizeof(*new));
 	attr = malloc(sizeof(*attr));
-	new->data = data;
-	construct_path(abs_path, dir_path, new->data->d_name);
+	new->data = copy_dirent(data);
+	construct_path(abs_path, dir_path, data->d_name);
 	if (stat(abs_path, attr) == -1)
 	{
 		new->attr = NULL;
 		free(attr);
 	}
 	else
+	{
 		new->attr = attr;
+	}
 	new->next = t->next;
 	new->prev = t;
 	new->lines = 0;
@@ -81,14 +101,9 @@ void	free_entries(entry_node *head)
 	current = head;
 	while (current->next != current->next->next)
 	{
-		temp = current->next;
-		if (current->attr != NULL)
-			free(current->attr);
-		free(current);
-		current = temp;
+		delete_next_entry(current);
 	}
 	temp = current->next;
-	free(current->attr);
 	free(current);
 	free(temp);
 }

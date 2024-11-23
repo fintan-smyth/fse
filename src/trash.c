@@ -449,6 +449,7 @@ int	navigate_trash(vd_node *dir_node, trash_node *head)
 	trash_node	*selected;
 	trash_node	*temp;
 	char		*home = getenv("HOME");
+	char		trash_location[200];
 	int			lines;
 	char		c;
 	char		buf[500];
@@ -459,6 +460,9 @@ int	navigate_trash(vd_node *dir_node, trash_node *head)
 	check_trash_nodes_valid(trash_list);
 	check_unindexed_trash(trash_list);
 	lines = count_trash_nodes(head);
+	sprintf(trash_location, "%s/.local/share/fse/.trash", home);
+	if (strcmp(trash_location, dir_node->dir_name) == 0)
+		out = 1;
 	selected = head->next;
 	if (selected == selected->next)
 		selected = NULL;
