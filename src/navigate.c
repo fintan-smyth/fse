@@ -82,7 +82,7 @@ void	pick_sort_method(void)
 		toggle_reverse_sort();
 }
 
-void	insert_entry(vd_node *dir_node, char *buf)
+int	insert_entry(vd_node *dir_node, char *buf)
 // Prompts the user to insert a new entry into the directory.
 // Args:
 //  - buf:	char array used to construct shell command
@@ -92,6 +92,7 @@ void	insert_entry(vd_node *dir_node, char *buf)
 	char	c;
 	int		len;
 	int		is_dir = 0;
+	int		out = 0;
 
 	reset_term_settings();
 	printf("\e[%d;3H[%*s]\e[4G \e[33minsert:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
@@ -100,7 +101,7 @@ void	insert_entry(vd_node *dir_node, char *buf)
 	set_term_settings();
 	len = my_strlen(buf);
 	if (len == 0 || c == 27 || str_printable(buf) == 0)
-		return ;
+		return (out);
 	if (buf[len - 1] == '/')
 	{
 		buf[len - 1] = 0;
@@ -110,7 +111,7 @@ void	insert_entry(vd_node *dir_node, char *buf)
 	{
 		sprintf(env.gutter_pushback, "\e[33mEntry already exists:\e[m %s", buf);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
-		return ;
+		return (out);
 	}
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup(buf);
@@ -119,14 +120,16 @@ void	insert_entry(vd_node *dir_node, char *buf)
 		sprintf(command_buf, "mkdir -p \"%s\"", buf);
 		sprintf(env.gutter_pushback, "\e[33mNew dir created: \e[34;1m%s\e[m", buf);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
-		system(command_buf);
-		return ;
+		if (system(command_buf) == 0)
+			out = 1;
+		return (out);
 	}
 	sprintf(command_buf, "touch \"%s\"", buf);
 	sprintf(env.gutter_pushback, "\e[33mNew file created: \e[m%s", buf);
 	env.FLAGS ^= F_GUTTER_PUSHBACK;
-	system(command_buf);
-	return ;
+	if (system(command_buf) == 0)
+		out = 1;
+	return (out);
 }
 
 int	execute_shell_cmd(char	*buf)
@@ -679,7 +682,8 @@ int	navigate(vd_node *dir_node)
 		// 	// size_t space = get_dir_size(dir_node);
 		// 	// printf("\e[1m%s:\t", dir_node->dir_name);
 		// 	// format_filesize(space);
-		// 	printf("<vd_node: %ld>\n<entry_node: %ld>\n<gen_node: %ld>\n<dirent: %ld>\n<stat: %ld>", sizeof(vd_node), sizeof(entry_node), sizeof(gen_node), sizeof(struct dirent), sizeof(struct stat));
+		// 	// printf("<vd_node: %ld>\n<entry_node: %ld>\n<gen_node: %ld>\n<dirent: %ld>\n<stat: %ld>", sizeof(vd_node), sizeof(entry_node), sizeof(gen_node), sizeof(struct dirent), sizeof(struct stat));
+		// 	printf("type: %d", selected->data->d_type);
 		// 	printf("\n");
 		// 	exit(0);
 		// }
@@ -717,9 +721,13 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == binds.INSERT)
 		{
-			insert_entry(dir_node, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			if (insert_entry(dir_node, buf) == 1)
+			{
+				cleanup_directory(parent);
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
 		else if (c == binds.EDIT_DIR)
 		{
