@@ -129,13 +129,14 @@ void	insert_entry(vd_node *dir_node, char *buf)
 	return ;
 }
 
-void	execute_shell_cmd(char	*buf)
+int	execute_shell_cmd(char	*buf)
 // Prompts the user to execute a shell command.
 // Args:
 //  - buf:	char array used to construct shell command
 {
 	char	*bufp = buf;
 	char	c;
+	int		out = 0;
 
 	reset_term_settings();
 	printf("\e[%d;3H[%*s]\e[4G \e[33mcmd:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
@@ -144,14 +145,16 @@ void	execute_shell_cmd(char	*buf)
 	if (my_strlen(buf) == 0 || c == 27)
 	{
 		set_term_settings();
-		return ;
+		return (out);
 	}
 	printf("\e[2J\e[H\e[31m###OUTPUT###\e[m\n\n");
 	fflush(stdout);
-	system(buf);
+	if (system(buf) == 0)
+		out = 1;
 	set_term_settings();
 	printf("\nPress any key to continue...");
 	c = getchar();
+	return (out);
 }
 
 void	print_help(void)
@@ -395,24 +398,27 @@ void	cut_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char *
 	}
 }
 
-void	run_executable(entry_node *selected, char *buf)
+int	run_executable(entry_node *selected, char *buf)
 // If executable, runs the selected file.
 // Args:
 //  - selected:	pointer to selected entry node
 //  - buf:		char array used to construct shell command
 {
-	reset_term_settings();
-	printf("\e[2J\e[H");
-	fflush(stdout);
+	int	out = 0;
 	if (selected->data->d_type == DT_REG && (selected->attr->st_mode & S_IXUSR))
 	{
+		reset_term_settings();
+		printf("\e[2J\e[H");
+		fflush(stdout);
 		sprintf(buf, "./\"%s\"", selected->data->d_name);
-		system(buf);
+		if (system(buf) == 0)
+			out = 1;
 		set_term_settings();
 		printf("Press any key to continue...");
 		getchar();
 	}
 	set_term_settings();
+	return (out);
 }
 
 int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_result)
@@ -443,7 +449,7 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 		return (1);
 	}
 	*selected = *search_result;
-	draw_box();
+	// draw_box();
 	return (0);
 }
 
@@ -497,7 +503,7 @@ void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offs
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
 
-void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
+int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 // Moves selected file or directory to trash.
 // Args:
 //  - dir_node:		pointer to current directory node
@@ -508,6 +514,7 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 	int 	len = strlen(dir_node->dir_name);
 	char	command_buf[500];
 	char	*home = getenv("HOME");
+	int		out = 0;
 
 	memcpy(buf, dir_node->dir_name, len);
 	if (strncmp(buf, "/", strlen(buf)))
@@ -520,7 +527,8 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 	{
 		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/.trash/%s_%d\"", buf, home, (*selected)->data->d_name, (int) (*selected)->attr->st_ctime);
 		if ((system(command_buf)) != 0)
-			return ;
+			return (out);
+		out = 1;
 		insert_selected_trash(dir_node->dir_name, *selected, trash_list);
 		write_trash_file();
 		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->data->d_name);
@@ -547,9 +555,10 @@ void	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 			dir_node->selected_name = strdup((*selected)->data->d_name);
 		}
 	}
+	return (out);
 }
 
-void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
+int	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 // Prompts the user to rename the selected entry.
 // Args:
 //  - dir_node:	pointer to current directory node
@@ -559,6 +568,7 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 	char	*bufp = buf;
 	char	command_buf[500];
 	char	c;
+	int		out = 0;
 
 	reset_term_settings();
 	printf("\e[%d;3H[%*s]\e[4G \e[33mrename:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
@@ -566,7 +576,7 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 		*(bufp++) = c;
 	set_term_settings();
 	if (my_strlen(buf) == 0 || c == 27 || str_printable(buf) == 0)
-		return ;
+		return (out);
 	if (check_file_exists(dir_node, buf))
 	{
 		draw_box();
@@ -574,17 +584,19 @@ void	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 		clear_gutter();
 		printf("\e[%d;3H[ \e[1;33mFile exists. Overwrite? [y/N] : \e[m%.*s ]", env.TERM_ROWS, env.TERM_COLS - 38, buf);
 		if ((c = getchar()) != 'y')
-			return ;
+			return (out);
 	}
 	set_term_settings();
 	sprintf(command_buf, "mv \"%s\" \"%s\"", selected->data->d_name, buf);
 	if (system(command_buf) == 0)
 	{
+		out = 1;
 		sprintf(env.gutter_pushback, "\e[33mRenamed file:\e[m %s -> %s",  selected->data->d_name, buf);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		free(dir_node->selected_name);
 		dir_node->selected_name = strdup(buf);
 	}
+	return (out);
 }
 
 void	bookmark_current_dir(vd_node *dir_node, char *buf)
@@ -634,7 +646,7 @@ int	navigate(vd_node *dir_node)
 	selected = get_selected(dir_node);
 	set_winsize();
 	draw_box();
-	// clear_gutter();
+	clear_gutter();
 	display_directory(dir_node, selected, parent, preview_offset);
 	while ((c = getchar()) != 'q')
 	{
@@ -654,27 +666,46 @@ int	navigate(vd_node *dir_node)
 		}
 		if (c == binds.UPDIR)
 		{
+			if (strcmp(dir_node->dir_name, "/") == 0)
+				continue;
 			chdir("..");
 			cleanup_directory(dir_node);
 			return (0);
 		}
+		// else if (c == 'w')
+		// {
+		// 	printf("\e[2J\e[H");
+		// 	// size_t space = get_dir_size(dir_node);
+		// 	// printf("\e[1m%s:\t", dir_node->dir_name);
+		// 	// format_filesize(space);
+		// 	printf("<vd_node: %ld>\n<entry_node: %ld>\n<gen_node: %ld>\n<dirent: %ld>\n<stat: %ld>", sizeof(vd_node), sizeof(entry_node), sizeof(gen_node), sizeof(struct dirent), sizeof(struct stat));
+		// 	printf("\n");
+		// 	exit(0);
+		// }
 		else if (c == binds.BOOKMARK_CURRENT)
 		{
 			bookmark_current_dir(dir_node, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			draw_box();
+			// cleanup_directory(dir_node);
+			// return (0);
 		}
 		else if (c == binds.VIEW_BOOKMARKS)
 		{
-			navigate_bookmarks(bookmarks);
-			cleanup_directory(dir_node);
-			return (0);
+			if (navigate_bookmarks(dir_node, bookmarks) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
 		else if (c == binds.OPEN_TRASH)
 		{
-			navigate_trash(trash_list);
-			cleanup_directory(dir_node);
-			return (0);
+			if (navigate_trash(dir_node, trash_list) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
 		else if (c == binds.GO_HOME)
 		{
@@ -705,8 +736,9 @@ int	navigate(vd_node *dir_node)
 		else if (c == binds.TOGGLE_PARENT)
 		{
 			toggle_preview();
-			cleanup_directory(dir_node);
-			return (0);
+			draw_box();
+			// cleanup_directory(dir_node);
+			// return (0);
 		}
 		else if (c == binds.PICK_SORT)
 		{
@@ -716,15 +748,19 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == binds.EXEC_SHELL)
 		{
-			execute_shell_cmd(buf);
-			cleanup_directory(dir_node);
-			return (0);
+			if (execute_shell_cmd(buf) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
 		else if (c == binds.HELP)
 		{
 			print_help();
-			cleanup_directory(dir_node);
-			return (0);
+			draw_box();
+			// cleanup_directory(dir_node);
+			// return (0);
 		}
 		else if (c == binds.PASTE)
 		{
@@ -737,12 +773,12 @@ int	navigate(vd_node *dir_node)
 		{
 			clear_path_list(copied);
 			clear_path_list(cut);
-			cleanup_directory(dir_node);
-			return (0);
+			// cleanup_directory(dir_node);
+			// return (0);
 		}
-		if (selected == NULL)
+		else if (selected == NULL)
 			continue;
-		if (c == binds.SELECT_NEXT)
+		else if (c == binds.SELECT_NEXT)
 		{
 			if (selected->next == selected->next->next)
 				continue ;
@@ -761,14 +797,19 @@ int	navigate(vd_node *dir_node)
 		else if (c == binds.OPEN || c == '\n')
 		{
 			open_selected(selected, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			if (selected->data->d_type != DT_REG)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
 		else if (c == binds.EDIT_FILE)
 		{
 			open_selected_in_editor(selected, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			// cleanup_directory(dir_node);
+			// return (0);
+			draw_box();
 		}
 		else if (c == binds.YANK)
 			yank_selected(dir_node, selected, cmd_count, buf);
@@ -776,17 +817,22 @@ int	navigate(vd_node *dir_node)
 			cut_selected(dir_node, selected, cmd_count, buf);
 		else if (c == binds.EXEC_FILE)
 		{
-			run_executable(selected, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			if (run_executable(selected, buf) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			// draw_box();
 		}
 		else if (c == binds.SEARCH_DIR)
 		{
 			if (search_in_dir(dir_node, &selected, &search_result) == 1)
 			{
-				cleanup_directory(dir_node);
-				return (0);
+				;
+				// cleanup_directory(dir_node);
+				// return (0);
 			}
+			draw_box();
 		}
 		else if (c == binds.PREV_DOWN)
 		{
@@ -816,22 +862,25 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == binds.DELETE)
 		{
-			delete_selected(dir_node, &selected, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			if (delete_selected(dir_node, &selected, buf) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
 		else if (c == binds.RENAME)
 		{
-			rename_file(dir_node, selected, buf);
-			cleanup_directory(dir_node);
-			return (0);
+			if (rename_file(dir_node, selected, buf) == 1)
+			{
+				cleanup_directory(dir_node);
+				return (0);
+			}
+			draw_box();
 		}
-		else
-		{
-			/*printf("\e[2J\e[H%c\t%d\n", c, c);*/
-			/*exit(0);*/
-			continue;
-		}
+		// else
+		// 	continue;
+		clear_gutter();
 		display_directory(dir_node, selected, parent, preview_offset);
 	}
 	cleanup_directory(dir_node);

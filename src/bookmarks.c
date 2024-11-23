@@ -298,7 +298,7 @@ void	display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, 
 	}
 }
 
-void	navigate_bookmarks(bookmark_node *head)
+int	navigate_bookmarks(vd_node *dir_node, bookmark_node *head)
 // Navigate and edit the user's bookmarks.
 // Args:
 //  - head:	pointer to the head of the bookmarks list
@@ -323,7 +323,7 @@ void	navigate_bookmarks(bookmark_node *head)
 	while ((c = getchar()) != binds.QUIT)
 	{
 		if (c == binds.VIEW_BOOKMARKS)
-			return ;
+			return (0);
 		clear_gutter();
 		if (selected == NULL)
 		{
@@ -342,8 +342,10 @@ void	navigate_bookmarks(bookmark_node *head)
 		}
 		else if (c == binds.OPEN || c == '\n')
 		{
+			if (strcmp(dir_node->dir_name, selected->path) == 0)
+				return (0);
 			chdir(selected->path);
-			return ;
+			return (1);
 		}
 		else if (c == binds.DELETE)
 		{
@@ -400,5 +402,5 @@ void	navigate_bookmarks(bookmark_node *head)
 		}
 		display_bookmarks(head, selected, lines, &offset);
 	}
-	return ;
+	return (0);
 }

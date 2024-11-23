@@ -20,6 +20,12 @@ typedef struct path_node
 	char			 *path;
 } path_node;
 
+typedef struct gen_node
+{
+	struct gen_node *next;
+	void			*data;
+} gen_node;
+
 struct directory
 {
 	entry_node *children;
@@ -30,6 +36,7 @@ typedef struct vd_node
 {
 	struct vd_node		*next;
 	struct directory	*directory;
+	struct gen_node		*children;
 	int					offset;
 	int					no_entries;
 	char				*dir_name;
@@ -56,6 +63,7 @@ int			number_list(entry_node *head);
 int			comp_entries(entry_node *a, entry_node *b);
 
 struct directory *get_directory(vd_node *dir_node);
+gen_node	*insert_child_vd(gen_node *children, vd_node *child);
 vd_node			 *init_visited(void);
 vd_node			 *vd_insert(vd_node *visited, char *dir_name);
 vd_node			 *get_vd_node(vd_node *visited, char *path);

@@ -220,6 +220,7 @@ int	check_trash_nodes_valid(trash_node *trash_list)
 		hidden = 1;
 	else
 		env.FLAGS ^= F_HIDDEN;
+	cleanup_directory(trash_dir);
 	get_directory(trash_dir);
 	current = trash_list;
 	while (current->next != current->next->next)
@@ -265,6 +266,7 @@ int	check_trash_nodes_valid(trash_node *trash_list)
 		hidden = 1;
 	else
 		env.FLAGS ^= F_HIDDEN;
+	cleanup_directory(trash_dir);
 	get_directory(trash_dir);
  	entry = trash_dir->directory->children->next->next->next;
  	while (entry != entry->next)
@@ -442,7 +444,7 @@ size_t	print_trash_size(char *buf, int lines, char *home)
 	return (trash_size);
 }
 
-void	navigate_trash(trash_node *head)
+int	navigate_trash(vd_node *dir_node, trash_node *head)
 {
 	trash_node	*selected;
 	trash_node	*temp;
@@ -452,6 +454,7 @@ void	navigate_trash(trash_node *head)
 	char		buf[500];
 	int			offset = 0;
 	size_t		trash_size;
+	int			out = 0;
 
 	check_trash_nodes_valid(trash_list);
 	check_unindexed_trash(trash_list);
@@ -470,7 +473,7 @@ void	navigate_trash(trash_node *head)
 	while ((c = getchar()) != binds.QUIT)
 	{
 		if (c == binds.OPEN_TRASH)
-			return ;
+			return (out);
 		clear_gutter();
 		if (selected == NULL)
 		{
@@ -536,6 +539,8 @@ void	navigate_trash(trash_node *head)
 					selected = NULL;
 				clear_gutter();
 				sprintf(buf, "mv \"%s/.local/share/fse/.trash/%s\" \"%s/%s\"", home, temp->name, temp->old_location, temp->old_name);
+				if (strcmp(temp->old_location, dir_node->dir_name) == 0)
+					out = 1;
 				printf("\e[%d;3H[ \e[33mRestored file: \e[m \"%s\" ]", env.TERM_ROWS, temp->old_name);
 				system(buf);
 				delete_selected_trash_node(head, temp);
@@ -580,4 +585,5 @@ void	navigate_trash(trash_node *head)
 		}
 		display_trash(head, selected, lines, &offset);
 	}
+	return (out);
 }

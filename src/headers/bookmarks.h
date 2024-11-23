@@ -1,6 +1,8 @@
 #ifndef BOOKMARKS_H_
 #define BOOKMARKS_H_
 
+#include "structs.h"
+
 typedef struct bookmark_node
 {
 	struct bookmark_node	*prev;
@@ -21,7 +23,7 @@ void			write_bookmarks(void);
 void			load_bookmarks_file(void);
 int				count_bookmarks(bookmark_node *head);
 void			display_bookmarks(bookmark_node *head, bookmark_node *selected, int lines, int *offset);
-void			navigate_bookmarks(bookmark_node *head);
+int				navigate_bookmarks(vd_node *dir_node, bookmark_node *head);
 
 
 #endif // !BOOKMARKS_H_

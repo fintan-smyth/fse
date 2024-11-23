@@ -490,7 +490,9 @@ void	recursive_dir_size(vd_node *dir_node, size_t *total, char **buf)
 	vd_node		*child;
 	entry_node	*current;
 
-	get_directory(dir_node);
+	cleanup_directory(dir_node);
+	if (get_directory(dir_node) == NULL)
+		return ;
 	current = dir_node->directory->children->next;
 	while (current != current->next)
 	{
@@ -503,7 +505,7 @@ void	recursive_dir_size(vd_node *dir_node, size_t *total, char **buf)
 				recursive_dir_size(child, total, buf);
 			}
 		}
-		else
+		else if (current->data->d_type == DT_REG)
 		{
 			if (current->attr != NULL)
 				*total += current->attr->st_size;

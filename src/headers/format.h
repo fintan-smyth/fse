@@ -16,7 +16,7 @@ int		colour_extension(char *filename);
 void	colour_entry(entry_node *entry);
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level);
 void	print_entries(vd_node *dir_node, entry_node *selected, int level);
-void	display_subdirectory(entry_node *selected, char *path);
+void	display_subdirectory(vd_node *dir_node, entry_node *selected, char *path);
 void	display_parent(vd_node *dir_node, vd_node *parent);
 void	preview_text(entry_node *file, int start_line);
 void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent, int preview_start);

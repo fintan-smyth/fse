@@ -1,3 +1,4 @@
+#include "headers/structs.h"
 #include "headers/utils.h"
 #include "headers/format.h"
 #include "headers/env.h"
@@ -198,7 +199,7 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 	}
 }
 
-void	display_subdirectory(entry_node *dir_entry, char *cwd_path)
+void	display_subdirectory(vd_node *dir_node, entry_node *dir_entry, char *cwd_path)
 // Prints a formatted list of the entries in a subdirectory of the cwd.
 // Args:
 //  - dir_entry:	pointer to entry node of the subdirectory
@@ -211,6 +212,7 @@ void	display_subdirectory(entry_node *dir_entry, char *cwd_path)
 		cwd_path = strcat(cwd_path, "/");
 	cwd_path = strcat(cwd_path, dir_entry->data->d_name);
 	subdir_node = get_vd_node(VISITED_DIRS, cwd_path);
+	insert_child_vd(dir_node->children, subdir_node);
 	get_directory(subdir_node);
 	if (subdir_node->directory == NULL)
 	{
@@ -218,7 +220,7 @@ void	display_subdirectory(entry_node *dir_entry, char *cwd_path)
 	}
 	selected_sub = get_selected(subdir_node);
 	print_entries(subdir_node, selected_sub, 1);
-	cleanup_directory(subdir_node);
+	// cleanup_directory(subdir_node);
 }
 
 void	display_parent(vd_node *dir_node, vd_node *parent)
@@ -352,7 +354,7 @@ void	print_gutter(vd_node *dir_node, entry_node *selected)
 	print_entry_no(dir_node, selected);
 }
 
-void	preview_entry(entry_node *selected, char *cwd_name, int preview_offset)
+void	preview_entry(vd_node *dir_node, entry_node *selected, char *cwd_name, int preview_offset)
 // Previews the selected entry with the appropriate function.
 // Args:
 //  - selected:			pointer to node of selected entry
@@ -361,7 +363,7 @@ void	preview_entry(entry_node *selected, char *cwd_name, int preview_offset)
 {
 	clear_sub_box();
 	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
-		display_subdirectory(selected, cwd_name);
+		display_subdirectory(dir_node, selected, cwd_name);
 	else if (selected->data->d_type == DT_REG)
 	{
 		if (selected->lines == 0)
@@ -405,5 +407,5 @@ void	display_directory(vd_node *dir_node, entry_node *selected, vd_node *parent,
 	print_gutter(dir_node, selected);
 	if (selected == NULL)
 		return ;
-	preview_entry(selected, cwd_name, preview_offset);
+	preview_entry(dir_node, selected, cwd_name, preview_offset);
 }

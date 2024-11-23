@@ -1,6 +1,36 @@
 #include "headers/utils.h"
+#include "headers/structs.h"
 #include <stdio.h>
 #include <sys/stat.h>
+
+gen_node *init_gen_list(void)
+// Initialises a generic linked list.
+// Returns:
+//  - Pointer to head of generic list
+{
+	gen_node	*head;
+	gen_node	*tail;
+
+	head = (gen_node *)malloc(sizeof(*head));
+	tail = (gen_node *)malloc(sizeof(*tail));
+	head->next = tail;
+	tail->next = tail;
+	head->data = NULL;
+	tail->data = NULL;
+	return (head);
+}
+
+void	delete_next_gen(gen_node *t)
+// Deletes the next node from a given generic list.
+// Does NOT handle cleanup of data, which must be done by caller
+// Args:
+//  - t:	pointer to node before the node to be deleted
+{
+	gen_node	*temp;
+	temp = t->next;
+	t->next = t->next->next;
+	free(temp);
+}
 
 int	str_printable(char *s)
 // Checks if a string contains only printable characters.

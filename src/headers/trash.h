@@ -27,6 +27,6 @@ void	load_trash_file(void);
 int		check_trash_nodes_valid(trash_node *trash_list);
 int	check_unindexed_trash(trash_node *trash_list);
 void	number_trash_nodes(trash_node *head);
-void	navigate_trash(trash_node *head);
+int		navigate_trash(vd_node *dir_node, trash_node *head);
 
 #endif // !TRASH_H_

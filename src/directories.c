@@ -19,10 +19,12 @@ struct vd_node	*init_visited(void)
 	head->directory = NULL;
 	head->dir_name = NULL;
 	head->selected_name = NULL;
+	head->children = NULL;
 	tail->next = tail;
 	tail->directory = NULL;
 	tail->dir_name = NULL;
 	tail->selected_name = NULL;
+	tail->children = NULL;
 	return (head);
 }
 
@@ -45,7 +47,44 @@ vd_node	*vd_insert(vd_node *visited, char *dir_path)
 	memset(new->selected_name, 0, 1 * sizeof(char));
 	new->offset = 0;
 	new->no_entries = 0;
+	new->children = init_gen_list();
 	return (new);
+}
+
+gen_node	*insert_child_vd(gen_node *children, vd_node *child)
+{
+	gen_node *new;
+
+	new = malloc(sizeof(*new));
+	new->data = child;
+	new->next = children->next;
+	children->next = new;
+	return (new);
+}
+
+
+void	cleanup_vd_children(vd_node *dir_node)
+{
+	gen_node *temp;
+
+	if (dir_node->children == NULL)
+		return ;
+	temp = dir_node->children;
+	while (temp->next != temp->next->next)
+	{
+		cleanup_directory(temp->next->data);
+		delete_next_gen(temp);
+	}
+}
+
+void	delete_children_list(vd_node *dir_node)
+{
+	if (dir_node->children == NULL)
+		return ;
+	cleanup_vd_children(dir_node);
+	free(dir_node->children->next);
+	free(dir_node->children);
+	dir_node->children = NULL;
 }
 
 int	check_visited(vd_node *visited, char *dir_path)
@@ -82,6 +121,7 @@ void	cleanup_directory(vd_node *dir_node)
 	free(dir_node->directory);
 	memset(dir_node->search_term, 0, 255);
 	dir_node->directory = NULL;
+	cleanup_vd_children(dir_node);
 }
 
 struct directory	*get_directory(vd_node *dir_node)
@@ -102,7 +142,9 @@ struct directory	*get_directory(vd_node *dir_node)
 	int					left = 0;
 
 	if (dir_node->directory != NULL)
+	{
 		return (NULL);
+	}
 	dir_node->no_entries = 0;
 	directory = malloc(sizeof(*directory));
 	head = init_list();
@@ -175,6 +217,7 @@ void	free_visited(vd_node *head)
 	{
 		free(current->dir_name);
 		free(current->selected_name);
+		delete_children_list(current);
 		current = current->next;
 	}
 	current = head;
