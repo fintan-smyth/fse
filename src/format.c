@@ -326,7 +326,7 @@ void	print_header(entry_node *selected, char *cwd_name)
 //  - cwd_name:			string containing the path of cwd
 {
 	clear_header();
-	printf("\e[1;3H[ \e[33;1m%.*s", env.TERM_COLS - 6, cwd_name);
+	printf("\e[1;3H[ \e[31;1m%.*s", env.TERM_COLS - 6, cwd_name);
 	if (my_strlen(cwd_name) != 1)
 		printf("/");
 	if (selected != NULL)
