@@ -2,6 +2,7 @@
 #include "headers/utils.h"
 #include "headers/format.h"
 #include "headers/env.h"
+#include <string.h>
 
 int	colour_extension(char *filename)
 {
@@ -228,7 +229,8 @@ void	display_subdirectory(vd_node *dir_node, entry_node *dir_entry, char *cwd_pa
 		cwd_path = strcat(cwd_path, "/");
 	cwd_path = strcat(cwd_path, dir_entry->data->d_name);
 	subdir_node = get_vd_node(VISITED_DIRS, cwd_path);
-	insert_child_vd(dir_node->children, subdir_node);
+	if (!check_child_inserted(dir_node, subdir_node))
+		insert_child_vd(dir_node->children, subdir_node);
 	get_directory(subdir_node);
 	if (subdir_node->directory == NULL)
 	{
@@ -253,6 +255,8 @@ void	display_parent(vd_node *dir_node, vd_node *parent)
 		return ;
 	}
 	get_directory(parent);
+	free(parent->selected_name);
+	parent->selected_name = get_file_name(dir_node->dir_name);
 	selected = get_selected(parent);
 	print_entries(parent, selected, -1);
 	// cleanup_directory(parent);
