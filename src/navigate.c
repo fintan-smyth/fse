@@ -542,7 +542,6 @@ int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 			{
 				free(dir_node->selected_name);
 				dir_node->selected_name = strdup("");
-
 			}
 			else
 			{
@@ -672,7 +671,7 @@ int	navigate(vd_node *dir_node)
 		{
 			if (strcmp(dir_node->dir_name, "/") == 0)
 				continue;
-			chdir("..");
+			chdir(parent->dir_name);
 			cleanup_directory(dir_node);
 			return (0);
 		}
@@ -746,6 +745,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == binds.TOGGLE_PARENT)
 		{
 			toggle_preview();
+			set_winsize();
 			draw_box();
 			// cleanup_directory(dir_node);
 			// return (0);
@@ -878,6 +878,8 @@ int	navigate(vd_node *dir_node)
 		{
 			if (delete_selected(dir_node, &selected, buf) == 1)
 			{
+				if (dir_node->offset + (env.TERM_ROWS - 4) >= dir_node->no_entries && dir_node->offset > 0)
+					dir_node->offset--;
 				cleanup_directory(dir_node);
 				return (0);
 			}
