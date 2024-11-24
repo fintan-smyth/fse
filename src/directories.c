@@ -103,6 +103,34 @@ void	delete_children_list(vd_node *dir_node)
 	dir_node->children = NULL;
 }
 
+int	count_children(vd_node *dir_node)
+{
+	gen_node	*current;
+	int			i = 0;
+
+	current = dir_node->children->next;
+	while (current != current->next)
+	{
+		current = current->next;
+		i++;
+	}
+	return (i);
+}
+
+int	check_child_inserted(vd_node *dir_node, vd_node *child)
+{
+	gen_node *current;
+
+	current = dir_node->children->next;
+	while (current != current->next)
+	{
+		if (current->data == child)
+			return (1);
+		current = current->next;
+	}
+	return (0);
+}
+
 int	check_visited(vd_node *visited, char *dir_path)
 // Checks if a directory has already been visited
 // Args:
@@ -284,3 +312,15 @@ vd_node	*get_parent(vd_node *dir_node)
 	return (parent);
 }
 
+void	print_vd_nodes(vd_node *head)
+{
+	vd_node	*current;
+
+	printf("\e[2J\e[H");
+	current = head->next;
+	while (current != current->next)
+	{
+		printf("%s\n", current->dir_name);
+		current = current->next;
+	}
+}
