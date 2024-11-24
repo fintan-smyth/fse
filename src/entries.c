@@ -336,9 +336,9 @@ entry_node	*get_selected(vd_node *dir_node)
 		return (NULL);
 	// if (children->next == children->next->next)
 	// return (NULL);
-	selected = dir_node->entry_array[0];
 	if (*(dir_node->selected_name) != 0)
 	{
+		selected = dir_node->directory->children->next;
 		while (strncmp(dir_node->selected_name, selected->data->d_name, strlen(dir_node->selected_name)) || strncmp(dir_node->selected_name, selected->data->d_name, strlen(selected->data->d_name)))
 		{
 			selected = selected->next;
@@ -349,6 +349,8 @@ entry_node	*get_selected(vd_node *dir_node)
 			}
 		}
 	}
+	else
+		selected = dir_node->entry_array[0];
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup(selected->data->d_name);
 	return (selected);
@@ -362,23 +364,22 @@ entry_node	*get_search_match(vd_node *dir_node)
 //  - pointer to first entry node matching search term
 //  - NULL if no entry matches search term
 {
-	entry_node	*children;
 	entry_node	*current;
+	int			i = 0;
 
-	children = dir_node->directory->children;
-	current = children->next;
-	if (children->next == children->next->next)
+	if (dir_node->no_entries == 0)
 		return (NULL);
+	current = dir_node->entry_array[0];
 	if (*(dir_node->search_term) != 0)
 	{
 		while (strcasestr(current->data->d_name, dir_node->search_term) == NULL)
 		{
-			current = current->next;
-			if (current == current->next)
-			{
+			if (++i == dir_node->no_entries)
 				return (NULL);
-			}
+			current = dir_node->entry_array[i];
 		}
+		if (i == dir_node->no_entries)
+			return (NULL);
 		free(dir_node->selected_name);
 		dir_node->selected_name = strdup(current->data->d_name);
 		return (current);

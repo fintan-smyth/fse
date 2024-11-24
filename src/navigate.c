@@ -235,7 +235,7 @@ void	select_prev(vd_node *dir_node, entry_node **selected, int cmd_count, int *p
 //  - cmd_count			the number of entries to move selection down by
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
-	int			i = 0;
+	int	i;
 
 	if (cmd_count == 0)
 		cmd_count = 1;
@@ -262,19 +262,26 @@ void	select_next_search_result(vd_node *dir_node, entry_node **selected, int *pr
 //  - selected:			address of pointer to selected entry
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
-	entry_node	*children = dir_node->directory->children;
+	int			i = (*selected)->pos;
+	entry_node	*current;
 
+	if (i >= dir_node->no_entries)
+		return ;
 	if (*dir_node->search_term != 0)
 	{
 		*preview_offset = 0;
-		do {
-			*selected = (*selected)->next;
-			if (*selected == (*selected)->next)
-				*selected = children->next;
-			free(dir_node->selected_name);
-			dir_node->selected_name = strdup((*selected)->data->d_name);
+		while (i < dir_node->no_entries)
+		{
+ 			current = dir_node->entry_array[i];
+			if (strcasestr(current->data->d_name, dir_node->search_term) != NULL)
+			{
+				*selected = current;
+				free(dir_node->selected_name);
+				dir_node->selected_name = strdup(current->data->d_name);
+				return ;
+			}
+			i++;
 		}
-		while (strcasestr((*selected)->data->d_name, dir_node->search_term) == NULL);
 	}
 }
 
@@ -285,20 +292,26 @@ void	select_prev_search_result(vd_node *dir_node, entry_node **selected, int *pr
 //  - selected:			address of pointer to selected entry
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
+	int			i = (*selected)->pos - 2;
+	entry_node	*current;
+
+	if (i < 0)
+		return ;
 	if (*dir_node->search_term != 0)
 	{
 		*preview_offset = 0;
-		do {
-			*selected = (*selected)->prev;
-			if (*selected == (*selected)->prev)
+		while (i >= 0)
+		{
+ 			current = dir_node->entry_array[i];
+			if (strcasestr(current->data->d_name, dir_node->search_term) != NULL)
 			{
-				while ((*selected)->next != (*selected)->next->next)
-					*selected = (*selected)->next;
+				*selected = current;
+				free(dir_node->selected_name);
+				dir_node->selected_name = strdup(current->data->d_name);
+				return ;
 			}
-			free(dir_node->selected_name); 
-			dir_node->selected_name = strdup((*selected)->data->d_name);
+			i--;
 		}
-		while (strcasestr((*selected)->data->d_name, dir_node->search_term) == NULL);
 	}
 }
 
@@ -361,12 +374,13 @@ void	yank_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char 
 //  - buf:		char array used to construct absolute path of file
 {
 	int	i = 0;
+	int	start_index = selected->pos - 1;
 
 	if (cmd_count == 0)
 		cmd_count = 1;
-	while (i < cmd_count && selected != selected->next)
+	while (i < cmd_count && start_index + i < dir_node->no_entries)
 	{
-		construct_path(buf, dir_node->dir_name, selected->data->d_name);
+		construct_path(buf, dir_node->dir_name, dir_node->entry_array[start_index + i]->data->d_name);
 		if (check_path(copied, buf) == 0)
 		{
 			insert_path_node(buf, copied);
@@ -377,7 +391,7 @@ void	yank_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char 
 			delete_path(buf, copied);
 			clear_main_box();
 		}
-		selected = selected->next;
+		// selected = selected->next;
 		i++;
 	}
 }
@@ -390,12 +404,13 @@ void	cut_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char *
 //  - buf:		char array used to construct absolute path of file
 {
 	int	i = 0;
+	int	start_index = selected->pos - 1;
 
 	if (cmd_count == 0)
 		cmd_count = 1;
-	while (i < cmd_count && selected != selected->next)
+	while (i < cmd_count && start_index + i < dir_node->no_entries)
 	{
-		construct_path(buf, dir_node->dir_name, selected->data->d_name);
+		construct_path(buf, dir_node->dir_name, dir_node->entry_array[start_index + i]->data->d_name);
 		if (check_path(cut, buf) == 0)
 		{
 			insert_path_node(buf, cut);
@@ -459,6 +474,7 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 	{
 		sprintf(env.gutter_pushback, "\e[33mNo match found\e[m");
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
+		memset(dir_node->search_term, 0, 100);
 		return (1);
 	}
 	*selected = *search_result;
@@ -554,6 +570,8 @@ int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf, int *pr
 		}
 		else
 			select_next(dir_node, selected, 1, preview_offset);
+		// printf("\e[2J\e[H%s\n", dir_node->selected_name);
+		// exit(0);
 	}
 	return (out);
 }
@@ -680,7 +698,9 @@ int	navigate(vd_node *dir_node)
 		// 	// printf("\e[1m%s:\t", dir_node->dir_name);
 		// 	// format_filesize(space);
 		// 	// printf("<vd_node: %ld>\n<entry_node: %ld>\n<gen_node: %ld>\n<dirent: %ld>\n<stat: %ld>", sizeof(vd_node), sizeof(entry_node), sizeof(gen_node), sizeof(struct dirent), sizeof(struct stat));
-		// 	printf("type: %d", selected->data->d_type);
+		// 	printf("children: %d\n", count_children(dir_node));
+		// 	cleanup_directory(dir_node);
+		// 	printf("children: %d\n", count_children(dir_node));
 		// 	printf("\n");
 		// 	exit(0);
 		// }
@@ -695,6 +715,7 @@ int	navigate(vd_node *dir_node)
 		{
 			if (navigate_bookmarks(dir_node, bookmarks) == 1)
 			{
+				cleanup_directory(parent);
 				cleanup_directory(dir_node);
 				return (0);
 			}
@@ -713,6 +734,7 @@ int	navigate(vd_node *dir_node)
 		{
 			char *home = getenv("HOME");
 			chdir(home);
+			cleanup_directory(parent);
 			cleanup_directory(dir_node);
 			return (0);
 		}
