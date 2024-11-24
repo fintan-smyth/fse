@@ -207,17 +207,22 @@ void	select_next(vd_node *dir_node, entry_node **selected, int cmd_count, int *p
 //  - cmd_count			the number of entries to move selection down by
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
-	int			i = 0;
+	int			i;
 
 	if (cmd_count == 0)
 		cmd_count = 1;
 	clear_gutter();
 	*preview_offset = 0;
-	while (i < cmd_count && (*selected)->next != (*selected)->next->next)
-	{
-		(*selected) = (*selected)->next;
-		i++;
-	}
+	// while (i < cmd_count && (*selected)->next != (*selected)->next->next)
+	// {
+	// 	(*selected) = (*selected)->next;
+	// 	i++;
+	// }
+	if ((*selected)->pos + cmd_count > dir_node->no_entries)
+		i = dir_node->no_entries - 1;
+	else
+		i = (*selected)->pos + cmd_count - 1;
+	(*selected) = dir_node->entry_array[i];
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
@@ -236,11 +241,16 @@ void	select_prev(vd_node *dir_node, entry_node **selected, int cmd_count, int *p
 		cmd_count = 1;
 	clear_gutter();
 	*preview_offset = 0;
-	while (i < cmd_count && (*selected)->prev != (*selected)->prev->prev)
-	{
-		(*selected) = (*selected)->prev;
-		i++;
-	}
+	// while (i < cmd_count && (*selected)->prev != (*selected)->prev->prev)
+	// {
+	// 	(*selected) = (*selected)->prev;
+	// 	i++;
+	// }
+	if ((*selected)->pos - cmd_count <= 0)
+		i = 0;
+	else
+		i = (*selected)->pos - cmd_count - 1;
+	(*selected) = dir_node->entry_array[i];
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
@@ -439,7 +449,7 @@ int	search_in_dir(vd_node *dir_node, entry_node **selected, entry_node **search_
 
 	reset_term_settings();
 	printf("\e[%d;3H[%*s]\e[4G \e[33msearch:\e[m ", env.TERM_ROWS, (env.TERM_COLS) - 6, "");
-	memset(dir_node->search_term, 0, 255);
+	memset(dir_node->search_term, 0, 100);
 	searchp = dir_node->search_term;
 	while ((c = getchar()) != '\n')
 		*searchp++ = c;
@@ -463,11 +473,9 @@ void	goto_first_entry(vd_node *dir_node, entry_node **selected, int *preview_off
 //  - selected:			address of pointer to selected entry
 //  - preview_offset	pointer to preview_offset variable in navigate()
 {
-	entry_node *children = dir_node->directory->children;
-
 	*preview_offset = 0;
 	clear_gutter();
-	*selected = children->next;
+	(*selected) = dir_node->entry_array[0];
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
@@ -480,13 +488,11 @@ void	goto_entry_no(vd_node *dir_node, entry_node **selected, int *preview_offset
 //  - preview_offset	pointer to preview_offset variable in navigate()
 //  - entry_no			position of the entry to select
 {
-	entry_node *children = dir_node->directory->children;
-
 	*preview_offset = 0;
 	clear_gutter();
-	*selected = children->next;
-	while (((*selected)->next != (*selected)->next->next) && entry_no != (*selected)->pos)
-		*selected = (*selected)->next;
+	if (entry_no > dir_node->no_entries)
+		entry_no = dir_node->no_entries;
+	*selected = dir_node->entry_array[entry_no - 1];
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
@@ -500,13 +506,12 @@ void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offs
 {
 	*preview_offset = 0;
 	clear_gutter();
-	while ((*selected)->next != (*selected)->next->next)
-		*selected = (*selected)->next;
+	(*selected) = dir_node->entry_array[dir_node->no_entries - 1];
 	free(dir_node->selected_name);
 	dir_node->selected_name = strdup((*selected)->data->d_name);
 }
 
-int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
+int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf, int *preview_offset)
 // Moves selected file or directory to trash.
 // Args:
 //  - dir_node:		pointer to current directory node
@@ -532,30 +537,23 @@ int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf)
 		if ((system(command_buf)) != 0)
 			return (out);
 		out = 1;
+		*preview_offset = 0;
 		insert_selected_trash(dir_node->dir_name, *selected, trash_list);
 		write_trash_file();
 		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->data->d_name);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
-		if ((*selected)->next == (*selected)->next->next)
+		if ((*selected)->pos == dir_node->no_entries)
 		{
-			if ((*selected)->prev == (*selected)->prev->prev)
+			if ((*selected)->pos == 1)
 			{
 				free(dir_node->selected_name);
 				dir_node->selected_name = strdup("");
 			}
 			else
-			{
-				(*selected) = (*selected)->prev;
-				free(dir_node->selected_name);
-				dir_node->selected_name = strdup((*selected)->data->d_name);
-			}
+				select_prev(dir_node, selected, 1, preview_offset);
 		}
 		else
-		{
-			(*selected) = (*selected)->next;
-			free(dir_node->selected_name);
-			dir_node->selected_name = strdup((*selected)->data->d_name);
-		}
+			select_next(dir_node, selected, 1, preview_offset);
 	}
 	return (out);
 }
@@ -793,13 +791,13 @@ int	navigate(vd_node *dir_node)
 			continue;
 		else if (c == binds.SELECT_NEXT)
 		{
-			if (selected->next == selected->next->next)
+			if (selected->pos == dir_node->no_entries)
 				continue ;
 			select_next(dir_node, &selected, cmd_count, &preview_offset);
 		}
 		else if (c == binds.SELECT_PREV)
 		{
-			if (selected->prev == selected->prev->prev)
+			if (selected->pos == 1)
 				continue ;
 			select_prev(dir_node, &selected, cmd_count, &preview_offset);
 		}
@@ -876,7 +874,7 @@ int	navigate(vd_node *dir_node)
 		}
 		else if (c == binds.DELETE)
 		{
-			if (delete_selected(dir_node, &selected, buf) == 1)
+			if (delete_selected(dir_node, &selected, buf, &preview_offset) == 1)
 			{
 				if (dir_node->offset + (env.TERM_ROWS - 4) >= dir_node->no_entries && dir_node->offset > 0)
 					dir_node->offset--;

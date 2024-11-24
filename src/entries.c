@@ -196,7 +196,7 @@ void	swap_entries(entry_node **entry_array, int i, int j)
 
 	if (i == j)
 		return ;
-	swap_nodes(entry_array[i], entry_array[j]);
+	// swap_nodes(entry_array[i], entry_array[j]);
 	temp = entry_array[i];
 	entry_array[i] = entry_array[j];
 	entry_array[j] = temp;
@@ -292,6 +292,17 @@ int	number_list(entry_node *head)
 	return (i);
 }
 
+void number_entry_array(entry_node **entry_array, int no_entries)
+{
+	int	i = 0;
+
+	while (i < no_entries)
+	{
+		entry_array[i]->pos = i + 1;
+		i++;
+	}
+}
+
 void	populate_entry_array(entry_node **entry_array, entry_node *first)
 // Populates the array used for sorting an entry list.
 // Args:
@@ -321,9 +332,11 @@ entry_node	*get_selected(vd_node *dir_node)
 	entry_node	*selected;
 
 	children = dir_node->directory->children;
-	selected = children->next;
-	if (children->next == children->next->next)
+	if (dir_node->no_entries == 0)
 		return (NULL);
+	// if (children->next == children->next->next)
+	// return (NULL);
+	selected = dir_node->entry_array[0];
 	if (*(dir_node->selected_name) != 0)
 	{
 		while (strncmp(dir_node->selected_name, selected->data->d_name, strlen(dir_node->selected_name)) || strncmp(dir_node->selected_name, selected->data->d_name, strlen(selected->data->d_name)))

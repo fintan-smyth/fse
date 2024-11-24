@@ -36,12 +36,13 @@ typedef struct vd_node
 {
 	struct vd_node		*next;
 	struct directory	*directory;
+	struct entry_node	**entry_array;
 	struct gen_node		*children;
 	int					offset;
 	int					no_entries;
 	char				*dir_name;
 	char				*selected_name;
-	char				search_term[255];
+	char				search_term[100];
 } vd_node;
 
 extern vd_node *VISITED_DIRS;
@@ -60,6 +61,7 @@ void		swap_entries(entry_node **entry_array, int i, int j);
 void		populate_entry_array(entry_node **entry_array, entry_node *first);
 void		q_sort(entry_node **entry_array, int left, int right);
 int			number_list(entry_node *head);
+void 		number_entry_array(entry_node **entry_array, int no_entries);
 int			comp_entries(entry_node *a, entry_node *b);
 
 struct directory *get_directory(vd_node *dir_node);

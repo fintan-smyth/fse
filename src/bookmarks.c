@@ -342,6 +342,10 @@ int	navigate_bookmarks(vd_node *dir_node, bookmark_node *head)
 		}
 		else if (c == binds.OPEN || c == '\n')
 		{
+			// printf("\e[2J\e[H");
+			// printf("dir_name: %s\n", dir_node->dir_name);
+			// printf("path: %s\n", selected->path);
+			// exit(0);
 			if (strcmp(dir_node->dir_name, selected->path) == 0)
 				return (0);
 			chdir(selected->path);

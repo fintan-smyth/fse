@@ -268,9 +268,14 @@ int	check_trash_nodes_valid(trash_node *trash_list)
 		env.FLAGS ^= F_HIDDEN;
 	cleanup_directory(trash_dir);
 	get_directory(trash_dir);
- 	entry = trash_dir->directory->children->next->next->next;
+ 	entry = trash_dir->directory->children->next;
  	while (entry != entry->next)
  	{
+		if (strcmp(entry->data->d_name, ".") == 0 || strcmp(entry->data->d_name, "..") == 0)
+		{
+			entry = entry->next;
+			continue;
+		}
  		current = trash_list->next;
 		while (current != current->next)
 		{

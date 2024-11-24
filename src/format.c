@@ -153,6 +153,7 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 	entry_node			*current;
 	int					offset;
 	int 				max = env.TERM_ROWS - 4;
+	int					i = 0;
 
 	head = dir_node->directory->children;
 	if (head->next == head->next->next)
@@ -194,14 +195,23 @@ void	print_entries(vd_node *dir_node, entry_node *selected, int level)
 		offset = selected->pos - 1;
 	}
 	dir_node->offset = offset;
-	while (current->pos != (offset + 1))
-		current = current->next;
+	// while (current->pos != (offset + 1))
+	// 	current = current->next;
+	i = offset;
 	printf("\e[3;1H");
-	while ((current != current->next) && current->pos <= max + offset)
+	// while ((current != current->next) && current->pos <= max + offset)
+	// {
+	// 	format_entry(dir_node, current, selected, level);
+	// 	printf("\n\e[m");
+	// 	current = current->next;
+	// }
+	current = dir_node->entry_array[i];
+	while (i < dir_node->no_entries && dir_node->entry_array[i]->pos <= max + offset)
 	{
+		current = dir_node->entry_array[i];
 		format_entry(dir_node, current, selected, level);
 		printf("\n\e[m");
-		current = current->next;
+		i++;
 	}
 }
 
