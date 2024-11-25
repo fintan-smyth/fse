@@ -35,9 +35,9 @@ void	open_selected_in_editor(entry_node *selected, char *buf)
 
 	reset_term_settings();
 	if (editor == NULL)
-		sprintf(buf, "%s \"%s\"", "vim", selected->data->d_name);
+		sprintf(buf, "%s \"%s\"", "vim", selected->d_name);
 	else
-		sprintf(buf, "%s \"%s\"", editor, selected->data->d_name);
+		sprintf(buf, "%s \"%s\"", editor, selected->d_name);
 	system(buf);
 	set_term_settings();
 }
@@ -224,7 +224,7 @@ void	select_next(vd_node *dir_node, entry_node **selected, int cmd_count, int *p
 		i = (*selected)->pos + cmd_count - 1;
 	(*selected) = dir_node->entry_array[i];
 	free(dir_node->selected_name);
-	dir_node->selected_name = strdup((*selected)->data->d_name);
+	dir_node->selected_name = strdup((*selected)->d_name);
 }
 
 void	select_prev(vd_node *dir_node, entry_node **selected, int cmd_count, int *preview_offset)
@@ -252,7 +252,7 @@ void	select_prev(vd_node *dir_node, entry_node **selected, int cmd_count, int *p
 		i = (*selected)->pos - cmd_count - 1;
 	(*selected) = dir_node->entry_array[i];
 	free(dir_node->selected_name);
-	dir_node->selected_name = strdup((*selected)->data->d_name);
+	dir_node->selected_name = strdup((*selected)->d_name);
 }
 
 void	select_next_search_result(vd_node *dir_node, entry_node **selected, int *preview_offset)
@@ -273,11 +273,11 @@ void	select_next_search_result(vd_node *dir_node, entry_node **selected, int *pr
 		while (i < dir_node->no_entries)
 		{
  			current = dir_node->entry_array[i];
-			if (strcasestr(current->data->d_name, dir_node->search_term) != NULL)
+			if (strcasestr(current->d_name, dir_node->search_term) != NULL)
 			{
 				*selected = current;
 				free(dir_node->selected_name);
-				dir_node->selected_name = strdup(current->data->d_name);
+				dir_node->selected_name = strdup(current->d_name);
 				return ;
 			}
 			i++;
@@ -303,11 +303,11 @@ void	select_prev_search_result(vd_node *dir_node, entry_node **selected, int *pr
 		while (i >= 0)
 		{
  			current = dir_node->entry_array[i];
-			if (strcasestr(current->data->d_name, dir_node->search_term) != NULL)
+			if (strcasestr(current->d_name, dir_node->search_term) != NULL)
 			{
 				*selected = current;
 				free(dir_node->selected_name);
-				dir_node->selected_name = strdup(current->data->d_name);
+				dir_node->selected_name = strdup(current->d_name);
 				return ;
 			}
 			i--;
@@ -323,30 +323,30 @@ void	open_selected(entry_node *selected, char *buf)
 {
 	char	*pager = getenv("PAGER");
 
-	if (selected->data->d_type == DT_DIR)
+	if (selected->d_type == DT_DIR)
 	{
-		chdir(selected->data->d_name);
+		chdir(selected->d_name);
 		return ;
 	}
-	else if (selected->data->d_type == DT_LNK)
+	else if (selected->d_type == DT_LNK)
 	{
-		if (readlink(selected->data->d_name, buf, 500) != -1)
+		if (readlink(selected->d_name, buf, 500) != -1)
 		{
 			chdir(buf);
 			return ;
 		}
 	}
-	else if (selected->data->d_type == DT_REG)
+	else if (selected->d_type == DT_REG)
 	{
 		char	*ext_buf;
 
-		if ((ext_buf = get_extension(selected->data->d_name)) != NULL)
+		if ((ext_buf = get_extension(selected->d_name)) != NULL)
 	 	{
 			if (strcmp(ext_buf, "mp4") == 0
 					|| strcmp(ext_buf, "mkv") == 0
 				)
 			{
-				sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->data->d_name);
+				sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->d_name);
 				system(buf);
 				free(ext_buf);
 				return ;
@@ -354,11 +354,11 @@ void	open_selected(entry_node *selected, char *buf)
 			free(ext_buf);
 		}
 		if (pager == NULL)
-			sprintf(buf, "%s \"%s\"", "less", selected->data->d_name);
+			sprintf(buf, "%s \"%s\"", "less", selected->d_name);
 		else if (strncmp(pager, "bat", 3) == 0)
-			sprintf(buf, "%s \"%s\"", "bat --paging=always", selected->data->d_name);
+			sprintf(buf, "%s \"%s\"", "bat --paging=always", selected->d_name);
 		else
-			sprintf(buf, "%s \"%s\"", pager, selected->data->d_name);
+			sprintf(buf, "%s \"%s\"", pager, selected->d_name);
 		printf("\e[2J\e[H");
 		fflush(stdout);
 		system(buf);
@@ -380,7 +380,7 @@ void	yank_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char 
 		cmd_count = 1;
 	while (i < cmd_count && start_index + i < dir_node->no_entries)
 	{
-		construct_path(buf, dir_node->dir_name, dir_node->entry_array[start_index + i]->data->d_name);
+		construct_path(buf, dir_node->dir_name, dir_node->entry_array[start_index + i]->d_name);
 		if (check_path(copied, buf) == 0)
 		{
 			insert_path_node(buf, copied);
@@ -410,7 +410,7 @@ void	cut_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char *
 		cmd_count = 1;
 	while (i < cmd_count && start_index + i < dir_node->no_entries)
 	{
-		construct_path(buf, dir_node->dir_name, dir_node->entry_array[start_index + i]->data->d_name);
+		construct_path(buf, dir_node->dir_name, dir_node->entry_array[start_index + i]->d_name);
 		if (check_path(cut, buf) == 0)
 		{
 			insert_path_node(buf, cut);
@@ -433,13 +433,13 @@ int	run_executable(entry_node *selected, char *buf)
 //  - buf:		char array used to construct shell command
 {
 	int	out = 0;
-	if (selected->data->d_type == DT_REG && (selected->attr->st_mode & S_IXUSR))
+	if (selected->d_type == DT_REG && (selected->attr->st_mode & S_IXUSR))
 	{
 		out = 1;
 		reset_term_settings();
 		printf("\e[2J\e[H");
 		fflush(stdout);
-		sprintf(buf, "./\"%s\"", selected->data->d_name);
+		sprintf(buf, "./\"%s\"", selected->d_name);
 		system(buf);
 		set_term_settings();
 		printf("Press any key to continue...");
@@ -493,7 +493,7 @@ void	goto_first_entry(vd_node *dir_node, entry_node **selected, int *preview_off
 	clear_gutter();
 	(*selected) = dir_node->entry_array[0];
 	free(dir_node->selected_name);
-	dir_node->selected_name = strdup((*selected)->data->d_name);
+	dir_node->selected_name = strdup((*selected)->d_name);
 }
 
 void	goto_entry_no(vd_node *dir_node, entry_node **selected, int *preview_offset, int entry_no)
@@ -510,7 +510,7 @@ void	goto_entry_no(vd_node *dir_node, entry_node **selected, int *preview_offset
 		entry_no = dir_node->no_entries;
 	*selected = dir_node->entry_array[entry_no - 1];
 	free(dir_node->selected_name);
-	dir_node->selected_name = strdup((*selected)->data->d_name);
+	dir_node->selected_name = strdup((*selected)->d_name);
 }
 
 void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offset)
@@ -524,7 +524,7 @@ void	goto_last_entry(vd_node *dir_node, entry_node **selected, int *preview_offs
 	clear_gutter();
 	(*selected) = dir_node->entry_array[dir_node->no_entries - 1];
 	free(dir_node->selected_name);
-	dir_node->selected_name = strdup((*selected)->data->d_name);
+	dir_node->selected_name = strdup((*selected)->d_name);
 }
 
 int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf, int *preview_offset)
@@ -543,20 +543,20 @@ int	delete_selected(vd_node *dir_node, entry_node **selected, char *buf, int *pr
 	memcpy(buf, dir_node->dir_name, len);
 	if (strncmp(buf, "/", strlen(buf)))
 		strcat(buf, "/");
-	strcat(buf, (*selected)->data->d_name);
+	strcat(buf, (*selected)->d_name);
 	clear_gutter();
 	printf("\e[%d;3H[ \e[1;33mdelete selected file? [y/N] : \e[m%.*s ]",
-		env.TERM_ROWS, env.TERM_COLS - 38, (*selected)->data->d_name);
+		env.TERM_ROWS, env.TERM_COLS - 38, (*selected)->d_name);
 	if ((c = getchar()) == 'y')
 	{
-		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/.trash/%s_%d\"", buf, home, (*selected)->data->d_name, (int) (*selected)->attr->st_ctime);
+		sprintf(command_buf, "mv \"%s\" \"%s/.local/share/fse/.trash/%s_%d\"", buf, home, (*selected)->d_name, (int) (*selected)->attr->st_ctime);
 		if ((system(command_buf)) != 0)
 			return (out);
 		out = 1;
 		*preview_offset = 0;
 		insert_selected_trash(dir_node->dir_name, *selected, trash_list);
 		write_trash_file();
-		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->data->d_name);
+		sprintf(env.gutter_pushback, "\e[33mMoved entry to trash:\e[m %s", (*selected)->d_name);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		if ((*selected)->pos == dir_node->no_entries)
 		{
@@ -605,11 +605,11 @@ int	rename_file(vd_node *dir_node, entry_node *selected, char *buf)
 			return (out);
 	}
 	set_term_settings();
-	sprintf(command_buf, "mv \"%s\" \"%s\"", selected->data->d_name, buf);
+	sprintf(command_buf, "mv \"%s\" \"%s\"", selected->d_name, buf);
 	if (system(command_buf) == 0)
 	{
 		out = 1;
-		sprintf(env.gutter_pushback, "\e[33mRenamed file:\e[m %s -> %s",  selected->data->d_name, buf);
+		sprintf(env.gutter_pushback, "\e[33mRenamed file:\e[m %s -> %s",  selected->d_name, buf);
 		env.FLAGS ^= F_GUTTER_PUSHBACK;
 		free(dir_node->selected_name);
 		dir_node->selected_name = strdup(buf);
@@ -830,7 +830,7 @@ int	navigate(vd_node *dir_node)
 		else if (c == binds.OPEN || c == '\n')
 		{
 			open_selected(selected, buf);
-			if (selected->data->d_type != DT_REG)
+			if (selected->d_type != DT_REG)
 			{
 				// cleanup_directory(dir_node);
 				cleanup_vd_children(dir_node);

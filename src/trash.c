@@ -102,11 +102,11 @@ trash_node *insert_selected_trash(char *old_location, entry_node *selected, tras
 	if (old_location != NULL)
 	{
 		char		buf[500];
-		sprintf(buf, "%s_%d", selected->data->d_name, (int) selected->attr->st_ctime);
-		new = insert_trash_node(buf, selected->data->d_name, old_location, selected->data->d_type, selected->attr->st_mode & S_IXUSR, head);
+		sprintf(buf, "%s_%d", selected->d_name, (int) selected->attr->st_ctime);
+		new = insert_trash_node(buf, selected->d_name, old_location, selected->d_type, selected->attr->st_mode & S_IXUSR, head);
 		return (new);
 	}
-	new = insert_trash_node(selected->data->d_name, selected->data->d_name, old_location, selected->data->d_type, selected->attr->st_mode & S_IXUSR, head);
+	new = insert_trash_node(selected->d_name, selected->d_name, old_location, selected->d_type, selected->attr->st_mode & S_IXUSR, head);
 	return (new);
 }
 
@@ -228,7 +228,7 @@ int	check_trash_nodes_valid(trash_node *trash_list)
 		entry = trash_dir->directory->children->next;
 		while (entry != entry->next)
 		{
-			if (strcmp(current->next->name, entry->data->d_name) == 0)
+			if (strcmp(current->next->name, entry->d_name) == 0)
 				break ;
 			entry = entry->next;
 		}
@@ -271,7 +271,7 @@ int	check_trash_nodes_valid(trash_node *trash_list)
  	entry = trash_dir->directory->children->next;
  	while (entry != entry->next)
  	{
-		if (strcmp(entry->data->d_name, ".") == 0 || strcmp(entry->data->d_name, "..") == 0)
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 		{
 			entry = entry->next;
 			continue;
@@ -279,7 +279,7 @@ int	check_trash_nodes_valid(trash_node *trash_list)
  		current = trash_list->next;
 		while (current != current->next)
 		{
-			if (strcmp(current->name, entry->data->d_name) == 0)
+			if (strcmp(current->name, entry->d_name) == 0)
 				break ;
 			current = current->next;
 		}

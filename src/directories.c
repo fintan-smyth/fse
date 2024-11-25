@@ -210,9 +210,9 @@ struct directory	*get_directory(vd_node *dir_node)
 	current = head;
 	while (current->next != current->next->next)
 	{
-		// if (current->next->data->d_type < 4 || current->next->data->d_type > 10)
+		// if (current->next->d_type < 4 || current->next->d_type > 10)
 		// 	delete_next_entry(current);
-		if (strncmp(current->next->data->d_name, ".", 1) == 0)
+		if (strncmp(current->next->d_name, ".", 1) == 0)
 		{
 			if ((env.FLAGS & F_HIDDEN) == 0)
 			{
@@ -232,9 +232,9 @@ struct directory	*get_directory(vd_node *dir_node)
 		int i = 0;
 		while (i < dir_node->no_entries)
 		{
-			if (strcmp(entry_array[i]->data->d_name, ".") == 0)
+			if (strcmp(entry_array[i]->d_name, ".") == 0)
 				swap_entries(entry_array, i, 0);
-			else if (strcmp(entry_array[i]->data->d_name, "..") == 0)
+			else if (strcmp(entry_array[i]->d_name, "..") == 0)
 				swap_entries(entry_array, i, 1);
 			i++;
 		}

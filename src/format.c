@@ -54,7 +54,7 @@ void	colour_entry(entry_node *entry)
 //  - entry:	pointer to entry node of file
 {
 	printf("\e[m");
-	switch (entry->data->d_type) {
+	switch (entry->d_type) {
 		case DT_DIR:
 			printf("\e[1;34m");
 			break;
@@ -68,7 +68,7 @@ void	colour_entry(entry_node *entry)
 			printf("\e[1;33m");
 			break;
 		case DT_REG:
-			if (colour_extension(entry->data->d_name) == 1)
+			if (colour_extension(entry->d_name) == 1)
 				break;
 			else if (entry->attr == NULL)
 				break;
@@ -97,7 +97,7 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	int		box_width;
 	int		remaining_space;
 
-	construct_path(buf, dir_node->dir_name, current->data->d_name);
+	construct_path(buf, dir_node->dir_name, current->d_name);
 	switch (level) {
 		case 0:
 			offset = env.SEP_1 + 2;
@@ -125,19 +125,19 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 		else
 			printf("\e[1;7m");
 	}
-	printf("%.*s", box_width - 1, current->data->d_name);
-	remaining_space = box_width - my_strlen(current->data->d_name);
+	printf("%.*s", box_width - 1, current->d_name);
+	remaining_space = box_width - my_strlen(current->d_name);
 	if (remaining_space > 0)
-		printf("%*s", box_width - my_strlen(current->data->d_name), " ");
-	search_term_start = strcasestr(current->data->d_name, dir_node->search_term);
-	if (my_strlen(current->data->d_name) > box_width)
+		printf("%*s", box_width - my_strlen(current->d_name), " ");
+	search_term_start = strcasestr(current->d_name, dir_node->search_term);
+	if (my_strlen(current->d_name) > box_width)
 		printf("~");
 	if (check_path(copied, buf))
 		printf("\e[%dG\e[m\e[33m*\e[m", offset - 1);
 	if (check_path(cut, buf))
 		printf("\e[%dG\e[m\e[31m*\e[m", offset - 1);
 	if (search_term_start != NULL && *dir_node->search_term != 0)
-		printf("\e[%sm\e[%dG%.*s", current == selected ? "7;41" : "1;31", offset + (int)(search_term_start - current->data->d_name), my_strlen(dir_node->search_term), search_term_start);
+		printf("\e[%sm\e[%dG%.*s", current == selected ? "7;41" : "1;31", offset + (int)(search_term_start - current->d_name), my_strlen(dir_node->search_term), search_term_start);
 }
 
 void	print_entries(vd_node *dir_node, entry_node *selected, int level)
@@ -227,7 +227,7 @@ void	display_subdirectory(vd_node *dir_node, entry_node *dir_entry, char *cwd_pa
 
 	if (strncmp(cwd_path, "/", strlen(cwd_path)))
 		cwd_path = strcat(cwd_path, "/");
-	cwd_path = strcat(cwd_path, dir_entry->data->d_name);
+	cwd_path = strcat(cwd_path, dir_entry->d_name);
 	subdir_node = get_vd_node(VISITED_DIRS, cwd_path);
 	if (!check_child_inserted(dir_node, subdir_node))
 		insert_child_vd(dir_node->children, subdir_node);
@@ -275,7 +275,7 @@ void	preview_text(entry_node *file, int preview_offset)
 	int		to_skip = preview_offset;
 	FILE	*fp;
 
-	fp = fopen(file->data->d_name, "r");
+	fp = fopen(file->d_name, "r");
 	if (fp == NULL)
 	{
 		free(line);
@@ -346,7 +346,7 @@ void	print_header(entry_node *selected, char *cwd_name)
 	if (selected != NULL)
 	{
 		colour_entry(selected);
-		printf("%.*s", (env.TERM_COLS - 8 - my_strlen(cwd_name)), selected->data->d_name);
+		printf("%.*s", (env.TERM_COLS - 8 - my_strlen(cwd_name)), selected->d_name);
 	}
 	printf("\e[m ]");
 }
@@ -382,19 +382,19 @@ void	preview_entry(vd_node *dir_node, entry_node *selected, char *cwd_name, int 
 //  - preview_offset	number of lines to skip from start of text file preview
 {
 	clear_sub_box();
-	if (selected->data->d_type == DT_DIR || selected->data->d_type == DT_LNK)
+	if (selected->d_type == DT_DIR || selected->d_type == DT_LNK)
 		display_subdirectory(dir_node, selected, cwd_name);
-	else if (selected->data->d_type == DT_REG)
+	else if (selected->d_type == DT_REG)
 	{
 		if (selected->lines == 0)
 		{
-			if (is_binary(selected->data->d_name))
+			if (is_binary(selected->d_name))
 			{
 				selected->lines = -1;
 				printf("\e[3;%dH\e[7m%.*s\e[m\n", env.SEP_2 + 2, (env.TERM_COLS - env.SEP_2) - 2, "Cannot preview file");
 			}
 			else
-				selected->lines = count_lines(selected->data->d_name);
+				selected->lines = count_lines(selected->d_name);
 		}
 		if (selected->lines < 0)
 			printf("\e[3;%dH\e[7m%.*s\e[m\n", env.SEP_2 + 2, (env.TERM_COLS - env.SEP_2) - 2, "Cannot preview file");

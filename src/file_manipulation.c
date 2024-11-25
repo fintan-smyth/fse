@@ -194,7 +194,7 @@ int	check_path_exists(vd_node *dir_node, char *path)
 	file_name = get_file_name(path);
 	while (current != current->next)
 	{
-		if (strcmp(file_name, current->data->d_name) == 0)
+		if (strcmp(file_name, current->d_name) == 0)
 		{
 			free(file_name);
 			return (1);
@@ -218,7 +218,7 @@ int	check_file_exists(vd_node *dir_node, char *file_name)
 
 	while (current != current->next)
 	{
-		if (strcmp(file_name, current->data->d_name) == 0)
+		if (strcmp(file_name, current->d_name) == 0)
 			return (1);
 		current = current->next;
 	}
@@ -450,7 +450,7 @@ void	print_file_attributes(entry_node *entry)
 		return ;
 	if (entry->attr == NULL)
 		return ;
-	switch (entry->data->d_type) {
+	switch (entry->d_type) {
 		case (DT_LNK):
 			printf("\e[1;36ml");
 			break;
@@ -471,7 +471,7 @@ void	print_file_attributes(entry_node *entry)
 	printf("%s", (entry->attr->st_mode & S_IWOTH) ? "\e[31mw" : "\e[30m-");
 	printf("%s", (entry->attr->st_mode & S_IXOTH) ? "\e[32mx" : "\e[30m-");
 	printf(" \e[m");
-	(entry->data->d_type == DT_REG) ? format_filesize(entry->attr->st_size) : printf("\e[30m   -");
+	(entry->d_type == DT_REG) ? format_filesize(entry->attr->st_size) : printf("\e[30m   -");
 	user = user_from_uid(entry->attr->st_uid);
 	group = group_from_gid(entry->attr->st_gid);
 	printf(" \e[1;33m%s", user);
@@ -496,16 +496,16 @@ void	recursive_dir_size(vd_node *dir_node, size_t *total, char **buf)
 	current = dir_node->directory->children->next;
 	while (current != current->next)
 	{
-		if (current->data->d_type == DT_DIR)
+		if (current->d_type == DT_DIR)
 		{
-			if (strcmp(current->data->d_name, ".") != 0 && strcmp(current->data->d_name, "..") != 0)
+			if (strcmp(current->d_name, ".") != 0 && strcmp(current->d_name, "..") != 0)
 			{
-				construct_path(*buf, dir_node->dir_name, current->data->d_name);
+				construct_path(*buf, dir_node->dir_name, current->d_name);
 				child = get_vd_node(VISITED_DIRS, *buf);
 				recursive_dir_size(child, total, buf);
 			}
 		}
-		else if (current->data->d_type == DT_REG)
+		else if (current->d_type == DT_REG)
 		{
 			if (current->attr != NULL)
 				*total += current->attr->st_size;

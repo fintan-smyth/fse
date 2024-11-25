@@ -1,6 +1,7 @@
 #include "headers/structs.h"
 #include "headers/env.h"
 #include "headers/utils.h"
+#include <string.h>
 
 entry_node *init_list(void)
 // Initialises a doubly linked list of nodes containing information
@@ -14,12 +15,12 @@ entry_node *init_list(void)
 	head = (entry_node *)malloc(sizeof(*head));
 	tail = (entry_node *)malloc(sizeof(*tail));
 	head->next = tail;
-	head->data = NULL;
+	head->d_name = NULL;
 	head->attr = NULL;
 	head->pos = -5;
 	tail->next = tail;
 	tail->prev = head;
-	tail->data = NULL;
+	tail->d_name = NULL;
 	tail->attr = NULL;
 	head->prev = head;
 	return (head);
@@ -36,18 +37,18 @@ void	delete_next_entry(entry_node *t)
 	t->next->prev = t;
 	if (temp->attr != NULL)
 		free(temp->attr);
-	if (temp->data != NULL)
-		free(temp->data);
+	if (temp->d_name != NULL)
+		free(temp->d_name);
 	free(temp);
 }
 
-struct dirent	*copy_dirent(struct dirent *data)
+void	copy_dirent(entry_node *t, struct dirent *data)
 {
-	struct dirent *new = malloc(sizeof(*data));
+	// struct dirent *new = malloc(sizeof(*data));
 
-	new->d_type = data->d_type;
-	strcpy(new->d_name, data->d_name);
-	return (new);
+	t->d_type = data->d_type;
+	t->d_name = strdup(data->d_name);
+	// return (new);
 }
 
 entry_node *insertafter(char *dir_path, struct dirent *data, entry_node *t)
@@ -71,7 +72,7 @@ entry_node *insertafter(char *dir_path, struct dirent *data, entry_node *t)
 		return (NULL);
 	new = (entry_node *)malloc(sizeof(*new));
 	attr = malloc(sizeof(*attr));
-	new->data = copy_dirent(data);
+	copy_dirent(new, data);
 	construct_path(abs_path, dir_path, data->d_name);
 	if (stat(abs_path, attr) == -1)
 	{
@@ -211,7 +212,7 @@ int	comp_entries(entry_node *right, entry_node *left)
 //  - 1 if position of nodes should be swapped
 //  - 0 if position of nodes should not be swapped
 {
-	int	type_comp = left->data->d_type - right->data->d_type;
+	int	type_comp = left->d_type - right->d_type;
 	if (type_comp > 0)
 		return (1);
 	if (type_comp < 0)
@@ -242,7 +243,7 @@ int	comp_entries(entry_node *right, entry_node *left)
 				return (Apply_reverse(1));
 			break;
 		default:
-			if (strcasecmp(right->data->d_name, left->data->d_name) < 0)
+			if (strcasecmp(right->d_name, left->d_name) < 0)
 				return (Apply_reverse(1));
 			break;
 	}
@@ -339,7 +340,7 @@ entry_node	*get_selected(vd_node *dir_node)
 	if (*(dir_node->selected_name) != 0)
 	{
 		selected = dir_node->directory->children->next;
-		while (strncmp(dir_node->selected_name, selected->data->d_name, strlen(dir_node->selected_name)) || strncmp(dir_node->selected_name, selected->data->d_name, strlen(selected->data->d_name)))
+		while (strncmp(dir_node->selected_name, selected->d_name, strlen(dir_node->selected_name)) || strncmp(dir_node->selected_name, selected->d_name, strlen(selected->d_name)))
 		{
 			selected = selected->next;
 			if (selected == selected->next)
@@ -352,7 +353,7 @@ entry_node	*get_selected(vd_node *dir_node)
 	else
 		selected = dir_node->entry_array[0];
 	free(dir_node->selected_name);
-	dir_node->selected_name = strdup(selected->data->d_name);
+	dir_node->selected_name = strdup(selected->d_name);
 	return (selected);
 }
 
@@ -372,7 +373,7 @@ entry_node	*get_search_match(vd_node *dir_node)
 	current = dir_node->entry_array[0];
 	if (*(dir_node->search_term) != 0)
 	{
-		while (strcasestr(current->data->d_name, dir_node->search_term) == NULL)
+		while (strcasestr(current->d_name, dir_node->search_term) == NULL)
 		{
 			if (++i == dir_node->no_entries)
 				return (NULL);
@@ -381,7 +382,7 @@ entry_node	*get_search_match(vd_node *dir_node)
 		if (i == dir_node->no_entries)
 			return (NULL);
 		free(dir_node->selected_name);
-		dir_node->selected_name = strdup(current->data->d_name);
+		dir_node->selected_name = strdup(current->d_name);
 		return (current);
 	}
 	return (NULL);

@@ -8,9 +8,11 @@ typedef struct entry_node
 {
 	struct entry_node	*prev;
 	struct entry_node	*next;
-	struct dirent		*data;
+	// struct dirent		*data;
+	char				*d_name;
+	int					d_type;
 	struct stat			*attr;
-	int				pos;
+	int					pos;
 	int					lines;
 } entry_node;
 
