@@ -315,7 +315,7 @@ void	select_prev_search_result(vd_node *dir_node, entry_node **selected, int *pr
 	}
 }
 
-void	open_selected(entry_node *selected, char *buf)
+int	open_selected(entry_node *selected, char *buf)
 // Opens the selected entry in a different manner depending on its type.
 // Args:
 //  - selected:	pointer to selected entry node
@@ -325,33 +325,26 @@ void	open_selected(entry_node *selected, char *buf)
 
 	if (selected->d_type == DT_DIR)
 	{
-		chdir(selected->d_name);
-		return ;
+		if (chdir(selected->d_name) != 0)
+			return (0);
+		return (1);
 	}
 	else if (selected->d_type == DT_LNK)
 	{
 		if (readlink(selected->d_name, buf, 500) != -1)
 		{
-			chdir(buf);
-			return ;
+			if (chdir(buf) != 0)
+				return (0);
+			return (1);
 		}
 	}
 	else if (selected->d_type == DT_REG)
 	{
-		char	*ext_buf;
-
-		if ((ext_buf = get_extension(selected->d_name)) != NULL)
+		if (get_file_type(selected->d_name, selected->d_type) == TYPE_VID)
 	 	{
-			if (strcmp(ext_buf, "mp4") == 0
-					|| strcmp(ext_buf, "mkv") == 0
-				)
-			{
-				sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->d_name);
-				system(buf);
-				free(ext_buf);
-				return ;
-			}
-			free(ext_buf);
+			sprintf(buf, "%s --no-terminal \"%s\" &", "mpv", selected->d_name);
+			system(buf);
+			return  (0);
 		}
 		if (pager == NULL)
 			sprintf(buf, "%s \"%s\"", "less", selected->d_name);
@@ -362,8 +355,9 @@ void	open_selected(entry_node *selected, char *buf)
 		printf("\e[2J\e[H");
 		fflush(stdout);
 		system(buf);
-		return ;
+		return (0);
 	}
+	return (0);
 }
 
 void	yank_selected(vd_node *dir_node, entry_node *selected, int cmd_count, char *buf)
@@ -687,7 +681,8 @@ int	navigate(vd_node *dir_node)
 		{
 			if (strcmp(dir_node->dir_name, "/") == 0)
 				continue;
-			chdir(parent->dir_name);
+			if (chdir(parent->dir_name) != 0)
+				continue ;
 			cleanup_directory(dir_node);
 			return (0);
 		}
@@ -704,6 +699,10 @@ int	navigate(vd_node *dir_node)
 		// 	printf("\n");
 		// 	exit(0);
 		// }
+		else if (c == 'I')
+		{
+			env.FLAGS ^= F_ICONS;
+		}
 		else if (c == binds.BOOKMARK_CURRENT)
 		{
 			bookmark_current_dir(dir_node, buf);
@@ -733,7 +732,8 @@ int	navigate(vd_node *dir_node)
 		else if (c == binds.GO_HOME)
 		{
 			char *home = getenv("HOME");
-			chdir(home);
+			if (chdir(home) != 0)
+				continue ;
 			cleanup_directory(parent);
 			cleanup_directory(dir_node);
 			return (0);
@@ -829,8 +829,7 @@ int	navigate(vd_node *dir_node)
 			select_prev_search_result(dir_node, &selected, &preview_offset);
 		else if (c == binds.OPEN || c == '\n')
 		{
-			open_selected(selected, buf);
-			if (selected->d_type != DT_REG)
+			if (open_selected(selected, buf) == 1)
 			{
 				// cleanup_directory(dir_node);
 				cleanup_vd_children(dir_node);

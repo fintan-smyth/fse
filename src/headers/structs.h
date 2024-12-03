@@ -47,6 +47,8 @@ typedef struct vd_node
 	char				search_term[100];
 } vd_node;
 
+enum	{TYPE_DIR, TYPE_LNK_DIR, TYPE_LNK_FILE, TYPE_IMG, TYPE_VID, TYPE_AUD, TYPE_ARCH, TYPE_BLK, TYPE_CHAR, TYPE_FILE, TYPE_CFG, TYPE_TXT};
+
 extern vd_node *VISITED_DIRS;
 
 entry_node *init_list(void);
@@ -101,5 +103,6 @@ void		print_file_attributes(entry_node *entry);
 void		recursive_dir_size(vd_node *dir_node, size_t *total, char **buf);
 size_t		get_dir_size(vd_node *dir_node);
 void		format_filesize(off_t filesize);
+int			get_file_type(char *filename, int type);
 
 #endif // !STRUCTS_H_

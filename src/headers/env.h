@@ -15,7 +15,7 @@ struct env_struct
 	unsigned char	FLAGS;
 } ;
 
-enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_REVERSE = 4, F_GUTTER_PUSHBACK = 8};
+enum	{F_PREVIEW = 1, F_HIDDEN = 2, F_REVERSE = 4, F_GUTTER_PUSHBACK = 8, F_ICONS = 16};
 enum	{SORT_ALPHA = 0, SORT_SIZE = 1, SORT_MTIME = 2, SORT_ATIME = 3};
 
 struct bind_struct

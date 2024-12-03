@@ -400,20 +400,21 @@ void	display_trash(trash_node *head, trash_node *selected, int lines, int *offse
 	{
 		if (current == selected)
 			printf("\e[7m");
-		switch (current->type) {
-			case (DT_DIR):
-				printf("\e[34m");
-				break;
-			case (DT_LNK):
-				printf("\e[36m");
-				break;
-			default:
-				if (colour_extension(current->old_name) == 1)
-					break;
-				else if (current->executable)
-					printf("\e[32m");
-				break;
-		}
+		colour_filename(current->old_name, current->type, current->executable);
+		// switch (current->type) {
+		// 	case (DT_DIR):
+		// 		printf("\e[34m");
+		// 		break;
+		// 	case (DT_LNK):
+		// 		printf("\e[36m");
+		// 		break;
+		// 	default:
+		// 		if (colour_extension(current->old_name) == 1)
+		// 			break;
+		// 		else if (current->executable)
+		// 			printf("\e[32m");
+		// 		break;
+		// }
 		printf("\e[%d;3H\e[1m%s%*s\e[22m ",
 		 current->pos + start_line - *offset, current->old_name, longest_name - my_strlen(current->old_name), "");
 		if (current->old_location != NULL)

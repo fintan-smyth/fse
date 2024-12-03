@@ -348,7 +348,8 @@ int	navigate_bookmarks(vd_node *dir_node, bookmark_node *head)
 			// exit(0);
 			if (strcmp(dir_node->dir_name, selected->path) == 0)
 				return (0);
-			chdir(selected->path);
+			if (chdir(selected->path) != 0)
+				return (0);
 			return (1);
 		}
 		else if (c == binds.DELETE)

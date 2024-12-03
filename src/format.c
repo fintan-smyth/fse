@@ -2,6 +2,7 @@
 #include "headers/utils.h"
 #include "headers/format.h"
 #include "headers/env.h"
+#include <dirent.h>
 #include <string.h>
 
 int	colour_extension(char *filename)
@@ -80,6 +81,78 @@ void	colour_entry(entry_node *entry)
 	}
 }
 
+void	colour_filename(char *filename, int d_type, int executable)
+{
+	int	type = get_file_type(filename, d_type);
+
+	if (executable && d_type == DT_REG)
+	{
+		printf("\e[1;32m");
+		return ;
+	}
+	switch (type) {
+		case (TYPE_DIR):
+			printf("\e[1;34m");
+			break;
+		case (TYPE_LNK_DIR):
+			printf("\e[1;36m");
+			break;
+		case (TYPE_CHAR):
+			printf("\e[1;33m");
+			break;
+		case (TYPE_BLK):
+			printf("\e[1;33m");
+			break;
+		case (TYPE_VID):
+			printf("\e[35m");
+			break;
+		case (TYPE_IMG):
+			printf("\e[35m");
+			break;
+		case (TYPE_AUD):
+			printf("\e[36m");
+			break;
+		case (TYPE_ARCH):
+			printf("\e[31m");
+			break;
+		default:
+			printf("\e[39m");
+			break;
+	}
+}
+
+void	print_icon(char *filename, int d_type)
+{
+	int	type = get_file_type(filename, d_type);
+
+	switch (type) {
+		case (TYPE_DIR):
+			printf("  ");
+			break;
+		case (TYPE_LNK_DIR):
+			printf("  ");
+			break;
+		// case (TYPE_CHAR):
+		// 	break;
+		// case (TYPE_BLK):
+		// 	break;
+		case (TYPE_VID):
+			printf("  ");
+			break;
+		case (TYPE_IMG):
+			printf("  ");
+			break;
+		case (TYPE_CFG):
+			printf("  ");
+			break;
+		// case (TYPE_ARCH):
+		// 	break;
+		default:
+			printf("  ");
+			break;
+	}
+}
+
 void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, int level)
 // Prints the formatted file name of an entry according to formatting rules.
 // Args:
@@ -96,6 +169,8 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 	int		offset;
 	int		box_width;
 	int		remaining_space;
+	int		executable = 0;
+	int		icon_offset = 0;
 
 	construct_path(buf, dir_node->dir_name, current->d_name);
 	switch (level) {
@@ -116,8 +191,8 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 			box_width = (env.SEP_2 - env.SEP_1) - 3;
 			break;
 	}
-	printf("\e[%dG", offset);
-	colour_entry(current);
+	remaining_space = box_width - my_strlen(current->d_name);
+	printf("\e[%dG\e[m", offset);
 	if (current == selected)
 	{
 		if (level == 1)
@@ -125,10 +200,19 @@ void	format_entry(vd_node *dir_node, entry_node *current, entry_node *selected, 
 		else
 			printf("\e[1;7m");
 	}
-	printf("%.*s", box_width - 1, current->d_name);
-	remaining_space = box_width - my_strlen(current->d_name);
-	if (remaining_space > 0)
-		printf("%*s", box_width - my_strlen(current->d_name), " ");
+	if (current->attr != NULL)
+		if (current->attr->st_mode & S_IXUSR)
+			executable = 1;
+	colour_filename(current->d_name, current->d_type, executable);
+	if (env.FLAGS & F_ICONS)
+	{
+		print_icon(current->d_name, current->d_type);
+		icon_offset = 3;
+	}
+	// colour_entry(current);
+	printf("%.*s", box_width - 1 - icon_offset, current->d_name);
+	if (remaining_space - icon_offset > 0)
+		printf("%*s", remaining_space - icon_offset, " ");
 	search_term_start = strcasestr(current->d_name, dir_node->search_term);
 	if (my_strlen(current->d_name) > box_width)
 		printf("~");

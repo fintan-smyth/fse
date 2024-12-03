@@ -484,7 +484,6 @@ void	print_file_attributes(entry_node *entry)
 	free(group);
 }
 
-
 void	recursive_dir_size(vd_node *dir_node, size_t *total, char **buf)
 {
 	vd_node		*child;
@@ -534,4 +533,79 @@ size_t	get_dir_size(vd_node *dir_node)
 	if (hidden == 0)
 		env.FLAGS ^= F_HIDDEN;
 	return (output);
+}
+
+int	get_file_type(char *filename, int d_type)
+{
+	char	*ext_buf;
+
+	switch (d_type) {
+		case DT_DIR:
+			return (TYPE_DIR);
+		case DT_LNK:
+			return (TYPE_LNK_DIR);
+		case DT_CHR:
+			return (TYPE_CHAR);
+		case DT_BLK:
+			return (TYPE_BLK);
+		case DT_REG:
+			{
+				if ((ext_buf = get_extension(filename)) != NULL)
+				{
+					if (strcasecmp(ext_buf, "mp4") == 0
+						|| strcasecmp(ext_buf, "mkv") == 0
+						|| strcasecmp(ext_buf, "webm") == 0
+						) {
+						free(ext_buf);
+						return (TYPE_VID);
+					}
+					else if (strcasecmp(ext_buf, "png") == 0
+						|| strcasecmp(ext_buf, "jpg") == 0
+						|| strcasecmp(ext_buf, "jpeg") == 0
+						|| strcasecmp(ext_buf, "xcf") == 0
+						|| strcasecmp(ext_buf, "tif") == 0
+						|| strcasecmp(ext_buf, "gif") == 0
+					) {
+						free(ext_buf);
+						return (TYPE_IMG);
+					}
+					else if (strcasecmp(ext_buf, "mp3") == 0
+						|| strcasecmp(ext_buf, "flac") == 0
+						|| strcasecmp(ext_buf, "m4a") == 0
+					) {
+						free(ext_buf);
+						return (TYPE_AUD);
+					}
+					else if (strcasecmp(ext_buf, "cfg") == 0
+						|| strcasecmp(ext_buf, "conf") == 0
+					) {
+						free(ext_buf);
+						return (TYPE_CFG);
+					}
+					else if (strcasecmp(ext_buf, "xz") == 0
+						|| strcasecmp(ext_buf, "gz") == 0
+						|| strcasecmp(ext_buf, "zstd") == 0
+						|| strcasecmp(ext_buf, "tar") == 0
+						|| strcasecmp(ext_buf, "zip") == 0
+					) {
+						free(ext_buf);
+						return (TYPE_ARCH);
+					}
+					else
+					{
+						free(ext_buf);
+						return (TYPE_FILE);
+					}
+				}
+				else if (strcasecmp(filename, "Makefile") == 0
+				)
+					{
+						return (TYPE_CFG);
+					}
+				else
+					return (TYPE_FILE);
+			}
+		default:
+			return (TYPE_FILE);
+	}
 }
